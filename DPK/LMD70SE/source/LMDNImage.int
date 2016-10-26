@@ -1,0 +1,13 @@
+
+uses
+  LMDCustomNImage;
+
+type
+  TLMDNImage=class(TLMDCustomNImage)
+  published
+    property Bitmap;
+    property Control;
+  end;
+
+
+implementation

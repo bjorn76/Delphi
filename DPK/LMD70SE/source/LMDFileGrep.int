@@ -1,0 +1,122 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  LMDCustomComponent, LMDDateTime, LMDListBox, LMDStrings;
+
+type
+
+  TLMDFileGrep = class;
+  TLMDFoundEvent = procedure (Sender : TObject; found : String) of object;
+  TLMDFileChangeEvent = procedure (Sender : TObject; name : String) of object;
+
+  TLMDSearchThread = class (TThread)
+  private
+    FOwner : TLMDFileGrep;
+    FToBeAdded: String; //internal use only
+    procedure StartGrep;
+  protected
+    procedure SAddS;
+    procedure SAddF;
+  public
+    procedure Execute; override;
+    constructor Create (aOwner : TLMDFileGrep;CreateSuspended: Boolean);
+    destructor Destroy; override;
+    procedure SyncAddStringList (s: String);
+    procedure SyncAddFound (s: String);
+  end;
+
+  TLMDFileGrepAttribute = (fmReadOnly, fmArchive, fmAnyfile, fmSystem, fmHidden);
+  TLMDFileGrepAttributes = set of TLMDFileGrepAttribute;
+  TLMDReturnValue = (rvDir, rvFilename, rvAttr, rvSize, rvCreateDate, rvLastAccessDate, rvLastModifiedDate);
+  TLMDReturnValues = set of TLMDReturnValue;
+  TLMDLookFor = (lfCreateAfter, lfCreateBefore, lfAccessedAfter, lfAccessedBefore, lfModifiedAfter, lfModifiedBefore);
+  TLMDLookFors = set of TLMDLookFor;
+
+  TLMDFileGrep = class(TLMDCustomComponent)
+  private
+    FFileMasks,
+    FDirs,
+    FContent       : String;
+    FSizeMin,
+    FSizeMax       : Integer;
+    FAttr          : TLMDFileGrepAttributes;
+    FCreatedMin,
+    FCreatedMax,
+    FAccessedMin,
+    FAccessedMax,
+    FModifiedMin,
+    FModifiedMax   : TLMDDateTime;
+    FOutStringList : TLMDListBox;
+    FFound         : TStrings;
+    FCreateFoundList,
+    FCaseSensitiveContent,
+    FCancelling,
+    FRecurseSubDirs,
+    FThreaded      : Boolean;
+    FThreadPriority: TThreadPriority;
+    FOnEnd,
+    FOnCancel,
+    FOnFinished    : TNotifyEvent;
+    FOnFound       : TLMDFoundEvent;
+    FReturnVals    : TLMDReturnValues;
+    FLookFor       : TLMDLookFors;
+    FReturnDelimiter : Char;
+    FSrchThread    : TLMDSearchThread;
+    FOnDirChanged,
+    FOnFileChanged : TLMDFileChangeEvent;
+    FOnErrorOpenFile:TLMDFileChangeEvent;
+    procedure SetDateTime (index : Integer;aValue : TLMDDateTime);
+    procedure SetThreadPriority (aValue : TThreadPriority);
+  protected
+    procedure Notification (AComponent: TComponent; Operation: TOperation); override;
+    function lfDate (val : TLMDLookFor) : TDateTime;
+    function getAttr : Word;
+    procedure GrepFiles (StartDir, FileMasks : String;
+                    RecurseSubDir : Boolean;
+                    MinSize, MaxSize : Integer;
+                    MinCreateDate, MaxCreateDate,
+                    MinLastAccessDate, MaxLastAccessDate,
+                    MinLastWriteDate, MaxLastWriteDate : TDateTime;
+                    Attr : Word; CaseSensitiveContent : Boolean;
+                    Content : String; OnError:TLMDFileChangeEvent=nil);
+  public
+    constructor Create (aOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Grep;
+    procedure Cancel;
+    property Found : TStrings read FFound;
+    property Files : TStrings read FFound;
+  published
+    property About;
+    property FileMasks : String read FFileMasks write FFileMasks;
+    property Dirs : String read FDirs write FDirs;
+    property Attributes : TLMDFileGrepAttributes read FAttr write FAttr default [fmAnyFile];
+    property CreatedAfter : TLMDDateTime index 0 read FCreatedMin write SetDateTime;
+    property CreatedBefore : TLMDDateTime index 1 read FCreatedMax write SetDateTime;
+    property AccessedAfter : TLMDDateTime index 2 read FAccessedMin write SetDateTime;
+    property AccessedBefore : TLMDDateTime index 3 read FAccessedMax write SetDateTime;
+    property ModifiedAfter : TLMDDateTime index 4 read FModifiedMin write SetDateTime;
+    property ModifiedBefore : TLMDDateTime index 5 read FModifiedMax write SetDateTime;
+    property MinSize : Integer read FSizeMin write FSizeMin default 0;
+    property MaxSize : Integer read FSizeMax write FSizeMax default 0;
+    property Content : String read FContent write FContent;
+    property CaseSensitiveContent : Boolean read FCaseSensitiveContent write FCaseSensitiveContent default true;
+    property ThreadedSearch : Boolean read FThreaded write FThreaded default true;
+    property ThreadPriority : TThreadPriority read FThreadPriority write SetThreadPriority default tpNormal;
+    property RecurseSubDirs : Boolean read FRecurseSubDirs write FRecurseSubDirs default true;
+    property OutStringList : TLMDListBox read FOutStringList write FOutStringList default nil;
+    property ReturnValues : TLMDReturnValues read FReturnVals write FReturnVals default [rvDir, rvFileName];
+    property ReturnDelimiter : Char read FReturnDelimiter write FReturnDelimiter default ';';
+    property LookForDates : TLMDLookFors read FLookFor write FLookFor default [];
+    property InternalFoundList: Boolean read FCreateFoundList write FCreateFoundList default true;
+
+    property OnFinished : TNotifyEvent read FOnFinished write FOnFinished;
+    property OnCancel : TNotifyEvent read FOnCancel write FOnCancel;
+    property OnFound : TLMDFoundEvent read FOnFound write FOnFound;
+    property OnDirChange : TLMDFileChangeEvent read FOnDirChanged write FOnDirChanged;
+    property OnEnd : TNotifyEvent read FOnEnd write FOnEnd;
+    property OnFileChange : TLMDFileChangeEvent read FOnFileChanged write FOnFileChanged;
+    property OnErrorOpenFile:TLMDFileChangeEvent read FOnErrorOpenFile write FOnErrorOpenFile;
+  end;
+
+implementation

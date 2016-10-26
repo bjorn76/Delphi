@@ -1,0 +1,15 @@
+
+uses
+  Windows,
+  Graphics,
+  intfLMDBase;
+
+type
+  ILMDFaceControllerEditable = interface(IInterface)
+    ['{4CF92C4B-8694-477D-8E1E-2F6A2EAAE960}']
+    function fcGetModified: Boolean;
+    function fcGetReadOnly: Boolean;
+    function fcGetInvalidData: Boolean;
+  end;
+
+implementation

@@ -1,0 +1,219 @@
+
+uses
+  Windows, Classes, Forms, Graphics, Controls, SysUtils,
+  {$IFDEF LMDCOMP6}Types,{$ENDIF}
+  LMDClass, LMDGraph, LMDProcs, LMDStrings, LMDBase,
+
+  LMDButtonBase,
+  LMDGlyphTextLayout,
+  {$IFNDEF LMDDISABLE_LMDTHEMES}LMDXPStyles,{$ELSE}uxTheme,{$ENDIF}
+  LMDFXCaption,
+  LMD3DCaption,
+  LMDButtonLayout,
+  LMDGradient;
+
+const
+  DSF_CLIPRECT=$1;
+  {2}
+  DSF_USEOFFSCREENBITMAP=$4;
+
+  DSF_CENTER=$8;
+  DSF_STRETCH=$10;
+  DSF_TILE=$20;
+
+  DSF_TRANSPARENCY=$40;
+  DSF_BRUSHCOPY=$80;
+  DSF_TRANSPARENCY_MASK=$100;
+
+  DSF_KEEPWIDTH=$200;
+  DSF_KEEPHEIGHT=$400;
+  {800, 2000, 4000, 8000}
+
+  DSF_PALETTEREALIZE=$1000;
+
+  DSF_KEEPRATIO=DSF_KEEPWIDTH + DSF_KEEPHEIGHT;
+  DSF_STRETCHKEEPHEIGHT=DSF_STRETCH+DSF_KEEPHEIGHT;
+  DSF_STRETCHKEEPWIDTH=DSF_STRETCH+DSF_KEEPWIDTH;
+  DSF_STRETCHKEEPRATIO=DSF_STRETCH+DSF_KEEPRATIO;
+
+type
+  TLMDWhereRect = record
+     CompleteRect,
+     TextRect,
+     GlyphRect,
+     ArrowRect  : TRect;
+  end;
+
+{Standard frame routines}
+function LMDDrawFrame3D(aCanvas:TCanvas;var dRect:TRect; Style: TLMDBevelStyle;
+                        LightColor, ShadowColor:TColor; Depth: Integer):Boolean;
+function LMDDrawFrameShadow(aCanvas:TCanvas; var aRect:TRect; LightColor, ShadowColor,
+                            BorderColor:TColor; WidthOuter, WidthInner:TLMDBorderWidth;
+                            Transparent:Boolean; flags:Word):Boolean;
+function LMDDrawStdFrameExt(Style:TLMDBorderStyle):Integer;
+function LMDDrawStdFrame(aCanvas:TCanvas; var aRect:TRect;
+                         Style: TLMDBorderStyle; flags:Word):Boolean;
+procedure LMDDrawBorder(aCanvas: TCanvas; aBounds: TRect; ULColor, LRColor: TColor);
+
+function LMDGetCtrlBorderWidth(aCtl3D:Boolean; aBorderStyle:TBorderStyle; useXP:Boolean=false):Byte;
+
+{general drawing}
+procedure LMDDrawTriangle(aCanvas: TCanvas; x,y,size: integer; Col: TColor;
+                          Down, Enabled:Boolean);
+
+{Bitmaps}
+procedure LMDBmpCreateFromRect(aValue:TBitmap; aRect:TRect; fColor:TColor);
+{3.0}
+procedure LMDBmpCreateGrayscale(Dest, Src:TBitmap);
+procedure LMDBmpCreateMasks(const srcBmp:TBitmap; Mask, NewImage:TBitmap;
+                            MaskColor:TColor);
+procedure LMDBmpCreateMasksExt(srcCanvas:TCanvas; srcRect:TRect; aMask,
+                               NewImage:TBitmap; MaskColor:TColor);
+
+procedure LMDBmpClipDraw(aCanvas:TCanvas; aRect:TRect; aBitmap:TBitmap;
+                         flags:WORD; pos:LongInt; MaskColor:TColor);
+procedure LMDBmpClipDrawExt(aCanvas:TCanvas; aRect:TRect; srcCanvas:TCanvas;
+                            srcRect:TRect; flags:WORD; pos:LongInt; MaskColor:TColor; Add:TObject);
+
+function  LMDBmpDraw(aCanvas:TCanvas; aRect:TRect; aBitmap:TBitmap; flags:WORD;
+                     TransColor:TColor):TRect;
+function  LMDBmpDrawExt(aCanvas:TCanvas; aRect:TRect; srcCanvas:TCanvas;
+                        srcRect:TRect; flags:WORD; TransColor:TColor; pal:HPalette; Add:TObject):TRect;
+{3.0}
+procedure LMDBmpDrawDisabledState(DestBmp, SrcBmp:TBitmap; x,y: Integer);
+procedure LMDBmpStretchDraw(aCanvas:TCanvas; aRect:TRect; aBitmap:TBitmap);
+procedure LMDCopyBmpSize(DestBmp,SrcBmp: TBitmap);
+{3.02}
+procedure LMDMaskBmpDraw(aCanvas: TCanvas; aRect: TRect; aMask, Original: TBitmap;
+                         MaskCol, TransCol: TColor);
+
+
+{Something special}
+procedure LMDFillPattern(hdc:HDC;R:TRect; Pattern:TBitmap);
+procedure LMDFillTexture(hdc:HDC; R:TRect; bm:TBitmap; bmOffset:TPoint);
+procedure LMDIcon2Bitmap(aBitmap:TBitmap; aIcon:TIcon; aColor:TColor);
+procedure LMDBitmap2Icon (b : TBitmap; var i : Hicon; w,h : Integer);
+
+{3.0}
+{LMDBmpFromDesktop:
+ saves area aRect (in screen coordinates) from the desktop in
+ bitmap aBitmap, size of the Bitmap will be adjusted automatically}
+procedure LMDBmpFromDesktop(aBitmap:TBitmap; aRect:TRect);
+
+{Gradient Drawing}
+{------------------------------------------------------------------------------}
+procedure LMDGradientCreateColorList(Color, EndColor:TColor;ColorCount:TLMDColorCount;
+                                     ColorList:TList; Clear : Boolean);
+function  LMDGradientCreatePalette(ColorList:TList):HPalette;
+procedure LMDGradientPaintExt(aCanvas:TCanvas; aRect:TRect; gStyle:TLMDGradientStyle;
+                           ColorList:TList; Palette:HPalette; flags:Word; pos:LongInt);
+procedure LMDGradientPaint(aCanvas:TCanvas; aRect:TRect; Color, EndColor:TColor;
+                           ColorCount:TLMDColorCount; gStyle:TLMDGradientStyle;
+                           flags:Word; pos:LongInt);
+procedure LMDSuperGradientPaint(aCanvas:TCanvas; aRect:TRect; Color : array of TColor;
+                           ColorCount:TLMDColorCount; gStyle:TLMDGradientStyle;
+                           flags:Word; pos:LongInt);
+function LMDGradientGetColor(Color, EndColor:TColor;CurrentStep, ColorCount:Integer):TColor;
+
+{Misc Routines - Font}
+function LMDAlignRect(Alignment:TLMDAlignment; srcRect, destRect:TRect):TRect;
+function LMDAlignTextRect(Alignment:TLMDAlignment; const aString:String;
+                          Effects:TLMD3DCaption; aRect:TRect;
+                          Font:TFont; MultiLine, Accel:Boolean; flags:LongInt):TRect;
+procedure LMDDrawTextExt(aCanvas:TCanvas; const aString:String;
+                         Effects:TLMD3DCaption; aRect:TRect; flags:Longint;
+                         Extflags:TLMDDrawTextStyles; {$IFDEF CLR}var NRect:TRect{$ELSE}NRect:PRect{$ENDIF});
+procedure LMDDrawText(aCanvas:TCanvas; const aString:String; Effects:TLMD3DCaption;
+                      aRect:TRect; flags:Word);
+{3.0}
+procedure LMDDrawTextAndGlyph(aCanvas: TCanvas; const aString:String; Effects:TLMD3DCaption;
+                              aDest: TRect; aGlyph: TBitmap; aGlyphMask: TBitmap;
+                              aLayout: TLMDGlyphTextLayout; MultiLine, Accel, Transparent:Boolean;
+                              ExtFlags:TLMDDrawTextStyles; flags:LongInt);
+
+function LMDDrawTextAndGlyphExt(
+          aCanvas: TCanvas;
+          const aString:String;
+          Effects:TLMD3DCaption;     {Font must be already set!}
+          aDest: TRect;
+          srcCanvas: TCanvas;
+          var srcRect:TRect;
+          aMaskCanvas: TCanvas;
+          TransColor:TColor;
+          aLayout: TLMDGlyphTextLayout;
+          MultiLine,
+          Accel,
+          Transparent:Boolean;
+          ExtFlags:TLMDDrawTextStyles;
+          flags:LongInt) : TLMDWhereRect;
+
+procedure LMDDrawTextCalc(const aString:String; Effects:TLMD3DCaption; var aRect:TRect;
+                          Font:TFont; MultiLine, Accel:Boolean; BExt:Integer; flags:LongInt);
+procedure LMDDrawTextCalcExt(Canvas:TCanvas; const aString:String;
+                          Effects:TLMD3DCaption; var aRect:TRect;
+                          Font:TFont; MultiLine, Accel:Boolean; BExt:Integer;flags:LongInt);
+{Buttons}
+function LMDDrawBtnFaceExt(aControl: TWinControl; aCanvas:TCanvas; MouseIsOver: Boolean; var dRect:TRect;Style:TLMDUserButtonStyle;
+                          State:TLMDButtonState; flags:Word; aColor: TColor):Boolean;
+function LMDDrawBtnFace (aCanvas:TCanvas; MouseIsOver: Boolean; var dRect:TRect;
+                        Style:TLMDUserButtonStyle; State:TLMDButtonState;
+                        flags:Word; aColor: TColor):Boolean;
+//6.0
+function LMDDrawBtnIsFlat(Style:TLMDUserButtonStyle):Boolean;
+//----
+
+function LMDIsTrueTypeFont(aFont:TFont):Boolean;
+function LMDIsTrueTypeFontCheck(aCanvas:TCanvas):Boolean;
+function LMDGetFontHeight(aFont:TFont):Integer;
+{3.X}
+function LMDGet3DTextWidth(const aString:String; Effects:TLMD3DCaption; aFont:TFont):Integer;
+function LMDGet3DTextHeight(Effects:TLMD3DCaption; aFont:TFont):Integer;
+
+{conversion Routines}
+procedure LMDStringToFont(const aValue:String; aFont:TFont);
+function LMDStringToPoint(const aValue:String):TPoint;
+function LMDStringToRect(const aValue:String):TRect;
+function LMDFontToString(aFont:TFont):String;
+function LMDPointToString(const aValue:TPoint):String;
+function LMDRectToString(const aValue:TRect):String;
+
+{misc routines for controls}
+{----------------------------------------------------------------------------}
+function LMDIsChild(Parent, Child:TControl):Boolean;
+
+{Form/Application related functions}
+{------------------------------------------------------------------------------}
+procedure LMDActivatePrevInstance;
+procedure LMDWait(ms: LongWord);
+function  LMDCenterChild(frmParent:TForm; frmchild: TForm; flag:Boolean):TModalResult;
+procedure LMDCenterForm(frm:TForm);
+
+procedure LMDCenterWindow(Wnd: HWnd; AtTop: Boolean);
+//4.0
+procedure LMDCenterChildWindow(Parent,Child:Hwnd; AtTop: Boolean);
+procedure LMDPositionWindow(Wnd:Hwnd; aRect:TRect; pos:TLMDDlgPosition; AtTop:Boolean);
+function LMDDlgGetTargetRect(aRel:TLMDDlgPosRel):TRect;
+
+function LMDShowModal(aClass:TFormClass; owner:TComponent):TModalResult;
+
+procedure LMDCheckFormSysMenu(aForm:TForm; aFlag:TLMDSysMenuEntries);
+procedure LMDCheckApplicationSysMenu(aFlag:TLMDSysMenuEntries);
+procedure LMDExplodeForm(aForm:TCustomForm);
+procedure LMDExplodeFormExt(aForm:TCustomForm; X,Y, Steps, Delay:Integer);
+procedure LMDExplodeForm2(aForm:TCustomForm);
+procedure LMDExplodeFormExt2(aForm:TCustomForm; X,Y, Steps, smWidth, smHeight,
+                             Delay:Integer; flag:Boolean);
+
+{Loading and saving of CustomColor-Lists}
+{------------------------------------------------------------------------------}
+procedure LMDLoadCustomColorList(IniFile:TObject; const Section:String; aList:TStrings);
+procedure LMDSaveCustomColorList(IniFile:TObject; const Section:String; aList:TStrings);
+procedure LMDLoadCustomColorFromIniFile(const filename:String; const Section:String; aList:TStrings);
+procedure LMDSaveCustomColorToIniFile(const Filename:String; const Section:String; aList:TStrings);
+
+{special}
+{Parsing into StringList}
+procedure LMDParseToStrList(const w:string;const delimiter:char; list:TStrings);
+procedure LMDGetDivider(dest:TStringList; const aValue:LongInt);
+
+implementation

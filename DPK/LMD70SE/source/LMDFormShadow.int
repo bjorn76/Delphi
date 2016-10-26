@@ -1,0 +1,43 @@
+
+uses
+  Windows,
+  Messages,
+  Classes,
+  LMDWndProcComponent,
+  LMDShadow,
+  lmdgraph;
+
+type
+  {------------------------- TLMDFormShadow -----------------------------------}
+  TLMDFormShadow = class(TLMDWndProcComponent)
+  private
+    bMouseCapture     : Boolean;
+    hRightWindow      : HWND;
+    hBottomWindow     : HWND;
+    tmpShadowStyle    : TLMDShadowStyle;
+
+    FShadow           : TLMDShadow;
+    FIAShadow         : Boolean;
+    procedure SetShadow(aValue:TLMDShadow);
+
+    procedure SetShadowParams(hWindow : HWND);
+    procedure ShowShadow(iCmdShow : Integer);
+    procedure DestroyShadow;
+    function  IsNoShadow:Boolean;
+    procedure MoveShadow;
+  protected
+    procedure Init;override;
+    procedure GetChange(Sender:TObject);override;
+    procedure RestoreState;override;
+    procedure WndProc(var Message: TMessage);override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor  Destroy; override;
+  published
+    property About;
+    property Shadow:TLMDShadow read FShadow write SetShadow;
+    property ShowInActive:Boolean read FIAShadow write FIAShadow default True;
+  end;
+
+
+implementation

@@ -1,0 +1,166 @@
+
+uses
+  Windows,
+  Classes,
+  SysUtils,
+  lmdgraph,
+  lmdsysin,
+  LMDCPUInfoObject,
+  LMDCustomComponent;
+
+type
+  TLMDSysInfo = class(TLMDCustomComponent)
+  private
+    FEnvironment:TStringList;
+    FCPUInfo:TLMDCPUInfoObject;
+    procedure Dummy(index: Integer; aString:String);
+    procedure DummyInt(index: Integer; AInt:LongInt);
+    procedure DummyInt64(index: Integer; const AInt:Int64);
+    procedure DummyByte(aByte:Byte);
+    procedure DummyStrings(AList:TStringList);
+    procedure DummyBool(index: Integer; aBool:Boolean);
+
+    function GetInfoString(index : Integer):String;
+    function GetInfoLongInt(index : Integer):LongInt;
+    function GetInfoLongLongInt(index : Integer):Int64;
+
+    function GetFileName:String;
+    function GetFonts:TStringList;
+    function GetPrinters:TStringList;
+
+    function GetProcessorNumber:Byte;
+    function GetColorDepth:Byte;
+
+    // ver 4.
+    function GetInfoBool(index: Integer):Boolean;
+    procedure SetInfoBool(index: Integer; State:Boolean);
+    function GetEnvString:TStringList;
+    function GetKeyboardDelay:LongInt;
+     procedure SetKeyboardDelay(aValue:LongInt);
+    function GetKeyboardSpeed:LongInt;
+     procedure SetKeyboardSpeed(aValue:LongInt);
+    function GetLocalInfo (index : Integer) : String;
+    procedure SetLocalInfo (index : Integer; aValue : String);
+    // *-*
+//    procedure SetCPUInfo (aValue : TLMDCPUInfoObject);
+  public
+    constructor Create(AOwner:TComponent); override;
+    destructor Destroy; override;
+
+    function FreeSys:TLMDPercent;
+    function FreeGDI:TLMDPercent;
+    function FreeUSR:TLMDPercent;
+    property TempFileName:String read GetFileName;
+    {Procedure GetModuleList(aList:TStringList);
+    Procedure GetProcessList(aList:TStringList);}
+    Procedure GetDriveList(aList:TStringList);
+    function  GetDriveInfo(aDrive:String):TLMDDriveInfo;
+    function  GetDriveTypeString(aType:UInt):String;
+
+    // ver 4.
+    function GetEnvironmentValue(aEnvironmentString:String):String;
+    function SetEnvironmentValue(aEnvironmentString:String; const aValue:String):Boolean;
+    procedure SetDesktopWallpaper(const aBitmapPath:TFileName);
+    function GetScreenRect:TRect;
+    function GetWorkRect:TRect;
+    // *-*
+
+    {only compatibility}
+    property Username:String index 2 read GetInfoString;
+    property UserCompany:String index 1 read GetInfoString;
+
+  published
+    property About;
+    property AllFonts:TStringList read GetFonts write DummyStrings stored false;
+    property AllPrinters:TStringList read GetPrinters write DummyStrings stored false;
+
+    property CurrentUser:String index 0 read GetInfoString write Dummy stored false;
+    property RegisteredCompany:String  index 1 read GetInfoString write Dummy stored false;
+    property RegisteredOwner:String  index 2 read GetInfoString write Dummy stored false;
+
+    property ScreenSaverDelay: Longint index 7 read GetInfoLongInt write DummyInt Stored false;
+    property VersionWIN:String index 3 read GetInfoString write Dummy stored false;
+    property WinPath:String index 4 read GetInfoString write Dummy stored false;
+    property WinSysPath:String  index 5 read GetInfoString write Dummy stored false;
+
+    property Environment:TStringList read GetEnvString write DummyStrings stored false;
+    property FreeGdiRes:String index 6 read GetInfoString write Dummy stored false;
+    property FreeUsrRes:String index 7 read GetInfoString write Dummy stored false;
+    property FreeSysRes:String index 8 read GetInfoString write Dummy stored false;
+    property BuildNumber:LongInt index 0 read GetInfoLongInt write DummyInt stored False;
+    property MemPhysTotal:Int64 index 1 read GetInfoLongLongInt write DummyInt64 stored false;
+    property MemPhysFree:Int64 index 2 read GetInfoLongLongInt write DummyInt64 stored false;
+    property MemVirtTotal:Int64 index 3 read GetInfoLongLongInt write DummyInt64 stored false;
+    property MemVirtFree:Int64 index 4 read GetInfoLongLongInt write DummyInt64 stored false;
+    property MemVirtExtended:Int64 index 7 read GetInfoLongLongInt write DummyInt64 stored false;
+    property MemPageTotal:Int64 index 5 read GetInfoLongLongInt write DummyInt64 stored false;
+    property MemPageFree:Int64 index 6 read GetInfoLongLongInt write DummyInt64 stored false;
+    property MemoryLoaded:String index 9 read GetInfoString write Dummy stored false;
+    property Platform:String index 10 read GetInfoString write Dummy stored false;
+    property TempPath:String index 11 read GetInfoString write Dummy stored false;
+    property Computername:String index 12 read GetInfoString write Dummy stored false;
+    property ProcessorNumber:Byte read GetProcessorNumber write DummyByte stored false;
+    property ProcessorType:String index 13 read GetInfoString write Dummy stored false;
+    property ProcessorInfo : TLMDCPUInfoObject read FCPUInfo;
+    
+    // ver 4.
+    property ColorDepth: Byte read GetColorDepth write DummyByte stored false;
+    property DefaultLanguageString: String index 14 read GetInfoString write Dummy stored false;
+    property TimeZone: String index 15 read GetInfoString write Dummy stored false;
+    property TimeZoneDiff: LongInt index 9 read GetInfoLongInt write DummyInt stored false;
+    property PlusAvailable:Boolean index 9 read GetInfoBool write DummyBool stored false;
+    property ScreenWidth:LongInt index 10 read GetInfoLongInt write DummyInt stored false;
+    property ScreenHeight:LongInt index 11 read GetInfoLongInt write DummyInt stored false;
+    property ScreenPPi:LongInt index 12 read GetInfoLongInt write DummyInt stored false;
+
+    // changeable properties
+
+    property LocaleCalendarType : String index 0 read GetLocalInfo write SetLocalInfo stored false; //
+    property LocaleCurrencyDigits : String index 1 read GetLocalInfo write SetLocalInfo stored false; //
+    property LocaleICurrency : String index 2 read GetLocalInfo write SetLocalInfo stored false;
+    property LocaleDigits : String index 3 read GetLocalInfo write SetLocalInfo stored false; //
+    property LocaleFirstDayOfWeek : String index 4 read GetLocalInfo write SetLocalInfo stored false;
+    property LocaleFirstWeekOfYear : String index 5 read GetLocalInfo write SetLocalInfo stored false;
+    property LocaleZero : String index 6 read GetLocalInfo write SetLocalInfo stored false;
+    property LocaleMeasureSystem : String index 7 read GetLocalInfo write SetLocalInfo stored false;
+    property LocaleNegativeCurrencyFormat : String index 8 read GetLocalInfo write SetLocalInfo stored false;
+    property LocaleNegativeNumberFormat : String index 9 read GetLocalInfo write SetLocalInfo stored false;
+    property LocaleTime : String index 10 read GetLocalInfo write SetLocalInfo stored false;
+    property LocaleMorningSymbol: String index 11 read GetLocalInfo write SetLocalInfo stored false; //
+    property LocaleAfternoonSymbol : String index 12 read GetLocalInfo write SetLocalInfo stored false; //
+    property LocaleCurrencySymbol : String index 13 read GetLocalInfo write SetLocalInfo stored false; //
+    property LocaleDateSeparator : String index 14 read GetLocalInfo write SetLocalInfo stored false; //
+    property LocaleDecimalSeparator : String index 15 read GetLocalInfo write SetLocalInfo stored false; //
+    property LocaleNumericGrouping : String index 16 read GetLocalInfo write SetLocalInfo stored false; //
+    property LocaleListSeparator : String index 17 read GetLocalInfo write SetLocalInfo stored false; //
+    property LocaleLongDateFormat : String index 18 read GetLocalInfo write SetLocalInfo stored false; //
+    property LocaleMonthDecimalSeparator : String index 19 read GetLocalInfo write SetLocalInfo stored false;
+    property LocaleCurrencyGrouping : String index 20 read GetLocalInfo write SetLocalInfo stored false; //
+    property LocaleThousandSeparator : String index 21 read GetLocalInfo write SetLocalInfo stored false;
+    property LocaleNegativeSign : String index 22 read GetLocalInfo write SetLocalInfo stored false; //
+    property LocalePositiveSign : String index 23 read GetLocalInfo write SetLocalInfo stored false;
+    property LocaleShortDateFormat : String index 24 read GetLocalInfo write SetLocalInfo stored false; //
+    property LocaleThousand : String index 25 read GetLocalInfo write SetLocalInfo stored false; //
+    property LocaleTimeSeparator : String index 26 read GetLocalInfo write SetLocalInfo stored false; //
+    property LocaleShortTimeFormat : String index 27 read GetLocalInfo write SetLocalInfo stored false; //
+
+    property NumLockState:Boolean index 0 read GetInfoBool write SetInfoBool stored false;
+    property CapsLockState:Boolean index 1 read GetInfoBool write SetInfoBool stored false;
+    property ScrollLockState:Boolean index 2 read GetInfoBool write SetInfoBool stored false;
+
+    property DefaultLanguageID: LongInt index 8 read GetInfoLongInt stored false;
+
+    property KeyboardDelay:LongInt read GetKeyboardDelay write SetKeyboardDelay stored false;
+    property KeyboardSpeed:LongInt read GetKeyboardSpeed write SetKeyboardSpeed stored false;
+
+    property WindowAnimation:Boolean index 3 read GetInfoBool write SetInfoBool stored false;
+    property WarningBeep:Boolean index 4 read GetInfoBool write SetInfoBool stored false;
+    property ScreenSaveActive:Boolean index 5 read GetInfoBool write SetInfoBool stored false;
+    property FontSmoothing:Boolean index 6 read GetInfoBool write SetInfoBool stored false;
+    property DragFullWindows:Boolean index 7 read GetInfoBool write SetInfoBool stored false;
+    property SnapToDefaultButton:Boolean index 8 read GetInfoBool write SetInfoBool stored false;
+    // *-*
+  end;
+
+
+implementation

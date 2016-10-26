@@ -1,0 +1,19 @@
+
+uses
+  Windows,
+  Messages,
+  LMDMouseBaseCtrl;
+
+type
+  {------------------------- TLMDMouseFencer ----------------------------------}
+  TLMDMouseFencer = class(TLMDMouseBaseCtrl)
+  protected
+    procedure WndProc(var Message: TMessage);override;
+  public
+    destructor Destroy; override;
+    function Execute:Boolean;
+    function ExecuteEnh(aRect:TRect):Boolean;
+    procedure Stop;
+  end;
+
+implementation

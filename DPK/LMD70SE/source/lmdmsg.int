@@ -1,0 +1,160 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+
+  lmdgraph, lmdforma, lmdcont, lmdclass, lmdbase,
+
+  LMDButtonBase,
+  LMDWaveList,
+  LMDCustomImageList,
+  LMDBaseController,
+  LMDGlyphTextLayout,
+  LMD3DCaption,
+  LMDContainerComponent;
+
+type
+
+  TLMDBoxPosition = TLMDDlgPosition;
+
+  TLMDMessageBoxDlg = class(TLMDContainerComponent)
+  private
+    FCaption3D,
+    FMessageF3D   : TLMD3DCaption;
+    FButtonFont,
+    FCaptionFont,
+    FMessageFont  : TFont;
+    FMessageAlign : TLMDGlyphTextLayout;
+
+    FShowAgainBox,
+    FShowAgain,
+    FFillCaption,
+    FPlayWave,
+    FParentShowHint,
+    FCustomGlyph  : Boolean;
+    FCaptionTitle : String;
+    FCustomGlyphImageIndex,
+    FCustomGlyphListIndex : Integer;
+    FCustomGlyphImageList : TLMDCustomImageList;
+    FHints,
+    FButtonTitles : TStringList;
+    FWaveList     : TLMDWaveList;
+    FDlgType      : TMsgDlgType;
+    FButtons      : TMsgDlgButtons;
+    FColors,
+    FWaveListIndex,
+    FHeight,
+    FWidth,
+    FLeft,
+    FTop          : Integer;
+    FColor:TColor;
+    FPosition     : TLMDDlgPosition;
+    FButtonStyle  : TLMDNormalButtonStyle;
+    FBoxRel       : TLMDDlgPosRel;
+    FWaveChangeLink,
+    FChangeLink   : TLMDChangeLink;
+    FOnHelpClick  : TNotifyEvent;
+    FCaptionAlignment : TAlignment;
+
+    procedure SetFont (index : Integer;aValue : TFont);
+    procedure SetFont3D (index : Integer;aValue : TLMD3DCaption);
+    procedure SetCaptionTitle (aValue : String);
+    procedure SetStringList (index : integer; aValue : TStringList);
+    procedure SetCustomGlyphImageList (aValue : TLMDCustomImageList);
+    procedure SetCustomGlyphListIndex (aValue : Integer);
+    procedure SetCustomGlyphImageIndex (aValue : Integer);
+    procedure SetWaveList (aValue : TLMDWaveList);
+    procedure SetButtons (aValue : TMsgDlgButtons);
+    procedure SetInteger(index : Integer; aValue : Integer);
+    procedure SetBoxPos (aValue : TLMDDlgPosition);
+    procedure SetAlignment (aValue : TLMDGlyphTextLayout);
+    procedure SetButtonStyle (aValue : TLMDNormalButtonStyle);
+    procedure SetBool (index : Integer; aValue : Boolean);
+    procedure SetBoxRel (aValue : TLMDDlgPosRel);
+
+    procedure GetCustomGlyphIMLChange(Sender:TObject);
+    //function CustomGlyphIMLEmpty:Boolean;
+    procedure GetWaveListChange(Sender:TObject);
+    function WaveListEmpty:Boolean;
+
+    procedure ReadIdent(Reader:TReader);
+    procedure WriteIdent(Writer:TWriter);
+    function  CheckCont:Boolean;
+
+    procedure GetHelpClick(Sender : TObject);
+  protected
+    procedure DefineProperties(Filer:TFiler);override;
+    procedure OnShowAgain (Sender : TObject);    
+  public
+    constructor Create(aOwner : TComponent); override;
+    destructor Destroy; override;
+
+    function Execute (Caption,
+                       MessageTxt: String; Params : array of const;
+                       Buttons   : TMsgDlgButtons;
+                       Kind      : Integer;
+                       HelpCtx: Longint;
+                       X, Y, DefaultBtn: Integer) : TModalResult;
+    function ShowMessage (MessageTxt : String):Integer;
+    function MessageDlg (const Msg: string; AType: TMsgDlgType; AButtons: TMsgDlgButtons; HelpCtx: Longint): Word;
+    function MessageDlgPos(const Msg: string; AType: TMsgDlgType; AButtons: TMsgDlgButtons;
+                           HelpCtx: Longint; X, Y: Integer): Word;
+    procedure ShowMessageFmt(const Msg: string; Params: array of const);
+    function MessageBox(Text, Caption: PChar; Flags: Longint): Integer; overload;
+    function MessageBox(Text, Caption: PChar): Integer; overload;
+    function MessageBox(Text : PChar; Flags: Longint): Integer; overload;
+    function MessageBox(Text : PChar): Integer; overload;
+  published
+    property MessageFont3D : TLMD3DCaption index 0 read FMessageF3D write SetFont3D;
+    property CaptionFont3D : TLMD3DCaption index 1 read FCaption3D write SetFont3D;
+    property MessageAlignment : TLMDGlyphTextLayout read FMessageAlign write SetAlignment;
+    property MessageFont : TFont index 0 read FMessageFont write SetFont;
+    property CaptionFont : TFont index 1 read FCaptionFont write SetFont;
+    property Color:TColor read FColor write FColor default clBtnFace;
+    property ButtonFont : TFont index 2 read FButtonFont write SetFont;
+    property CaptionTitle : String read FCaptionTitle write SetCaptionTitle;
+    property CaptionAlignment : TAlignment read FCaptionAlignment write FCaptionAlignment default taLeftJustify;
+    property ButtonTitles : TStringList index 0 read FButtonTitles write SetStringList;
+    property Hints : TStringList index 1 read FHints write SetStringList;
+    property CustomGlyphImageList : TLMDCustomImageList read FCustomGlyphImageList write SetCustomGlyphImageList;
+    property CustomGlyphListIndex : Integer read FCustomGlyphListIndex write SetCustomGlyphListIndex;
+    property CustomGlyphImageIndex : Integer read FCustomGlyphImageIndex write SetCustomGlyphImageIndex;
+    property CustomGlyph : Boolean index 1 read FCustomGlyph write SetBool default false;
+    property Buttons : TMsgDlgButtons read FButtons write SetButtons default [mbOK];
+    property BoxLeft : Integer index 0 read FLeft write SetInteger default 0;
+    property BoxTop : Integer index 1 read FTop write SetInteger default 0;
+    property BoxWidth : Integer index 2 read FWidth write SetInteger default 0;
+    property BoxHeight : Integer index 3 read FHeight write SetInteger default 0;
+    property ButtonStyle : TLMDNormalButtonStyle read FButtonStyle write SetButtonStyle default nbsAutoDetect;
+    property ShowHints : Boolean index 0 read FParentShowHint write SetBool default false;
+    property Position : TLMDDlgPosition read FPosition write SetBoxPos default bpCenter;
+    property RelatePos : TLMDDlgPosRel read FBoxRel write SetBoxRel default brScreen;
+    property PlayWave : Boolean index 2 read FPlayWave write SetBool default false;
+    property ShowAgain : Boolean read FShowAgain write FShowAgain default true;
+    property ShowAgainBox : Boolean read FShowAgainBox write FShowAgainBox default false;
+    property CaptionFill : Boolean index 3 read FFillCaption write SetBool default false;
+    property Colors : Integer index 5 read FColors write SetInteger default 32;
+    property DlgType : TMsgDlgType read FDlgType write FDlgType default mtCustom;
+    property ImageList;
+    property ListIndex;
+    property ImageIndex;
+    property WaveList : TLMDWaveList read FWaveList write SetWaveList;
+    property WaveIndex : Integer index 4 read FWaveListIndex write SetInteger default 0;
+    property About;
+    property OnHelpClick : TNotifyEvent read FOnHelpClick write FOnHelpClick;
+  end;
+
+  function LMDExecuteMsg (Caption,
+                          MessageTxt: String; Params : array of const;
+                          Buttons   : TMsgDlgButtons;
+                          Kind      : Integer;
+                          HelpCtx: Longint;
+                          X, Y, DefaultBtn: Integer) : TModalResult;
+
+  procedure LMDShowMessage (MessageTxt : String);
+  function LMDMessageDlg (const Msg: string; AType: TMsgDlgType; AButtons: TMsgDlgButtons; HelpCtx: Longint): Word;
+  function LMDMessageDlgPos(const Msg: string; AType: TMsgDlgType; AButtons: TMsgDlgButtons;
+                                  HelpCtx: Longint; X, Y: Integer): Word;
+  procedure LMDShowMessageFmt(const Msg: string; Params: array of const);
+  function LMDMessageBox(Text, Caption: PChar; Flags: Longint): Integer;
+
+implementation

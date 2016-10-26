@@ -1,0 +1,27 @@
+
+uses
+  LMDCustomLabel;
+
+type
+  TLMDLabel=class(TLMDCustomLabel)
+  published
+    property About;
+    property Align;
+    property Alignment;
+    property AutoSize;
+    property Bevel;
+    property Caption;
+    property Color;
+    property Font;
+    property FontFX;
+    property MultiLine;
+    property Options;
+    property ShowAccelChar;
+    property Transparent;
+    property Twinkle;
+    property TwinkleVisible;
+    property TwinkleInVisible;
+    property TwinkleColor;
+  end;
+
+implementation

@@ -1,0 +1,32 @@
+
+uses
+  Windows,
+  Messages,
+  Classes,
+  Graphics,
+  LMDCustomControl;
+
+type
+  {-------------------TLMDCustomPanel------------------------------------------}
+  TLMDCustomPanel = class(TLMDCustomControl)
+  private
+    FLocked  : Boolean;
+    procedure WMMOVE(var Message: TWMMOVE); message WM_MOVE;
+    procedure WMSize(var Message: TWMSize); message WM_SIZE;
+  protected
+    property Color default clBtnFace;
+    property Locked:Boolean read FLocked write FLocked default False;
+    property ParentColor default False;
+  public
+    constructor Create(aOwner: TComponent); override;
+    destructor Destroy; override;
+
+    {supporting transparency}
+    function BackBitmapCheck: Boolean; override;
+    function BackBitmap: TBitmap; override;
+    function BackMapPoint(const aValue: TPoint): TPoint; override;
+    function BackDrawArea(Canvas: TCanvas; const dest: TRect; const src: TPoint; flags: Word=0): Boolean;override;
+  end;
+
+
+implementation

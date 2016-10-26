@@ -1,0 +1,9 @@
+
+uses
+  LMDCustomMMButton;
+
+type
+  TLMDMMButton=class(TLMDCustomMMButton)
+  end;
+
+implementation

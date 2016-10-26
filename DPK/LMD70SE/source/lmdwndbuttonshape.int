@@ -1,0 +1,154 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, stdctrls,
+  LMDClass, 
+  LMDGraph,
+  LMDGlyph,
+  LMDUtils,
+  LMDRegion,
+  LMDButtonBase,
+  LMDRgnShadow,
+  LMDCustomPanelFill,
+  LMDFXCaption,
+  LMDButtonLayout;
+
+type
+  TLMDWndButtonStyle = (wbWin40, wbWin31, wbSimple);
+  TLMDWndButtonFocus = (bfNone, bfText, bfClient);
+
+  { -------------------------------------------------------------------------- }
+  TLMDWndButtonShape = class (TLMDCustomPanelFill)
+  private
+    FRegion            : TLMDRegion;
+    FFontFX            : TLMDFxCaption;
+    FButtonLayout      : TLMDButtonLayout;
+    FEnterColorChange,
+    FFocused,
+    FPressed,
+    FMultiLine,
+    FRepeatedClick     : Boolean;
+    FTimerID           : TLMDTimer;
+    FRepeatingDelay,
+    FRepeatingInterval : Integer;
+    FGlyph             : Pointer;
+    FStyle             : TLMDWndButtonStyle;
+    FModalResult       : TModalResult;
+    FFocusStyle        : TLMDWndButtonFocus;
+    FEnterColor        : TColor;
+    FCaptionStart      : TPoint;
+    FOnDrawBorder      : TLMDBorderDrawEvent;
+    FUseGlobalTimer: Boolean;
+
+    procedure SetRegion (aValue : TLMDRegion);
+    procedure SetFontFX (aValue : TLMDFxCaption);
+    procedure SetBoolean (index : Integer; aValue : Boolean);
+    procedure SetInteger (index : Integer; aValue : Integer);
+    procedure SetNumGlyphs(aValue: TLMDNumGlyphs);
+    procedure SetGlyph(aValue: TBitmap);
+    procedure SetButtonLayout (aValue : TLMDButtonLayout);
+    procedure SetStyle (aValue : TLMDWndButtonStyle);
+    procedure SetModalResult (aValue : TModalResult);
+//    procedure SetFocusStyle (aValue : TLMDWndButtonFocus);
+    procedure SetEnterColor (aValue : TColor);
+    procedure SetCaptionStart (aValue : TPoint);
+
+    function GetNumGlyphs : TLMDNumGlyphs;
+    function GetGlyph : TBitmap;
+
+    procedure WMSize (var Msg : TWMSize); message WM_SIZE;
+    procedure WMSetFocus (var Message : TWMSetFocus); message WM_SETFOCUS;
+    procedure WMKillFocus (var Message : TWMKillFocus); message WM_KILLFOCUS;
+    procedure CMDesignHitTest(var Message: TCMDesignHitTest); message CM_DESIGNHITTEST;
+    procedure CMMouseEnter (var Message: TMessage); message CM_MOUSEENTER;
+    procedure WMDestroy (var Message : TMessage); message WM_DESTROY;
+
+    procedure DoTimer(Sender:TObject);
+    procedure DeActivateTimer;
+
+    procedure ReadPoint (Reader:TStream);
+    procedure WritePoint (Writer : TStream);
+  protected
+    procedure DefineProperties (Filer : TFiler); override;
+    procedure GetChange (Sender : TObject); override;
+    function CheckOptimized:Boolean; override;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+
+    procedure KeyDown(var Key: Word; Shift: TShiftState); override;
+    procedure KeyUp(var Key: Word; Shift: TShiftState); override;
+    
+  public
+    constructor Create (aOwner : TComponent); override;
+    destructor Destroy; override;
+
+    procedure Paint; override;
+    procedure RestoreBorderBack; override;
+    procedure RestoreBorderFront; override;
+
+    property Pressed : Boolean read FPressed;
+    property CaptionStart : TPoint read FCaptionStart write SetCaptionStart;
+
+  published
+    property About;
+    property ButtonLayout : TLMDButtonLayout read FButtonLayout write SetButtonLayout;
+//    property Cancel;
+    property Caption;
+    property Color;
+    property Cursor;
+//    property Default;
+    property DragCursor;
+    property DragMode;
+    property Enabled;
+    property EnterColor : TColor read FEnterColor write SetEnterColor default clCaptionText;
+    property EnterColorChange : Boolean index 2 read FEnterColorChange write SetBoolean default false;
+    property FillObject;
+    property Flat;
+//    property FocusStyle : TLMDWndButtonFocus read FFocusStyle write SetFocusStyle default bfClient;
+    property Font;
+    property FontFX : TLMDFxCaption read FFontFX write SetFontFX;
+    property Glyph : TBitmap read GetGlyph write SetGlyph;
+//    property HideHint;
+    property ImageIndex;
+    property ImageList;
+    property ListIndex;
+    property ModalResult : TModalResult read FModalResult write SetModalResult default mrNone;
+    property MultiLine : Boolean index 0 read FMultiLine write SetBoolean default true;
+    property NumGlyphs : TLMDNumGlyphs read GetNumGlyphs write SetNumGlyphs;
+//    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property Region : TLMDRegion read FRegion write SetRegion;
+    property RepeatedClick : Boolean index 1 read FRepeatedClick write SetBoolean default false;
+    property RepeatingInterval : Integer index 1 read FRepeatingInterval write SetInteger default 10;
+    property RepeatingDelay : Integer index 2 read FRepeatingDelay write SetInteger default 500;    
+    property ShowHint;
+    property Style : TLMDWndButtonStyle read FStyle write SetStyle default wbSimple;
+    property TabOrder;
+    property TabStop;
+    property Transparent;
+    // 7.0
+    property UseGlobalTimer:Boolean read FUseGlobalTimer write FUseGlobalTimer default false;
+    // ---
+    property Visible;
+
+    property OnDrawBorder: TLMDBorderDrawEvent read FOnDrawBorder write FOnDrawBorder;
+    property OnClick;
+    property OnDragDrop;
+    property OnDragOver;
+//    property OnDropDown;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnMouseDown;
+    property OnMouseEnter;
+    property OnMouseExit;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDrag;
+  end;
+
+implementation

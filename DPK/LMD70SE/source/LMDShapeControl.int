@@ -1,0 +1,20 @@
+
+uses
+  LMDBaseShape;
+
+type
+  {------------------------ TLMDShapeControl ----------------------------------}
+  TLMDShapeControl = class(TLMDBaseShape)
+  published
+    property Mode;
+    property CaptionClip;
+    property ImageList;
+    property ImageIndex;
+    property ListIndex;
+    property Bevel;
+    property RoundPercent;
+    property Shape;
+    property Teeth;
+  end;
+
+implementation

@@ -1,0 +1,33 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  LMDBuffer;
+
+type
+  TLMDDynLIFOBuffer = class(TLMDBuffer)
+  private
+    FCircleMode : Boolean;
+    FCurrent,
+    FTop        : PLMDDynNode;
+
+  protected
+    procedure FirstNode (var node : Pointer); override;
+    procedure NextNode (var node : Pointer); override;
+    function GetItem(node : Pointer) : Pointer; override;
+//    function GetItemSize (node : PLMDDynNode) : Integer; override;
+    function EOFBuffer(node : Pointer):Boolean; override;
+
+    procedure clearItem (item : Pointer);
+  public
+    function isEmpty : Boolean; override;
+    function isFull : Boolean; override;
+    procedure Put (item : Pointer); override;
+    //get will extract the last inserted node, delete the node and returns a pointer to the item => the item has to be destroyed manually if it has to be destroyed!!
+    function Get : Pointer; override;
+    procedure Clear; override;
+
+    constructor Create; override;
+    destructor Destroy; override;
+  end;
+
+implementation

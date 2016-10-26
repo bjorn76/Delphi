@@ -1,0 +1,37 @@
+uses
+  Windows;
+
+function LMDAddCharL(const aValue:String;i:Integer;c:Char):String;
+function LMDAddCharR(const aValue:String;i:Integer;c:Char):String;
+function LMDAddSpaceL(const aValue:String;i:Integer):String;
+function LMDAddSpaceR(const aValue:String;i:Integer):String;
+function LMDAddZeroL(const aValue:String;i:Integer):String;
+function LMDAddZeroR(const aValue:String;i:Integer):String;
+function LMDCodeInt(const X:array of LongInt; delimiter:Char):String;
+function LMDCodeString(const X:array of String; delimiter:Char):String;
+function LMDGetCodedCount(const aValue:String; delimiter:Char):Integer;
+procedure LMDSetCodedString(var aValue :String; const partStr : String; delimiter:Char; index:Integer);
+function LMDGetCodedInt(const aValue:String; delimiter:Char; index:Integer):LongInt;
+function LMDGetCodedString(const aValue:String; delimiter:Char; index:Integer):String;
+function LMDCount(const aValue:String; const search:Char):Integer;
+function LMDBackPos (c : Char;const s : String) : Integer;
+function LMDEmpty(const aValue:String):Boolean;
+function LMDFillString(i:Integer; w:char):String;
+function LMDSlashRemove(const aValue:string):String;
+function LMDSlashAdd(const aValue:string):String;
+function LMDSpace(i:Integer):String;
+function LMDReplaceChar(const aValue:String; toReplace, Replace:Char):String;
+Function LMDTrimL(const aValue:String):String;
+Function LMDTrimR(const aValue:String):String;
+function LMDTrim(const aValue:String):String;
+function LMDGetFirstString(const aValue: string; delimiter:Char): string;
+function LMDGetSecondString(const aValue: string; delimiter:Char): string;
+function LMDScanToNumber(const aValue: String) : Integer;
+// 5.05
+function LMDEncode(const aValue:String; Key: DWord):string;
+function LMDDecode(const aValue:String; Key: DWord):string;
+// 7.0
+function LMDEncode64(const aValue: String):String;
+function LMDDecode64(const aValue: String):String;
+
+implementation

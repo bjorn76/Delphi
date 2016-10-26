@@ -1,0 +1,29 @@
+
+uses
+  Classes,
+  lmdgraph,
+  LMD3DCaption;
+
+type
+  {adds Rotating and free Positioning}
+  TLMDFxCaption = class(TLMD3DCaption)
+  private
+    FAngle:TLMDAngle;
+    FPosX:WORD;
+    FPosY:WORD;
+    Procedure SetAngle(aValue:TLMDAngle);
+    Procedure SetPos(Index:Integer; aValue:WORD);
+  protected
+  public
+    constructor Create;override;
+    procedure Assign(Source: TPersistent); override;
+    function GetSetStr : String; override;
+    procedure SetPosXY(X,Y:Word);
+  published
+    property Angle:TLMDAngle read FAngle write SetAngle default 0;
+    property PosX:WORD index 0 read FPosX write SetPos default 0;
+    property PosY:WORD index 1 read FPosY write Setpos default 0;
+  end;
+
+
+implementation

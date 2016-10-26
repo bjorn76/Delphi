@@ -1,0 +1,87 @@
+
+uses
+  Windows,
+  Classes,
+  Forms,
+  SHLObj,
+  LMDClass,
+  LMDCustomComponent,
+  LMDBaseDialog;
+
+const
+  LMD_MAX_STATUSPATH=40;
+
+type
+  TLMDBrowseDlgOption=(doBrowseForComputer, doBrowseForPrinter, doDontGoBelowDomain,
+                       doReturnFileSysAncestors, doReturnFileSysDirs,
+                       doStatusText, doShowFiles, doAllowEdit,doShowPath,
+                       doEnableOK);
+  TLMDBrowseDlgOptions=set of TLMDBrowseDlgOption;
+
+  TLMDSystemFolders=(
+    bfoDesktop,bfoDesktopExpanded,bfoPrograms,bfoControlPanel,
+    bfoPrinters,bfoPersonal,bfoFavorites,bfoStartup,bfoRecent,
+    bfoSendto,bfoRecycleBin,bfoStartMenu,bfoDesktopDirectory,bfoMyComputer,
+    bfoNetwork,bfoNetworkNeighborhood,bfoInternet,bfoFonts,bfoTemplates,
+    bfoCommonStartMenu, bfoCommonPrograms, bfoCommonStartup,
+    bfoCommonDesktopDirectory, bfoAppData, bfoPrintHood,
+    // 5.0
+    bfoAltStartup, bfoCommonAltstartup, bfoCommonFavorites, bfoInternetChache,
+    bfoCookies, bfoHistory);
+
+  TLMDBrowseDlgSelectionChangeEvent=procedure(Sender:TObject; DialogHandle:Hwnd;
+                                              path:string; item:PItemIDList) of object;
+
+  TLMDBrowseDlgEditValidateEvent=procedure(Sender:TObject; path:string;
+                                           var Cancel: boolean) of object;
+
+  TLMDBrowseDlg=class(TLMDCustomComponent)
+  private
+    FPath,
+    FDisplayName,
+    FCaption,
+    FCaptionTitle,
+    FStatusText: String;
+    FHandle: HWnd;
+    FOnInit:TNotifyEvent;
+    FOnValidate:TLMDBrowseDlgEditValidateEvent;
+    FOnSelectionChanged: TLMDBrowseDlgSelectionChangeEvent;
+    FDlgPosRel: TLMDDlgPosRel;
+    FOptions:TLMDBrowseDlgOptions;
+    FPosition:TLMDDlgPosition;
+    FStartFolder:TLMDSystemFolders;
+    FSelected:PItemIDList;
+    procedure SetPath(const aValue:String);
+    procedure SetStatusText(const aValue:string);
+    procedure SetSelected(aValue:PItemIDList);
+  protected
+    procedure DoInit;
+    procedure DoSelectionChange(aValue:PItemIDList);
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+
+    function ConvertPathToItemIDList(const aPath:String; ItemIDList: PItemIDList):Boolean;
+    procedure EnableOKButton(aValue:Boolean);
+    function ExecuteEnh(Main:TCustomForm):Boolean;
+    function Execute:Boolean;
+
+    property SelectedItemID:PItemIDList read FSelected write SetSelected;
+    property SelectedName:String read FDisplayName;
+  published
+    property About;
+    property CaptionTitle:String read FCaptionTitle write FCaptionTitle;
+    property Caption:String read FCaption write FCaption;
+    property StartFolder:TLMDSystemFolders read FStartFolder write FStartFolder default bfoDesktopExpanded;
+    property Options:TLMDBrowseDlgOptions read FOptions write FOptions default [doReturnFileSysDirs, doShowPath];
+    property SelectedFolder:String read FPath write SetPath; // stored false;
+    property Position:TLMDDlgPosition read FPosition write FPosition default bpCenter;
+    property RelatePos:TLMDDlgPosRel read FDlgPosRel write FDlgPosRel default brActiveWindow;
+    property StatusText:String read FStatusText write SetStatusText;
+    property OnInit:TNotifyEvent read FOnInit write FOnInit;
+    property OnSelectionChanged:TLMDBrowseDlgSelectionChangeEvent read FOnSelectionChanged write FOnSelectionChanged;
+    property OnValidate:TLMDBrowseDlgEditValidateEvent read FOnValidate write FOnValidate;
+  end;
+
+
+implementation

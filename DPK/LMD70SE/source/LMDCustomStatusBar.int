@@ -1,0 +1,12 @@
+
+uses
+  LMDCustomBevelPanel;
+
+type
+  {-------------------TLMDCustomStatusBar--------------------------------------}
+  TLMDCustomStatusBar = class(TLMDCustomBevelPanel)
+  public
+    function GetControlGap:Integer;virtual;
+  end;
+
+implementation

@@ -1,0 +1,101 @@
+
+uses
+  Windows,
+  Classes,
+  Controls,
+  Messages,
+  LMDGraph, //TLMDAlignment
+  LMDBaseLabel, //TLMDLabelOptions
+  LMDCustomPanelFill;
+
+type
+  TLMDStaticText = class (TLMDCustomPanelFill)
+  private
+    FFocusControl   : TWinControl;
+    FShowAccelChar,
+    FMultiLine,
+    FAutoSize       : Boolean;
+    FOptions        : TLMDLabelOptions;
+
+    procedure SetBoolean (index : Integer; aValue : Boolean);
+    procedure SetOptions (aValue : TLMDLabelOptions);
+    procedure CMTextChanged(var Message: TMessage); message CM_TEXTCHANGED;
+    procedure CMDialogChar(var Message: TCMDialogChar); message CM_DIALOGCHAR;
+  protected
+    procedure GetChange (Sender : TObject); override;
+    procedure DrawCaption(aRect:TRect; aAlignment:TLMDAlignment); override;
+  public
+    constructor Create (aOwner : TComponent); override;
+    procedure Notification (AComponent: TComponent; Operation: TOperation); override;
+    procedure Loaded; override;
+    procedure CorrectBounds; virtual;
+    function GetOptionsFlag : Word;
+    function GetLabelText : String;
+    property DockManager;
+  published
+    // V4 enhancements
+    property Anchors;
+    property Constraints;
+    property UseDockManager default false;
+    property DockSite;
+    property DragKind;
+    property BiDiMode;
+    property ParentBiDiMode;
+
+    property OnCanResize;
+    property OnConstrainedResize;
+    property OnDockDrop;
+    property OnDockOver;
+    property OnEndDock;
+    property OnGetSiteInfo;
+    property OnStartDock;
+    property OnUnDock;
+
+    property About;
+    property Alignment;
+    property AutoSize : Boolean index 0 read FAutoSize write SetBoolean default true;
+    property BackFX;
+    property Bevel;
+    property Caption;
+    property Color;
+    property Cursor;
+    property DragCursor;
+    property DragMode;
+    property Enabled;
+    property FillObject;
+    property FocusControl : TWinControl read FFocusControl write FFocusControl;
+    property Font;
+    property FontFX;
+    property HelpContext;
+    property Hint;
+    property ImageIndex;
+    property ImageList;
+    property ListIndex;
+    property MultiLine : Boolean index 1 read FMultiLine write SetBoolean default false;
+    property Options:TLMDLabelOptions read FOptions write SetOptions;
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowAccelChar : Boolean index 2 read FShowAccelChar write SetBoolean default true;
+    property ShowHint;
+    property Transparent;
+    property TransparentBorder;
+
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnMouseDown;
+    property OnMouseEnter;
+    property OnMouseExit;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnResize;
+    property OnStartDrag;
+  end;
+
+implementation

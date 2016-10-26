@@ -1,0 +1,40 @@
+
+uses
+  Classes,
+  Graphics,
+  Controls, //THintWindow
+  LMDGraph,
+  LMD3DCaption,
+  LMDCustomComponent;
+
+type
+  {------------------- class TLMDCustomHint -----------------------------------}
+  TLMDCustomHint = class(TLMDCustomComponent)
+  private
+    FAlignment:TAlignment;
+    FColor:TColor;
+    FEnabled:Boolean;
+    FFont:TFont;
+    FFont3D:TLMD3DCaption;
+    FMaxWidth:Integer;
+    Procedure SetFont3d(aValue:TLMD3DCaption);
+    Procedure SetFont(aValue:TFont);
+  protected
+    FHintClass:THintWindowClass;
+    procedure SetEnabled(aValue:Boolean);virtual;
+    procedure Loaded;override;
+  public
+    Constructor Create(AOwner:TComponent);Override;
+    destructor Destroy;override;
+
+    property Alignment:TAlignment read FAlignment write FAlignment default taLeftJustify;
+    property Color:TColor read FColor write FColor default clInfoBk;
+    property Enabled:Boolean read FEnabled write SetEnabled default True;
+    property Font:TFont read FFont write SetFont;
+    property Font3D:TLMD3DCaption read FFont3D write SetFont3D;
+    Property MaxWidth:Integer Read FMaxWidth Write FMaxWidth default -4;
+  end;
+
+  TLMDHintPosition=(hpAboveLeft, hpAboveRight, hpBelowLeft, hpBelowRight);
+  
+implementation

@@ -1,0 +1,28 @@
+
+uses
+  Classes,
+  LMDCustomEdit;
+
+type
+  { ----------------------- TLMDCustomBrowseEdit ----------------------------- }
+  TLMDCustomBrowseEdit = class(TLMDCustomEdit)
+  private
+    FOnDlgChange,
+    FOnBeforeBrowse,
+    FOnAfterBrowse   : TNotifyEvent;
+  protected
+    procedure DoOnBrowseClick (Sender : TObject; index: Integer);
+    procedure DoBrowse; virtual;
+  public
+    constructor Create (aOwner : TComponent); override;
+  published
+    property CustomButtonsStyle;
+    property CustomButtonWidth;
+    property CustomButtonParentCtlXP;
+    property OnChange;
+    property OnDlgChange:TNotifyEvent read FOnDlgChange write FOnDlgChange;
+    property OnBeforeBrowse: TNotifyEvent read FOnBeforeBrowse write FOnBeforeBrowse;
+    property OnBrowse: TNotifyEvent read FOnAfterBrowse write FOnAfterBrowse;
+  end;
+
+implementation

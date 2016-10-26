@@ -1,0 +1,117 @@
+
+uses
+  Windows,
+  Classes,
+  Messages,
+  Graphics,
+  Controls,
+  LMDFontComboBox,
+  LMDFontListBox,
+  LMDCustomComboBox;
+
+type
+  TLMDSpecialFontComboBox = class(TLMDFontComboBox)
+  public
+    property OnFontChange;
+  end;
+
+  TLMDSpecialFontListBox = class(TLMDFontListBox)
+  public
+    property OnFontChange;
+  end;
+
+  TLMDFontSizeComboBox = class(TLMDCustomComboBox)
+  private
+    FFontName:TFontName;
+    FFontControl : TWinControl;
+    FEditorEnabled,
+    FUseNearest:Boolean;
+    FDefaultSize,
+    VRES, CHECK, FSIZE:Integer;
+    procedure SetEditorEnabled(aValue:Boolean);
+
+    procedure SetFontControl (aValue : TWinControl);
+    procedure SetFontComboControl(aValue : TLMDFontComboBox);
+    function GetFontComboControl : TLMDFontComboBox;
+    procedure SetFontListControl(aValue : TLMDFontListBox);
+    function GetFontListControl : TLMDFontListBox;
+
+    procedure SetSelected(aValue:Integer);
+    procedure SetFont(const aValue:TFontName);
+    procedure GetNearestValue(var aValue:Integer);
+    function GetSelected:Integer;
+    function CheckValue(aValue:Integer):Integer;
+    procedure CMExit(var Message: TCMExit); message CM_EXIT;
+    procedure CMFontChanged(var Message: TMessage); message CM_FONTCHANGED;
+    procedure CMFontChange(var Message: TMessage); message CM_FONTCHANGE;
+  protected
+    procedure CreateWnd; override;
+    procedure CreateFontSizeList;
+    procedure GetChange(Sender:TObject);
+    procedure InitHeight;
+    function IsValidChar(Key:Char):Boolean;
+    procedure KeyPress(var Key:Char); override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure Loaded; override;
+    procedure Init;
+    property FontSize:Integer read GetSelected write SetSelected;
+  published
+    property About;
+    property Color;
+    property Ctl3D;
+    property DefaultSize:Integer read FDefaultSize write FDefaultSize default 10;
+    property DragMode;
+    property DragCursor;
+    property DropDownCount;
+    property DropDownWidth;
+    property EditorEnabled: Boolean read FEditorEnabled write SetEditorEnabled default True;
+    property Enabled;
+    property Flat;
+    property FocusControl;
+    property Font;
+    property FontCombo:TLMDFontComboBox read GetFontComboControl write SetFontComboControl;
+    property FontList:TLMDFontListBox read GetFontListControl write SetFontListControl;
+    property FontName:TFontName read FFontName write SetFont;
+    property ParentColor;
+    property ParentCtl3D;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    property UseNearestSize:Boolean read FUseNearest write FUseNearest default false;
+    property UseGlobalTimer;
+    property Visible;
+
+   {Events}
+   property OnSelect;
+   property OnChange;
+   property OnClick;
+   property OnDblClick;
+   property OnDragDrop;
+   property OnDragOver;
+   property OnDropDown;
+   property OnEditClick;
+   property OnEndDrag;
+   property OnEnter;
+   property OnExit;
+   property OnKeyDown;
+   property OnKeyPress;
+   property OnKeyUp;
+   property OnStartDrag;
+
+    // V4 enhancements
+   property Anchors;
+   property Constraints;
+   property DragKind;
+   property BiDiMode;
+   property ParentBiDiMode;
+   property OnEndDock;
+   property OnStartDock;
+  end;
+
+
+implementation

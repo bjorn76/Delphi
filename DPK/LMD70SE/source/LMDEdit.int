@@ -1,0 +1,57 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  LMDBaseEdit, LMDCustomEdit;
+
+type
+  TLMDEdit = class(TLMDCustomEdit)
+  private
+    { Private declarations }
+  protected
+    { Protected declarations }
+  public
+    { Public declarations }
+  published
+    property About;
+    property AutoComplete;
+    property AutoSelect;
+    property AutoSize;
+    property Bevel;
+    property Caret;
+    property CharCase;
+    property Alignment;
+    property CustomButtons;
+    property CustomButtonsStyle;
+    property CustomButtonWidth;
+    property CustomButtonParentCtlXP;
+    property Flat;
+    property FocusOnMouseAbove;
+    property Font;
+    property Font3D;
+    property HideSelection;
+    property HighlightBack;
+    property HighlightText;
+    property ImageIndex;
+    property ImageList;
+    property ListIndex;
+    property MaxLength;
+    property OEMConvert;
+    property PasswordChar;
+    property ReadOnly;
+    property TabOnEnter;
+    property Text;
+    property Transparent;
+    property OnBtnClick;    
+  end;
+
+  TLMDLabeledEdit = class(TLMDEdit)
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property LabelPosition;
+    property LabelSpacing;
+    property LabelSync;
+    property EditLabel;
+  end;
+
+implementation

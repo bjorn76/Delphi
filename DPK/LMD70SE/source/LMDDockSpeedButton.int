@@ -1,0 +1,62 @@
+
+uses
+  Windows,
+  Graphics,
+  Classes,
+  Controls,
+  Messages,
+  LMDButtonBase,
+  LMDBase,
+  LMDCustomSpeedButton;
+
+type
+  TLMDDockSpeedButton=class(TLMDCustomSpeedButton)
+  private
+    FAdjustSize,
+    FChanging,
+    FDocked,
+    FDestroying,
+    FReflect     : Boolean;
+    FControl     : TWinControl;
+    FPosition    : TLMDDockPosition;
+    FMargin      : Integer;
+    FWndProc,
+    FWndProcOld  : TFarProc;
+    procedure SetBoolean(Index:Integer; aValue:Boolean);
+    procedure SetControl(aValue:TWinControl);
+    procedure SetMargin(aValue:Integer);
+    procedure SetPosition(aValue:TLMDDockPosition);
+    procedure AdjustToControl;
+    procedure AdjustToButton;
+    procedure InitWndProc;
+    procedure RestoreWndProc;
+    function HasControl:Boolean;
+    procedure ReadIdent(Reader: TReader);
+  protected
+    procedure BoundsChange(State:TLMDBoundsChangeStates);override;
+    procedure DefineProperties(Filer:TFiler);override;
+    // 6.0 RM
+    procedure Paint; override;
+    // ---
+    procedure DockControl;
+    procedure Loaded;override;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);override;
+    procedure Notification(AComponent: TComponent;Operation:TOperation);override;
+    procedure OwnWndProc(var Message: TMessage);
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    property Style;
+  published
+    property AdjustDockedSize:Boolean index 0 read FAdjustSize write SetBoolean default True;
+    property ButtonStyle;
+    //property Caption stored IsCustom;
+    property Control:TWinControl read FControl write SetControl;
+    property Docked:Boolean index 1 read FDocked write SetBoolean default True;
+    property GlyphKind default gkEllipsis;
+    property Margin:Integer read FMargin write SetMargin default 1;
+    property Position:TLMDDockPosition read FPosition write SetPosition default dpRight;
+    property ReflectOwnChanges:Boolean index 2 read FReflect write SetBoolean default True;
+  end;
+
+implementation

@@ -1,0 +1,373 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<title>LMD-Tools Installation</title>
+</head>
+
+<body bgcolor="#FFFFE1" link="#008080" alink="#008000">
+
+<p><font color="#000080" size="6" face="Arial"><strong>LMD-Tools Special Edition
+Installation </strong></font></p>
+
+<hr>
+
+<p><font face="Arial">[</font><a href="readme.htm"><font
+face="Arial">ReadMe</font></a><font face="Arial">]</font></p>
+
+<p><a name="Top"></a><font face="Arial"> </font><font size="2"
+face="Arial">(© by LMD Innovative, (</font><a
+href="http://www.lmd.de"><font size="2" face="Arial">http://www.lmd.de</font></a><font
+size="2" face="Arial"> or </font><a
+href="http://www.lmdtools.com"><font size="2" face="Arial">http://www.lmdtools.com</font></a><font
+size="2" face="Arial">)</font></p>
+
+<p>&nbsp;</p>
+
+<p><font size="4" face="Arial">Contents</font></p>
+
+<p><font size="2" face="Arial">
+<a href="#C++ Builder5">
+C++ Builder 5</a><br>
+<a href="#Delphi 6">Delphi 5<br>
+Delphi 6</a><br>
+</font><a href="#Parts"><font size="2" face="Arial">Installing
+Parts of LMD-Tools<br>
+ </font></a><a href="#Uninstall"><font size="2" face="Arial">Uninstalling
+LMD-Tools</font></a></p>
+
+<p>&nbsp;</p>
+
+<p><font face="Arial"><strong><a name="C++ Builder5"></a>C++
+Builder 5</strong></font></p>
+
+<p><font size="2" face="Arial"><strong>Installation (Alternative
+1)</strong></font><font face="Arial"><br>
+</font><font size="2" face="Arial">The current CBuilder 5 version
+of LMD-Tools SE supports one design time package only. For installing
+the design time packages manually, you have to install the
+LMD-Tools design-time package</font></p>
+
+<pre><font size="2" face="Arial">LMD50SE_B5.BPL 		LMD-Tools Special Edition Components 
+
+in the &quot;Install packages...&quot;-dialog.
+</font></pre>
+
+<p><font color="#FF0000" size="2" face="Arial"><strong>Important</strong></font><font
+size="2" face="Arial">:<br>
+Furthermore you have to add the full path (e.g. (BCB)\lib\lmd50se) LMD-Tools
+DCU/OBJ files to the CBuilder's
+library path (Library Page/Environment Options in the Tools
+Menu). <br>
+Alternatively the Path could be added to the system path settings. Please note
+that unlike in Delphi versions LMD-Tools CBuilder library directories are
+located below the \Lib directory of<br>
+your CBuilder installation.<br>
+<br>
+Beyond that the library directory contains all BPK sources, so
+that you're able to modify package files youself.</font></p>
+
+<p><font size="2" face="Arial"><strong>How to add the components
+(Alternative 2)</strong><br>
+You may use this alternative to create new package files if you
+have problems to install the default packages:</font></p>
+
+<ol>
+    <li><font size="2" face="Arial">Start Borland C++ Builder 5.</font></li>
+    <li><font size="2" face="Arial">Select 'Install Component
+        ...' from the Component- menu.</font></li>
+    <li><font size="2" face="Arial">Decide wether you want to
+        create a new package or use an existing by clicking on
+        the corresponding tab. If you select first alternative
+        you have to specify a name for the new package.</font></li>
+    <li><font size="2" face="Arial">Change the File Type to
+        'Source file (*.PAS)'</font></li>
+    <li><font size="2" face="Arial">Choose Browse to open the
+        File Open dialog box. Select the directory which contains
+        the LMD-Tools (The \lib\lmd50\main directory below the Borland CBuilder
+      3 installation directory) and then search for 'LMD_REG.PAS'.</font></li>
+    <li><font size="2" face="Arial">Choose OK to close the browse
+        dialog box. Choose OK to close the 'Install Component...'
+        dialog box. </font></li>
+</ol>
+
+<p><font size="2" face="Arial">The library will be rebuilt.
+Please ignore the warnings the compiler generates. After that the
+LMD-Tools tabs will appear at the end of the current component
+palette. </font></p>
+
+<p><font color="#FF0000" size="2" face="Arial"><strong>Note (!!!)</strong></font><font
+size="2" face="Arial"><br>
+Please don't mix up the two installation alternatives! If you
+want to change the installation method you have to remove old
+installation completely!</font></p>
+
+<p><font size="2" face="Arial"><strong>How to add helpfile into
+the IDE </strong><br>
+By default the installer tries to install helpfile automatically.<br>
+</font><a href="#Top"><font size="1" face="Arial">[Top]</font></a></p>
+
+<p>&nbsp;</p>
+
+<p><font size="3" face="Arial"><strong><a name="Delphi 5"></a>Delphi 5</strong></font><font size="2" face="Arial"><br>
+<br>
+<strong>How to add the components (Alternative 1 - full versions)</strong><br>
+The current Delphi 5 version
+of LMD-Tools SE supports one design time package only. For installing
+the design time packages manually, you have to install the
+LMD-Tools design-time package </font></p>
+
+<pre><font size="2" face="Arial">LMD50SE_D5.BPL 		LMD-Tools Special Edition Components </font></pre>
+
+<p><font color="#FF0000" size="2" face="Arial"><strong>Important:</strong></font><font
+size="2" face="Arial"><br>
+Furthermore you have to add the full path (e.g. C:\LMD50\lib\d5)
+of LMD-Tools DCU files to the Delphi's library path (Library Page/Environment Options in the Tools Menu). Alternatively the
+Path could be added to the system path settings.<br>
+<br>
+Beyond that the \lib\d5 directory contains all DPK sources, so
+that you're able to modify package files yourself.&nbsp;<br>
+<br>
+<br>
+<strong>How to add the components (Alternative 2)</strong><br>
+You may use this alternative to create new package files if you
+have problems to install the default packages:</font></p>
+
+<ol>
+    <li><font size="2" face="Arial">Start Delphi 5.</font></li>
+    <li><font size="2" face="Arial">Select 'Install Component
+        ...' from the Component- menu.</font></li>
+    <li><font size="2" face="Arial">Decide wether you want to
+        create a new package or use an existing by clicking on
+        the corresponding tab. If you select first alternative
+        you have to specify a name for the new package.</font></li>
+    <li><font size="2" face="Arial">Choose Browse to open the
+        File Open dialog box. Select the directory which contains
+        the LMD-Tools (\lib\d4) and then search for
+        'LMD_REG.PAS'.</font></li>
+    <li><font size="2" face="Arial">Choose OK to close the browse
+        dialog box. Choose OK to close the 'Install Component...'
+        dialog box.&nbsp; </font></li>
+</ol>
+
+<p><font size="2" face="Arial">The library will be rebuilt.
+Please ignore the warnings the compiler generates. After that the
+LMD-Tools tabs will appear at the end of the current component
+palette. </font></p>
+
+<p><font color="#FF0000" size="2" face="Arial"><strong>Note (!!!)</strong></font><font
+size="2" face="Arial"><br>
+Please don't mix up the two installation alternatives! If you
+want to change the installation method you have to remove old
+installation completely!<br>
+</font></p>
+
+<p><font size="2" face="Arial"><strong>How to add helpfile into
+the Delphi-IDE </strong><br>
+By default the installer tries to install helpfile automatically.
+To install the LMD-Tools Helpfile manually use Openhelp (Menu
+Help|Customize).</font><font size="1" face="Arial"><br>
+</font><a href="#Top"><font size="1" face="Arial">[Top]</font></a></p>
+
+<p>&nbsp;</p>
+
+<p><font size="3" face="Arial"><strong><a name="Delphi 6"></a>Delphi 6</strong></font><font size="2" face="Arial"><br>
+<br>
+<strong>How to add the components (Alternative 1 - full versions)</strong><br>
+The current Delphi 5 version
+of LMD-Tools SE supports one design time package only. For installing
+the design time packages manually, you have to install the
+LMD-Tools design-time package </font></p>
+
+<pre><font size="2" face="Arial">LMD50SE_D5.BPL 		LMD-Tools Special Edition Components </font></pre>
+
+<p><font color="#FF0000" size="2" face="Arial"><strong>Important:</strong></font><font
+size="2" face="Arial"><br>
+Furthermore you have to add the full path (e.g. C:\LMD50\lib\d5)
+of LMD-Tools DCU files to the Delphi's library path (Library Page/Environment Options in the Tools Menu). Alternatively the
+Path could be added to the system path settings.<br>
+<br>
+Beyond that the \lib\d5 directory contains all DPK sources, so
+that you're able to modify package files yourself.&nbsp;<br>
+<br>
+<br>
+<strong>How to add the components (Alternative 2)</strong><br>
+You may use this alternative to create new package files if you
+have problems to install the default packages:</font></p>
+
+<ol>
+    <li><font size="2" face="Arial">Start Delphi 5.</font></li>
+    <li><font size="2" face="Arial">Select 'Install Component
+        ...' from the Component- menu.</font></li>
+    <li><font size="2" face="Arial">Decide wether you want to
+        create a new package or use an existing by clicking on
+        the corresponding tab. If you select first alternative
+        you have to specify a name for the new package.</font></li>
+    <li><font size="2" face="Arial">Choose Browse to open the
+        File Open dialog box. Select the directory which contains
+        the LMD-Tools (\lib\d4) and then search for
+        'LMD_REG.PAS'.</font></li>
+    <li><font size="2" face="Arial">Choose OK to close the browse
+        dialog box. Choose OK to close the 'Install Component...'
+        dialog box.&nbsp; </font></li>
+</ol>
+
+<p><font size="2" face="Arial">The library will be rebuilt.
+Please ignore the warnings the compiler generates. After that the
+LMD-Tools tabs will appear at the end of the current component
+palette. </font></p>
+
+<p><font color="#FF0000" size="2" face="Arial"><strong>Note (!!!)</strong></font><font
+size="2" face="Arial"><br>
+Please don't mix up the two installation alternatives! If you
+want to change the installation method you have to remove old
+installation completely!<br>
+</font></p>
+
+<p><font size="2" face="Arial"><strong>How to add helpfile into
+the Delphi-IDE </strong><br>
+By default the installer tries to install helpfile automatically.
+To install the LMD-Tools Helpfile manually use Openhelp (Menu Help|Customize).</font><font size="1" face="Arial"><br>
+</font><a href="#Top"><font size="1" face="Arial">[Top]</font></a></p>
+
+<p>&nbsp;</p>
+
+<p><a name="Parts"></a><font size="3" face="Arial"><strong>Installing
+Parts of LMD-Tools</strong></font></p>
+
+<p><font size="2" face="Arial">By default the LMD_REG.PAS
+installation unit installs all available components. You can
+easily uninstall unwanted parts of LMD-Tools by turning compiler
+switches on/off in the file <strong>lmdctabs.inc</strong>. <br>
+Currently the components are divided up into main groups as
+follows (you'll find the specific registration units which are
+called by LMD_REG.PAS in the brackets):<br>
+<br>
+<em>Default components (lmdregst.pas)</em><br>
+Most basic components like standard buttons, containers, panels
+or labels. These components should be always installed because
+they are used in most of LMD-Tools component and property
+editors. The compiler switch is called LMDDEFAULTCP and is <br>
+activated by default.<br>
+<br>
+<em>Extended components (lmdregex.pas)</em><br>
+More specific components like TLMDClock, TLMDLabelFill, Splitter
+controls and more. <br>
+The compiler switch is called LMDEXTENDEDCP and is activated by
+default.<br>
+<br>
+<em>Dialog components (lmdregdg.pas)</em><br>
+All dialog components of LMD-Tools like TLMDAboutDlg, TLMDTipDlg
+and more.<br>
+The compiler switch is called LMDDIALOGCP and is activated by
+default.<br>
+<br>
+<em>Edit components (lmdregec.pas)<br>
+</em>The new edit controls and all listbox/combobox descendants
+are located here<br>
+(from version 4.0R3 on). The compiler switch is called LMDEDITCP
+and is<br>
+activated by default.</font></p>
+
+<p><font size="2" face="Arial"><em>System components
+(lmdregsy.pas)</em><br>
+System components like TLMDShapeHint, TLMDFormStyler and more.<br>
+The compiler switch is called LMDSYSTEMCP and is activated by
+default.<br>
+<br>
+<em>Multimedia components (lmdregmm.pas)</em><br>
+Multimedia components like TLMDWaveComp, all ShapeControls or
+TLMD3DEffect buttons. <br>
+The compiler switch is called LMDMMCP and is activated by default.<br>
+<br>
+</font><a href="#Top"><font size="1" face="Arial">[Top]</font></a></p>
+
+<p>&nbsp;</p>
+
+<p><a name="Uninstall"></a><font size="3" face="Arial"><strong>Uninstalling
+LMD-Tools</strong></font></p>
+
+<p><font size="2" face="Arial">To remove LMD-Tools SE from your
+system follow the directions below.</font></p>
+
+<p><font size="2" face="Arial"><strong>C++ Builder 5</strong></font></p>
+
+<ul>
+    <li><font size="2" face="Arial">Close all files and projects
+        and and select &quot;Components|Install
+        Packages...&quot;. </font></li>
+    <li><font size="2" face="Arial">Select all LMD-Tools packages
+        from the Packages list and click the &quot;Remove&quot;
+        button.</font></li>
+    <li><font size="2" face="Arial">After that remove the (BCB)
+        \lib\lmd50\main or (BCB)
+        \lib\lmd50\free directories from the global library search path
+        in &quot;Tools|Environment Options&quot;, Tab Library.<br>
+      </font></li>
+</ul>
+
+<p><font size="2" face="Arial"><strong>Delphi 5 and 6</strong></font></p>
+
+<ul>
+    <li><font size="2" face="Arial">Close all files and projects
+        and and select &quot;Components|Install
+        Packages...&quot;.</font></li>
+    <li><font size="2" face="Arial">Select all LMD-Tools packages
+        from the Packages list and click the &quot;Remove&quot; button.
+        </font></li>
+</ul>
+
+<p><font size="2" face="Arial"><br>
+<strong>Delphi 5</strong>
+        </font></p>
+
+<ul>
+    <li><font size="2" face="Arial">Close all files and projects
+        and and select &quot;Components|Install
+        Packages...&quot;.</font></li>
+    <li><font size="2" face="Arial">Select all LMD-Tools packages
+        from the Packages list and click the &quot;Remove&quot; button.
+        </font></li>
+</ul>
+
+<p>&nbsp;</p>
+
+<p><font size="2" face="Arial">
+<strong>Removing LMD-Tools files
+from your hard disk<br>
+</strong>After uninstalling the components from the CBuilder
+IDE/Delphi you may remove the component files physically.
+        </font></p>
+
+<p><font size="2" face="Arial"><em>Windows NT 3.51</em><br>
+Run the uninstaller app (unwise.exe) located in the LMD-Tools
+installation directory and follow the instructions.<br>
+<br>
+<em>Windows 95 / Windows NT 4.0 or higher</em><br>
+Open the Add/Remove Programs icon from the Control Panel and
+double click the &quot;LMD-Tools V5.X&quot; entry.</font></p>
+
+<p><font size="2" face="Arial">All the DCUs and backup files have
+to be removed manually from the LMD-Tools' uninstallation
+directory. As a rule the installation directory won't be deleted
+during the unstallation because such files will be generated
+while you work on the Tools but - for safety's sake - won't be
+deleted automatically by the uninstaller.<br>
+The 32bit-versions will create the key
+HKEY_CURRENT_USER\SOFTWARE\LMD Innovative\LMD-Tools in the
+current registry.These entries can be deleted if they're not longer required.<br>
+</font><a href="#Top"><font size="1" face="Arial">[Top]</font></a></p>
+
+<p>&nbsp;</p>
+
+<hr>
+
+<p><font color="#000080" size="1" face="Arial">© 2001 by </font><a
+href="http://www.lmd.de"><font color="#000080" size="1"
+face="Arial">LMD Innovative</font></a><font color="#000080"
+size="1" face="Arial"> Germany<br>
+All other trademarks are acknowledged.</font></p>
+</body>
+</html>

@@ -1,0 +1,46 @@
+
+uses
+  Windows,
+  Graphics,
+  Classes,
+  Controls,
+  lmdgraph,
+  LMDFXCaption,
+  LMDObject;
+
+type
+  TLMDCaption = class(TLMDObject)
+    private
+      FAlignment : TLMDAlignment;
+      FCaption   : TCaption;
+      FFont      : TFont;
+      FFontFx    : TLMDFxCaption;
+      FMultiLine : Boolean;
+      FDefault   : Boolean;
+      procedure SetAlignment(aValue:TLMDAlignment);
+      procedure SetCaption(aValue:TCaption);
+      procedure SetFont(aValue:TFont);
+      procedure SetFontFx(aValue:TLMDFxCaption);
+      procedure SetMultiLine(aValue:Boolean);
+    protected
+      procedure FontChanged(Sender:TObject);
+      procedure GetChange(Sender:TObject);override;
+    public
+      constructor Create;override;
+      constructor CreateParams(aValue, aFontName:String; aFontSize:Integer;
+                               aFontColor:TColor;aNotify:TNotifyEvent);
+      destructor Destroy;override;
+      procedure Assign(Source: TPersistent); override;
+      function GetSetStr : String; override;
+      procedure DrawCaption(aCanvas:TCanvas; aCaption:String; aRect:TRect;
+                            extflags:TLMDDrawTextStyles; BackColor:TColor; pos:LongInt);
+      property Default:Boolean read FDefault write FDefault;
+    published
+      property Alignment:TLMDAlignment read FAlignment write SetAlignment default agCenter;
+      property Caption:TCaption read FCaption write SetCaption;
+      property Font:TFont read FFont write SetFont;
+      property FontFX:TLMDFxCaption read FFontFx write SetFontFx;
+      property MultiLine:Boolean read FMultiline write SetMultiLine default false;
+  end;
+
+implementation

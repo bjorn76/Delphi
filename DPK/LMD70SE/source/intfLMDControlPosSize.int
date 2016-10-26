@@ -1,0 +1,37 @@
+
+uses
+  Windows,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  intfLMDBase;
+
+type
+
+  ILMDControlPosSize = interface
+     ['{EE3AFF62-E73A-41F2-B04D-D24710377EBD}']
+     function GetAllowMove: Boolean;
+     procedure SetAllowMove(const aValue: Boolean);
+     function GetAllowSize: Boolean;
+     procedure SetAllowSize(const aValue: Boolean);
+     function GetLocked: Boolean;
+     procedure SetLocked(const aValue: Boolean);
+     function GetMoveRect:TRect;
+     procedure SetOnMove(const aValue:TNotifyEvent);
+     function GetOnMove:TNotifyEvent;
+     property AllowMoving:Boolean read GetAllowMove write SetAllowMove;
+     property AllowSizing:Boolean read GetAllowSize write SetAllowSize;
+     property ControlLocked:Boolean read GetLocked write SetLocked;
+     property OnMove:TNotifyEvent read GetOnMove write SetOnMove;
+   end;
+
+  //helpers
+  function LMDControlSizingHitTest(Handle:HWND; cPos:TPoint; CRect:Trect; bs:Byte):LongWord;
+
+  // set ControlLocked property for all controls on aParen form
+  procedure LMDSetCtlLocked(aParent: TCustomForm; Value:Boolean);overload;
+  procedure LMDSetCtlLocked(aParent: TWinControl; Value:Boolean);overload;
+
+
+implementation

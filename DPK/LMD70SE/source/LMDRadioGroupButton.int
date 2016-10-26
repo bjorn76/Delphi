@@ -1,0 +1,38 @@
+
+uses
+  Messages, classes,
+  LMDCustomRadioGroup,
+  LMDCustomButtonGroup,
+  LMDRadioButton;
+
+type
+  TLMDRadioGroupButton = class(TLMDRadioButton)
+  private
+    {FInClick: Boolean;
+    procedure CNCommand(var Message: TWMCommand); message CN_COMMAND;}
+    procedure WMKeyDown (var Msg : TWMKEYDOWN); message WM_KEYDOWN;
+    procedure WMKeyUp (var Msg : TWMKEYUP); message WM_KEYUP;
+    procedure WMKey (var Msg : TWMKEY); message WM_CHAR;
+    procedure WMLMouseDown (var Msg : TMessage); message WM_LBUTTONDOWN;
+    procedure WMLMouseUp (var Msg : TMessage); message WM_LBUTTONUP;
+    procedure WMRMouseDown (var Msg : TMessage); message WM_RBUTTONDOWN;
+    procedure WMRMouseUp (var Msg : TMessage); message WM_RBUTTONUP;
+    procedure WMMouseMove (var Msg : TMessage); message WM_MOUSEMOVE;
+  protected
+    function CanModify: Boolean; override;
+    procedure SetChecked(aValue:Boolean);override;
+    procedure ChangeScale(M, D: Integer); override;
+    procedure DblClick; override;
+{    procedure KeyDown(var Key: Word; Shift: TShiftState); override;
+    procedure KeyUp(var Key: Word; Shift: TShiftState); override;
+    procedure KeyPress(var Key: Char); override;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;}
+  public
+    constructor CreateExt(Group: TLMDCustomRadioGroup);
+    destructor Destroy; override;
+    property Transparent default True;
+  end;
+
+implementation

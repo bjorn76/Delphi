@@ -1,0 +1,55 @@
+
+uses
+  Windows,
+  Graphics,
+  Classes,
+  LMDClass,
+  LMDObject,
+  LMDGraph;
+
+type
+  TLMDRegionMask = class(TLMDObject)
+  private
+    FRegionData  : PRGNDATA;
+    FDataSize    : Integer;
+    FBmpUp,
+    FBmpDn,
+    FBmp         : TBitmap; //normal (contains "flat" image for button, up/down image for others)
+    FPixelFormat : TLMDSavePixelFormat;
+    FCompressed  : Boolean;
+
+    procedure SetRegionData (aValue : PRGNDATA);
+    procedure SetDataSize (aValue : Integer);
+    procedure SetBorderBmp (index : integer;aValue : TBitmap);
+
+    procedure ReadRegionData (Reader : TStream);
+    procedure ReadBitmap (Stream:TStream);
+    procedure ReadUpBitmap (Stream:TStream);
+    procedure ReadDnBitmap (Stream:TStream);
+    procedure WriteRegionData (Writer : TStream);
+    procedure WriteBitmap (Stream:TStream);
+    procedure WriteUpBitmap (Stream:TStream);
+    procedure WriteDnBitmap (Stream:TStream);
+  protected
+    procedure DefineProperties (Filer : TFiler); override;
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+    procedure Assign(Source:TPersistent); override;
+    procedure CreateBorderUpBmp;
+    procedure CreateBorderDnBmp;
+
+    procedure GetMem;
+    procedure FreeMem;
+    procedure GetRegionData (frh : HRGN);
+    property RegionData : PRGNDATA read FRegionData write SetRegionData;
+    property BorderBmp : TBitmap index 0 read FBmp write SetBorderBmp;
+    property BorderUpBmp : TBitmap index 1 read FBmpUp write SetBorderBmp;
+    property BorderDnBmp : TBitmap index 2 read FBmpDn write SetBorderBmp;
+  published
+    property RegionDataSize : Integer read FDataSize write SetDataSize default 0;
+    property Compressed : Boolean read FCompressed write FCompressed default false;
+    property PixelFormat:TLMDSavePixelFormat read FPixelFormat write FPixelFormat default spfDefault;
+  end;
+
+implementation

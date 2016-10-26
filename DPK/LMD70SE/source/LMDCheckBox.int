@@ -1,0 +1,17 @@
+
+uses
+  LMDCustomCheckBox;
+
+type
+  {------------------------- TLMDCheckBox -------------------------------------}
+  TLMDCheckBox = class(TLMDCustomCheckBox)
+  published
+    {$IFNDEF LMDTOOLS_SPECIALEDITION}
+      property BackFX;
+    {$ENDIF}
+    property Checked;
+    property State;
+  end;
+
+
+implementation

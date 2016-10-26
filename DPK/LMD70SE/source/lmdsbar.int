@@ -1,0 +1,261 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, StdCtrls,
+  LMDObject,
+  LMDSpinButton,
+  LMDClass,
+  LMDCaret,
+  LMDFillObject,
+  LMDBevel,
+  LMDCustomBevelPanel,
+  LMDCustomPanelFill;
+
+type
+  TLMDScrollBarThumb = class (TLMDCustomPanelFill)
+  private
+    FMousePressed: Boolean;
+    procedure WMSetFocus(var Msg : TWMSetFocus); message WM_SETFOCUS;
+  protected
+    function ControlSupportsXP: Boolean; override;
+  public
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseExit; override;
+    procedure MouseEnter; override;
+    procedure CreateGripBmp (vertical: Boolean);
+    constructor Create (aOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Paint; override;
+    property Bevel;
+    property Color;
+    property Ctl3D;
+    property FillObject;
+    property Flat;
+    property ParentCtl3D;
+    property Visible;
+    property Transparent;
+  end;
+
+  TLMDScrollBarKind = (skVertical, skHorizontal);
+  TLMDThumbMode = (tmFixed, tmAuto);
+  TLMDBackStyle = (bsDefault, bsUser);
+  { -------------------------------------------------------------------------- }
+  TLMDScrollBar = class(TLMDCustomBevelPanel)
+  private
+    FTimerId    : TLMDTimer;
+    MX, MY,
+    FMin,
+    FMax,
+    FSmall,
+    FLarge,
+    FThumbLength,
+    FButtonWidth,
+    FPosition   : Integer;
+    FKind       : TLMDScrollBarKind;
+    FBack       : TLMDFillObject;
+    FThumbMode  : TLMDThumbMode;
+    FBackStyle  : TLMDBackStyle;
+    FOnScroll   : TScrollEvent;
+    FThumbCursor: TCursor;
+    FThumbBevel : TLMDBevel;
+    FThumbFlat,
+    FAllowMousePos,
+    FCanBeFocused : Boolean;
+    //internal Variables
+    FCaret      : TLMDCaret;
+    FBtnS       : TLMDScrollBarThumb;
+    FBtn1,
+    FBtn2       : TLMDSpinButton;
+    FPaintRect  : TRect;
+    FB          : TBitmap;
+    FMoveThumb  : Boolean;
+    FTrackLength: Integer;
+    FMousePos   : TPoint;
+    FThumbColor : TColor;
+
+    // 7.0
+    FUseGlobalTimer: Boolean;
+    FHideFocus: Boolean;
+    // ---
+    procedure SetBack (aValue : TLMDFillObject);
+    procedure SetKind (aValue: TLMDScrollBarKind);
+    procedure SetInteger (index, aValue : Integer);
+    procedure SetCanBeFocused (aValue : Boolean);
+    procedure SetBoolean (aValue : Boolean);
+    procedure SetThumbBevel (aValue : TLMDBevel);
+    procedure SetColor(aValue : TColor);
+    procedure SetBackStyle(aValue: TLMDBackStyle);
+
+    procedure DoThumbMouseDown (Sender : TObject;Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure DoThumbMouseUp (Sender : TObject;Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure DoThumbMouseMove (Sender : TObject; Shift : TShiftState; X, Y : Integer);
+
+    procedure CMEnabledChanged (var Msg : TMessage); message CM_ENABLEDCHANGED;
+
+    procedure WMGetDlgCode(var Msg : TWMGetDlgCode); message WM_GETDLGCODE;
+    procedure WMSetFocus(var Msg : TWMSetFocus); message WM_SETFOCUS;
+    procedure WMKillFocus(var Msg : TWMKillFocus); message WM_KILLFOCUS;
+    procedure WMKeyDown(var Msg : TWMKeyDown); message WM_KEYDOWN;
+//    procedure WMSize (var Msg : TWMSIZE); message WM_SIZE;
+    procedure DoTimerEvent (Sender : TObject);
+  protected
+    // 6.1
+    procedure DoThemeChanged;override;
+    // ---
+    procedure ExecuteEvent (event : TScrollCode);
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseMove (Shift : TShiftState; X, Y : Integer); override;
+    procedure MouseExit; override;
+    function GetFillObject  : TLMDFillObject; override;
+
+    procedure SetButtons;
+    procedure RefreshBackground;
+    function ControlSupportsXP: Boolean; override;
+    procedure GetXPBevelParams (var aClassName: WideString; var aPartId, aStateId : Integer); override;
+    procedure DoInc(Sender : TObject);
+    procedure DoDec(Sender : TObject);
+    procedure EnableTimer;
+    procedure RemoveTimer;
+  public
+    constructor Create (aOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Paint; override;
+    procedure Loaded; override;
+    // 7.0: public access to internal caret - use with care!
+    property Caret:TLMDCaret read FCaret;
+    // ---
+    property CanBeFocused : Boolean read FCanBeFocused write SetCanBeFocused;
+  published
+    property About;
+    property Align;
+    {$IFNDEF LMDTOOLS_SPECIALEDITION}
+      property BackFX;
+      property FaceController;
+    {$ENDIF}
+    property Bevel;
+    property Color;
+    property Flat;
+    property Hint;
+    property ParentColor;
+
+    // 7.0
+    property HideFocus:Boolean read FHideFocus write FHideFocus default false;
+    // ---
+    property Max : Integer index 0 read FMax write SetInteger default 100;
+    property Min : Integer index 1 read FMin write SetInteger default 0;
+    property Position    : Integer index 2 read FPosition write SetInteger default 0;
+    property SmallChange : Integer read FSmall write FSmall default 1;
+    property LargeChange : Integer read FLarge write FLarge default 10;
+    property ThumbLength : Integer index 4 read FThumbLength write SetInteger default 16;
+    property BackStyle   : TLMDBackStyle read FBackStyle write SetBackStyle default bsDefault;
+    property ThumbMode   : TLMDThumbMode read FThumbMode write FThumbMode default tmFixed;
+    property ThumbFlat   : Boolean read FThumbFlat write SetBoolean default false;
+    property ThumbColor  : TColor read FThumbColor write SetColor default clBtnFace;
+    property ThumbBevel  : TLMDBevel read FThumbBevel write SetThumbBevel;
+    property ThumbCursor : TCursor read FThumbCursor write FThumbCursor default crDefault;
+    property Kind        : TLMDScrollBarKind read FKind write SetKind default skHorizontal;
+    property ButtonWidth : Integer index 3 read FButtonWidth write SetInteger default 16;
+    property Back        : TLMDFillObject read FBack write SetBack;
+    property AllowMousePos : Boolean read FAllowMousePos write FAllowMousePos default true;
+    property TabOrder;
+    property TabStop default true;
+    property Ctl3D;
+    property CtlXP;
+    property ParentCtl3D;
+    property Transparent;
+    property Enabled;
+    property Cursor;
+    property DragCursor;
+    property DragMode;
+    property HelpContext;
+    property ShowHint;
+    property ParentShowHint;
+    property PopupMenu;
+
+    // 7.0
+    property UseGlobalTimer:Boolean read FUseGlobalTimer write FUseGlobalTimer default false;
+    // ---
+
+    //    property TabStop;
+    property Visible;
+
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyUp;
+    property OnKeyPress;
+    property OnMouseWheel;
+    property OnMouseEnter;
+    property OnMouseExit;
+//    property OnChange;
+    property OnEndDrag;
+    property OnDragOver;
+    property OnStartDrag;
+    property OnDragDrop;
+    property OnAfterEnter;
+    property OnAfterExit;
+    property OnMouseMove;
+    property OnMouseDown;
+    property OnMouseUp;
+
+    property OnScroll : TScrollEvent read FOnSCroll write FOnScroll;
+
+    // V4 enhancements
+    property Anchors;
+    property Constraints;
+    property DragKind;
+    property BiDiMode;
+    property ParentBiDiMode;
+    property OnEndDock;
+    property OnStartDock;
+  end;
+
+  { -------------------------------------------------------------------------- }
+  TLMDScrollBarObject = class(TLMDObject)
+  private
+    FBack             : TLMDFillObject;
+    FBevel            : TLMDBevel;
+    FAllowMousePos,
+    FTransparent,
+    FCtl3D,
+    FParentCtl3D      : Boolean;
+    FButtonWidth,
+    FLargeChange,
+    FSmallChange      : Integer;
+    FCursor           : TCursor;
+    FColor,
+    FThumbColor       : TColor;
+    FBackStyle        : TLMDBackStyle;
+
+    //procedure SetBackStyle (aValue : TLMDBackStyle);
+    procedure SetBack (aValue : TLMDFillObject);
+    procedure SetBevel (aValue : TLMDBevel);
+    procedure SetBoolean (index : Integer;aValue : Boolean);
+    procedure SetInteger (index : Integer;aValue : Integer);
+    procedure SetColor (index : Integer; aColor : TColor);
+
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+    procedure AssignToScrollBar (aValue : TLMDScrollBar);
+    procedure Assign (Source : TPersistent);override;
+  published
+    property Back : TLMDFillObject read FBack write SetBack;
+    property Color : TColor index 0 read FColor write SetColor default clBtnFace;
+    property ThumbColor : TColor index 1 read FThumbColor write SetColor default clBtnFace;
+    property Cursor : TCursor read FCursor write FCursor default crDefault;
+    property Bevel : TLMDBevel read FBevel write SetBevel;
+    property ButtonWidth : Integer index 0 read FButtonWidth write SetInteger default 16;
+    property SmallChange : Integer index 1 read FSmallChange write SetInteger default 1;
+    property LargeChange : Integer index 2 read FLargeChange write SetInteger default 10;
+    property Transparent : Boolean index 0 read FTransparent write SetBoolean default false;
+    property Ctl3D : Boolean index 1 read FCtl3D write SetBoolean default true;
+    property ParentCtl3D : Boolean index 2 read FParentCtl3D write SetBoolean default true;
+    property AllowMousePos : Boolean index 3 read FAllowMousePos write FAllowMousePos default true;
+    property BackStyle  : TLMDBackStyle read FBackStyle write FBackStyle default bsDefault;
+
+    property OnChange;
+  end;
+
+implementation

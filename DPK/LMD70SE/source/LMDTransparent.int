@@ -1,0 +1,25 @@
+
+uses
+  Graphics,
+  Classes,
+  lmdgraph,
+  LMDObject;
+
+type
+  TLMDTransparent = class(TLMDObject)
+  private
+    FColor:TColor;
+    FStyle:TLMDTransparentMode;
+    procedure SetColor(AValue:TColor);
+    procedure SetStyle(AValue:TLMDTransparentMode);
+    function GetTransparent:Boolean;
+  public
+    constructor Create;override;
+    procedure Assign(Source:TPersistent);override;
+    property Transparent:Boolean read GetTransparent;
+  published
+    Property Color:TColor read FColor write SetColor default clBtnFace;
+    Property Mode:TLMDTransparentMode read FStyle write SetStyle default tpNone;
+  end;
+
+implementation

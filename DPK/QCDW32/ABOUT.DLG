@@ -1,0 +1,12 @@
+AboutBox DIALOG 22, 37, 118, 65
+STYLE DS_MODALFRAME | WS_OVERLAPPED | WS_CAPTION
+CAPTION "About Charting Tools"
+FONT 8, "Times New Roman"
+{
+ CTEXT "Copyright Quinn-Curtis, 1992 - 1995", -1, 1, 30, 115, 11
+ CTEXT "Version 2.5", -1, 22, 17, 72, 10
+ PUSHBUTTON "OK", IDOK, 34, 46, 47, 16, WS_GROUP
+ LTEXT "Charting Tools for Windows", -1, 22, 5, 85, 10, WS_CHILD | WS_VISIBLE | WS_GROUP
+}
+
+

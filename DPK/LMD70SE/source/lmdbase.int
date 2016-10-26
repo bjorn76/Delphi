@@ -1,0 +1,79 @@
+
+uses
+  Controls,
+  Classes,
+  Windows;
+
+{$IFDEF CLR}
+  {$R LMD.Vcl.LMDTools.resources}
+const
+  LMDBMPResourceName='LMD.Vcl.LMDTools';
+{$ELSE}
+  {$R LMDBMP.RES}
+{$ENDIF}
+const
+  CM_TRANSPARENTCHANGED=CM_BASE+205;           {internal message for TLMDBaseGraphicControl}
+
+  CM_LMDBACKCHANGED=CM_BASE+206;               {TLMDBack[..] controls must redraw}
+  CM_LMDAFTERENTER=CM_BASE+207;
+  CM_LMDAFTEREXIT=CM_BASE+208;
+  CM_LMDBEVELCHANGED=CM_BASE+209;
+
+  // 5.0
+  CM_REDOCK=CM_BASE+102;           {internal message for DockButtons}
+  CM_LMDDOCKED=CM_BASE+210;
+  CM_LMDSCROLLBOXSCROLLEVENT = CM_BASE+212;
+
+  // 6
+  CM_LMDTHEMECHANGED=CM_BASE+214;
+  CM_LMDPARENTCTLXPCHANGED=CM_BASE+216;
+
+  // 7.0
+  CM_LMDBOUNDLABELCHANGE=CM_BASE+217;
+
+  LMD_DEFAULTFONT:String[6]='Arial';             // do not lcalize
+  IDS_INTERNAL:String[8]='Internal';             // do not lcalize
+
+  // Bitmap Resource Identifier
+  IDB_GLYPHBMP='LMDBMPGLYPH';
+  IDB_FONTBMP='LMDBMPFONT';
+
+  IDB_CHECKBMP=16545;
+  IDB_OPTIONBMP=16544;
+  IDB_TIP=16816;
+  //IDB_GLYPHBMP=16546;
+  IDB_FILEBMP = 16600;
+
+  IDB_HEADERPINDOWN=16550;
+  IDB_HEADERDEFAULT=16551;
+  IDB_HEADERPINUP=16552;
+  
+type
+  {For AboutBox}
+  TLMDAboutVar=type String;
+  TLMDHTMLString=type String;
+  
+  TLMDBoundsChangeState=(bcSize, bcPos);
+  TLMDBoundsChangeStates=set of TLMDBoundsChangeState;
+
+  TLMDDockPosition=(dpBottom, dpLeft, dpRight, dpTop);
+
+  procedure LMDRaiseDockError(tmp, tmp1:TComponent);
+
+type
+  TLMDCollection=class(TOwnedCollection)
+  public
+  {$IFNDEF LMDCOMP6}
+    function Owner:TPersistent;
+  {$ENDIF}
+  end;
+
+  TLMDStandardEvent=procedure(Sender:TObject; var Cancel:Boolean) of object;
+
+  {used by TLMDForm and TLMDFMDrop}
+  TLMDFMDragDropEvent=procedure(Sender:TObject; fcount, x,y:Integer; FileList:TStrings) of object;
+
+procedure LMDCreateHandle(aControl:TWinControl);
+function LMDUniqueName(const cName:String; owner:TComponent):String;
+
+implementation

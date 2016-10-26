@@ -1,0 +1,14 @@
+
+uses
+  LMDCustomProgress;
+
+type
+  TLMDProgress=class(TLMDCustomProgress)
+  published
+    property Step;
+    property Position;
+    property UserValue;
+  end;
+
+
+implementation

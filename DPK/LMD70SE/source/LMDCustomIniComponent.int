@@ -1,0 +1,39 @@
+
+uses
+  Classes,
+  LMDCustomComponent,
+  LMDIniCtrl,
+  LMDClass; //TLMDIniCtrl
+
+type
+  {------------------- class TLMDCustomIniComponent ---------------------------}
+  TLMDCustomIniComponent = class(TLMDCustomComponent)
+  private
+    FIniLink:TLMDIniCtrl;
+    FIniUse:TLMDIniUse;
+    FSection:String;
+    FOwnerFormCreate,
+    FOwnerFormDestroy: TNotifyEvent;
+    procedure OwnerFormCreate(Sender:TObject);
+    procedure OwnerFormDestroy(Sender:TObject);
+    procedure SetIniLink(aValue:TLMDIniCtrl);
+    procedure SetSection(const aValue:String);
+    function GetSection:String;
+  protected
+    procedure CreateSectionDefault(var aValue:String);virtual;
+    //procedure Loaded;override;
+    procedure SetSectionDefault;
+    procedure Notification(aComponent:TComponent;Operation:TOperation);override;
+    procedure NotificationStandard(aComponent:TComponent);
+    procedure ReadState(Reader: TReader); override;
+  public
+    constructor Create(aOwner:TComponent);override;
+    destructor Destroy; override;
+    procedure RestoreState;dynamic;
+    procedure SaveState;dynamic;
+    property IniLink:TLMDIniCtrl read FIniLink write SetIniLink;
+    property IniUse: TLMDIniUse read FIniUse write FIniUse default ioUseGlobal;
+    property Section:String read GetSection write SetSection;
+  end;
+
+implementation

@@ -1,0 +1,45 @@
+:BASE Lmdintro.hlp
+:TITLE LMD-Tools 5 Helpfile
+1 LMD-TOOLS Version 5.0
+2 Introduction
+3 Welcome!=welcome@Lmdintro.hlp>Main
+3 Overview=lmdinhaltov@Lmdintro.hlp>Main
+3 System requirements=systemrequirements@Lmdintro.hlp>Main
+3 Installation Delphi=installation@Lmdintro.hlp>Main
+3 Installation CBuilder=installCB@Lmdintro.hlp>Main
+3 How to uninstall the LMD-Tools=advuninstall@Lmdintro.hlp>Main
+3 Overview LMD-Tools component tabs=lmd_tabs@Lmdintro.hlp>Main
+3 The first steps...=firststeps@Lmdintro.hlp>Main
+2 Tutorials
+3 First programs with the LMD-Tools...=firstprograms@Lmdintro.hlp>Main
+3 Tutor Container Components
+4 Introduction=tutorcont1@Lmdintro.hlp>Main
+4 Global Container (32bit)=tutorcont3@Lmdintro.hlp>Main
+4 Tutor "Transparent" feature of windowed controls=lmdtransparent@Lmdintro.hlp>Main
+4 Tutor Labels=lmdtutorlabels@Lmdintro.hlp>Main
+4 Tutor TLMDBevel=lmdtutortlmdbevel@Lmdintro.hlp>Main
+4 Tutor Dialogs=lmdtutordialogs@Lmdintro.hlp>Main
+4 Tutor Forms=lmdtutorforms@Lmdintro.hlp>Main
+4 Tutor TLMDFillObject=lmdtutortlmdfillobject@Lmdintro.hlp>Main
+3 Tutor Screensaver
+4 What is to be considered...=lmdwhatto@Lmdintro.hlp>Main
+4 Screensavers for Windows 3.X (16bit)=lmdscreenw316@Lmdintro.hlp>Main
+4 Screensavers for Windows 95=lmdscreen4w@Lmdintro.hlp>Main
+4 Screensavers for Windows NT=lmdscreennt@Lmdintro.hlp>Main
+2 Advanced topics
+3 Directory structure of the LMD-Tools=advdifferences@Lmdintro.hlp>Main
+3 Component-/Property-Editors=lmdEditoren@Lmdintro.hlp>Main
+3 Compatibility problems with Version 1.X=advcompatibility@Lmdintro.hlp>Main
+3 Removing of components/editors=advwhatsnew@Lmdintro.hlp>Main
+3 Set global compiler switches=lmdcompsinc@Lmdintro.hlp>Main
+3 Use of resource files=advusingres@Lmdintro.hlp>Main
+2 Contact and product informations
+3 Prices=lmdPrices@Lmdintro.hlp>Main
+3 Ordering informations=infoorderinfo@Lmdintro.hlp>Main
+3 Order Online=infoSWREG@Lmdintro.hlp>Main
+3 Order form=infoorderform@Lmdintro.hlp>Main
+3 Obtaining updates=infoupdates@Lmdintro.hlp>Main
+3 Support=infoSupport@Lmdintro.hlp>Main
+3 Distributors=lmdretailers@Lmdintro.hlp>Main
+3 Contact=infoAddresses@Lmdintro.hlp>Main
+3 License agreement=infoLicense@Lmdintro.hlp>Main

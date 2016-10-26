@@ -1,0 +1,67 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  LMDCustomImageList,
+  LMDBaseController,
+  LMDObject,
+
+
+  lmdgraph, lmdcont, lmdbase, lmdbmp, LMDFillObject;
+
+type
+
+  //ensure that component containg this object has got an extra Notification procedure which
+  //clears this objects ImageList if it is removed!!
+
+
+  TLMDAlphaObject = class(TLMDObject)
+  private
+    FImageList   : TLMDCustomImageList;
+    FStrength    : Single;
+    FImageIndex,
+    FListIndex   : Integer;
+    FTransparent : Boolean;
+    FFillObject  : TLMDFillObject;
+    FChangeLink  : TLMDChangeLink;
+
+    procedure SetInteger (index, aValue : Integer);
+    procedure SetBoolean (index:Integer;aValue : Boolean);
+    procedure SetSingle (aValue : Single);
+    procedure SetFillObject (aValue : TLMDFillObject);
+    procedure SetImageList (aValue : TLMDCustomImageList);
+
+    procedure GetIMLChange (Sender : TObject);
+    function IMLEmpty : Boolean;
+  protected
+    procedure GetChange (Sender : TObject); override;
+    procedure DefineProperties(Filer:TFiler); override;
+    procedure ReadIdent(Reader:TReader);
+    procedure WriteIdent(Writer:TWriter);
+    function CheckCont:Boolean;
+    function HasControl:Boolean;
+    function HasNonDefaultStrength: Boolean; //new July 02, JH    
+    property Transparent : Boolean index 0 read FTransparent write SetBoolean default false;
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+    procedure Assign (Source : TPersistent); override;
+    function GetSetStr : String; override;
+
+    function Enabled : Boolean;
+    function GetPalette : HPalette;
+
+//    procedure RectAlphaBlend (Target : TBitmap);
+    procedure AlphaBlend (Target : TBitmap);
+    procedure ControlBlend (OriginalBack : TBitmap; ControlsRect : TRect;
+                            DestinationRect : TRect; Target : TCanvas; Src : TRect);
+  published
+    property ImageList : TLMDCustomImageList read FImageList write SetImageList stored HasControl;
+    property ImageIndex : Integer index 0 read FImageIndex write SetInteger default 0;
+    property ListIndex : Integer index 1 read FListIndex write SetInteger default 0;
+    property Strength : Single read FStrength write SetSingle stored HasNonDefaultStrength;
+    property FillObject : TLMDFillObject read FFillObject write SetFillObject;
+  end;
+
+//procedure rudimentAlphaBlend (target, source1, source2 : TBitmap; FStrength : Byte; trans : boolean);
+
+implementation

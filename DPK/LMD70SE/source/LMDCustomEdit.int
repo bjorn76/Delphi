@@ -1,0 +1,105 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, StdCtrls,
+
+  LMDUtils,
+  LMDGraph,
+  LMDSBtn,
+  LMDBase,
+  LMDCustomControl,
+  LMDBaseEdit,
+  LMDButtonBase,
+  LMDEditAutoComplete;
+
+type
+  TLMDOnBtnClick = procedure (Sender, Btn : TObject; index : Integer) of object;
+
+  TLMDCustomEdit = class(TLMDBaseEdit)
+  private
+    FPasswordChar      : Char;
+    FSpecialText       : String;
+    FAutoSize          : Boolean;
+    FCustomButtons     : TLMDSpecialButtons;
+    FCustomButtonWidth : Integer;
+    FCustomButtonStyle : TLMDUserButtonStyle;
+    FAutoComplete      : TLMDEditAutoComplete;
+    FOnBtnClick        : TLMDOnBtnClick;
+    FCustomXP          : Boolean;
+    procedure SetPasswordChar (aValue : Char);
+    procedure SetAutoSize (aValue : Boolean); reintroduce;
+    procedure SetCustomButtons (aValue : TLMDSpecialButtons);
+    procedure SetCustomButtonWidth (aValue : Integer);
+    procedure SetCustomButtonXP(const Value: Boolean);
+    procedure SetAutoComplete (aValue : TLMDEditAutoComplete);
+    procedure ReadOldBtnStyle(Reader:TReader);
+    (*    procedure WMKeyDown(var Msg : TWMKeyDown); message WM_KEYDOWN;
+    procedure WMKeyUp(var Msg : TWMKeyUp); message WM_KEYUP;*)
+    procedure CMFontChanged(var Message:TMessage);message CM_FONTCHANGED;
+    procedure CMLMDBevelChanged(var Message:TMessage);message CM_LMDBEVELCHANGED;
+    procedure WMKillFocus(var Msg : TWMKillFocus); message WM_KILLFOCUS;
+    //EM_XXX message handling (everthing which is not explicitly named here is already done in TLMDBaseEdit
+    procedure EMGETPASSWORDCHAR (var Message : TMessage); message EM_GETPASSWORDCHAR;
+    procedure EMSETPASSWORDCHAR (var Message : TMessage); message EM_SETPASSWORDCHAR;
+  protected
+    function BackOneMore: Boolean; override;
+    function CalcMousePos(Pos : TSmallPoint) : LongInt; override;
+    function CalcMouseCol(XPos : Integer) : Integer; override;
+    function CalcMouseRow(YPos : Integer) : Integer; override;
+    // 7.0
+    procedure DefineProperties(Filer:TFiler);override;
+    // ---
+    procedure DoThemeChanged;override;
+    procedure GetCommandKey (var KeyCode : Word; Shift : TShiftState); override;
+
+    procedure CreateSpecialText(var s : String); virtual;
+    procedure ChangedText (At : Integer); override;
+    procedure FinishedSetSelText; override;
+    procedure HandleInsertText (at : Integer;var aValue : String); override;
+    procedure SetNewText; override;
+    procedure GetNewText; override;
+    procedure DrawText(from : Integer); overload; override;
+    procedure DrawText(from : Integer; const aTxt: String); reintroduce; overload; //virtual;
+    procedure CorrectBounds; virtual;
+    procedure DoAClick (Btn : TObject; index : Integer); virtual;
+    function AllowCopyPaste : Boolean; override;
+    procedure DrawSpecialTextBackground (aCanvas: TCanvas; aRect: TRect); virtual; //JH March 2002
+
+    procedure SetCustomButtonsXPMode(Value:Boolean);
+    procedure SetCaret; override;
+    procedure SetCustomButtonStyle (aValue : TLMDUserButtonStyle);virtual;
+
+    property SpecialText : String read FSpecialText write FSpecialText;
+    property AutoComplete: TLMDEditAutoComplete read FAutoComplete write SetAutoComplete;
+  public
+    constructor Create (aOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Notification (AComponent: TComponent; Operation: TOperation); override;
+    procedure BtnClick (index : Integer);
+    procedure Paint; override;
+    procedure Loaded; override;
+    procedure ModifyPaintRect; override;
+    procedure SetBorders;
+    property Text;
+    property PasswordChar : Char read FPasswordChar write SetPasswordChar;
+    property CustomButtons : TLMDSpecialButtons read FCustomButtons write SetCustomButtons;
+    property CustomButtonWidth : Integer read FCustomButtonWidth write SetCustomButtonWidth default 16;
+    property CustomButtonsStyle : TLMDUserButtonStyle read FCustomButtonStyle write SetCustomButtonStyle default ubsIntegrated;
+    property CustomButtonStyle : TLMDUserButtonStyle read FCustomButtonStyle write SetCustomButtonStyle;
+    property CustomButtonParentCtlXP:Boolean read FCustomXP write SetCustomButtonXP default false;
+    property ReadOnly;
+    property OnBtnClick : TLMDOnBtnClick read FOnBtnClick write FOnBtnClick;
+  published
+    property AutoSize : Boolean read FAutoSize write SetAutoSize default false;
+    property Font;
+    property CharCase;
+    property Font3D;
+
+    property MaxLength;
+    property HideSelection;
+    property AutoSelect;
+    property OEMConvert;
+    property ParentFont;
+
+  end;
+
+implementation

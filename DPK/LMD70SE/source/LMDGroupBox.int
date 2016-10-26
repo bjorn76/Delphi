@@ -1,0 +1,68 @@
+
+uses
+  LMDCustomGroupBox;
+
+type
+  TLMDGroupBox = class (TLMDCustomGroupBox)
+  published
+    // V4 enhancements
+    property Anchors;
+    property AutoSize;
+    property Constraints;
+    property DockSite;
+    property DragKind;
+    property BiDiMode;
+    property ParentBiDiMode;
+    property OnDockDrop;
+    property OnDockOver;
+    property OnEndDock;
+    property OnGetSiteInfo;
+    property OnStartDock;
+    property OnUnDock;
+    property About;
+    property Align;
+    property Alignment;
+    {.$IFNDEF LMDTOOLS_SPECIALEDITION}
+      property BackFX;
+    {.$ENDIF}
+    property Bevel;
+    property Caption;
+    property CaptionFont;
+    property CaptionFont3D;
+    property CaptionOffset;
+    property CaptionParentFont;
+    property Color;
+    property DragCursor;
+    property DragMode;
+    property Enabled;
+    property Font;
+    property ImageList;
+    property ImageIndex;
+    property ListIndex;
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowAccelChar;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    property Transparent;
+    property Visible;
+
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnResize;
+    property OnStartDrag;
+
+  end;
+
+implementation

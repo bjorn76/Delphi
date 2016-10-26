@@ -1,0 +1,75 @@
+
+uses
+  Windows, //TRect
+  Controls, //CM_TEXTCHANGED
+  Messages, //TMessage
+  Classes, //TAlignment
+  Graphics, //TCanvas
+  LMDGraphicControl,
+  LMD3DCaption,
+  LMDGraph;
+
+type
+  {-------------------------- TLMDBaseMeter -----------------------------------}
+  TLMDBaseMeter = class(TLMDGraphicControl)
+  private
+    F3DCaption:TLMD3DCaption;
+    FAlignment: TAlignment;
+    FDirection:TLMDMeterDirection;
+    FMaxValue,
+    FMinValue:LongInt;
+    FPercentValue,
+    FOldValue:TLMDPercent;
+    FStep:TLMDPercent;
+    FTextOptions:TLMDMeterTextOptions;
+    FUseFontColor:Boolean;
+    FUserValue:LongInt;
+    FDelta:Byte;
+    procedure Set3DCaption(aValue:TLMD3DCaption);
+    procedure SetAlignment(aValue:TAlignment);
+    Procedure SetDirection(aValue:TLMDMeterDirection);
+    procedure SetMinValue(aValue:LongInt);
+    procedure SetMaxValue(aValue:LongInt);
+    procedure SetPercentValue(aValue:TLMDPercent);
+    procedure SetTextOptions(aValue:TLMDMeterTextOptions);
+    procedure SetUserValue(aValue:LongInt);
+    procedure SetUseFontColor(aValue:Boolean);
+    procedure Synchronize(aFlag:Boolean);
+    procedure CMTextChanged(var Message: TMessage); message CM_TEXTCHANGED;
+  protected
+    FUpdate:Boolean;
+    function CorrectBounds:Boolean;virtual;
+    procedure SetDelta(aValue:Byte);
+    procedure DrawBar(aCancas:TCanvas; dest, notDest, aRect:TRect);virtual;
+    procedure DrawCaption(aCanvas:TCanvas; dest, notdest, aRect:TRect;
+                          flag:Boolean; second:TColor);
+    procedure Draw;
+    function GetDrawValue:TLMDPercent;virtual;
+    function GetPercentValue(aValue:LongInt):TLMDPercent;
+    procedure Paint;override;
+
+    {properties}
+    property Alignment:TAlignment read FAlignment write SetAlignment default taCenter;
+    property Direction:TLMDMeterDirection read FDirection write SetDirection default mdHorizontal;
+    property Delta:Byte read FDelta write SetDelta default 1;
+    property Font3D:TLMD3DCaption read F3DCaption write Set3DCaption;
+    property MaxValue:LongInt read FMaxValue write SetMaxValue default 100;
+    property MinValue:LongInt read FMinValue write SetMinValue default 0;
+    property OptionsText:TLMDMeterTextOptions read FTextOptions write SetTextOptions default toNoText;
+    property PercentValue:TLMDPercent read FPercentValue write SetPercentValue default 0;
+    property Position:TLMDPercent read FPercentValue write SetPercentValue default 0;
+    property Step:TLMDPercent read FStep write FStep default 10;
+    property UserValue:LongInt read FUserValue write SetUserValue default 0;
+    property UseFontColor:Boolean read FUseFontColor write SetUseFontColor default False;
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+    procedure Add(aValue:TLMDPercent);
+    procedure StepAdd;
+    procedure Sub(aValue:TLMDPercent);
+    procedure StepSub;
+    function GetExtend(aPercent:Byte; aExtend:Integer):integer;
+  end;
+
+
+implementation

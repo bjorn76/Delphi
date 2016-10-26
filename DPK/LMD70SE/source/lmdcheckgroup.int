@@ -1,0 +1,13 @@
+
+uses
+  LMDCustomCheckGroup;
+
+type
+  TLMDCheckGroup = class(TLMDCustomCheckGroup)
+  published
+//    property BackFX;  
+    property Value;
+    property IgnoreValue;
+  end;
+
+implementation

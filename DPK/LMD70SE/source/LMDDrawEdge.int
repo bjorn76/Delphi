@@ -1,0 +1,51 @@
+
+uses
+  Classes,
+  lmdgraph,
+  LMDControl;
+
+type
+  TLMDDiagonalStyle=(dsEndBottomLeft, dsEndBottomRight, dsEndTopLeft, dsEndTopRight);
+  TLMDDrawEdgeStyle=(esEdge, esDiagonal, esStandard);
+
+  TLMDDrawEdge = class(TLMDControl)
+  private
+    FDiagonal:TLMDDiagonalStyle;
+    FEdgeStyle:TLMDEdgeStyle;
+    FFilled:Boolean;
+    FFrame:TLMDFrameSides;
+    FShape:TLMDBorderStyle;
+    FSoft:Boolean;
+    FStyle:TLMDDrawEdgeStyle;
+    procedure SetBoolean(Index:Integer; aValue:Boolean);
+    procedure SetDiagonal(aValue:TLMDDiagonalStyle);
+    procedure SetEdgeStyle(aValue:TLMDEdgeStyle);
+    procedure SetFrame(aValue: TLMDFrameSides);
+    procedure SetStyle(aValue: TLMDDrawEdgeStyle);
+    procedure SetShape(aValue: TLMDBorderStyle);
+  protected
+    procedure Paint; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property About;
+    property Align;
+    property DiagonalStyle:TLMDDiagonalStyle read FDiagonal write SetDiagonal default dsEndBottomLeft;
+    property EdgeStyle:TLMDEdgeStyle read FEdgestyle write SetEdgeStyle default etEtched;
+    property Enabled;
+    property Filled:Boolean index 0 read FFilled write SetBoolean default false;
+    property FrameSides:TLMDFrameSides read FFrame write SetFrame default
+                        [fsBottom, fsLeft, fsRight, fsTop];
+    property ParentShowHint;
+    property StandardStyle:TLMDBorderStyle read FShape write SetShape default lsSingleLowered;
+    property ShowHint;
+    property Soft:Boolean index 1 read FSoft write SetBoolean default false;
+    property Style: TLMDDrawEdgeStyle read FStyle write SetStyle default esEdge;
+    property Visible;
+
+    property Anchors;
+    property Constraints;
+  end;
+
+
+implementation

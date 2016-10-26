@@ -1,0 +1,37 @@
+
+uses
+  Classes,
+  Graphics,
+  LMDButtonBase,
+  LMDGraph,
+  LMDGlyphTextLayout;
+
+type
+  TLMDButtonLayout=class(TLMDGlyphTextLayout)
+  private
+    FArrow: Boolean;
+    FArrowColor: TColor;
+    FArrowIndent: Integer;
+    FArrowPosition: TLMDArrowPosition;
+    FArrowSize: TLMDDDArrowSize;
+  protected
+    procedure SetArrow(aValue: Boolean);
+    procedure SetArrowColor(aValue: TColor);
+    procedure SetArrowPosition(aValue: TLMDArrowPosition);
+    procedure SetArrowSize(aValue: TLMDDDArrowSize);
+    procedure SetInteger(Index: Integer; aValue:Integer);
+  public
+    constructor Create;override;
+    procedure Assign(Source: TPersistent); override;
+  published
+    property Alignment default agCenter;
+    property Arrow: Boolean read FArrow write SetArrow default False;
+    property ArrowColor: TColor read FArrowColor write SetArrowColor default clBlack;
+    property ArrowIndent: Integer Index 0 read FArrowIndent write SetInteger default 3;
+    property ArrowPosition: TLMDArrowPosition read FArrowPosition
+                            write SetArrowPosition default apRightText;
+    property ArrowSize: TLMDDDArrowSize read FArrowSize write SetArrowSize default 3;
+  end;
+
+
+implementation

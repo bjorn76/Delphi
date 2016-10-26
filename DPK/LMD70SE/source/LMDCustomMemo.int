@@ -1,0 +1,303 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  LMDCustomControl, LMDBaseEdit, stdctrls, lmdutils, lmdclass, lmdgraph,
+  LMDObject,
+  LMDFillObject,
+  LMDSBar;
+
+const
+  LMDMaxVisibleLines = 150;
+
+type
+
+  TLMDCustomMemo = class;
+  TLMDScrollBarKind = (skHorizontal, skVertical, skBoth, skAuto, skNone);
+
+  { ----------------------------- TLMDMemoStrings ---------------------------- }
+  TLMDMemoStrings = class (TLMDObject)
+  private
+    FOwnerMemo : TLMDCustomMemo;
+    FAdditiveLoadFrom : Boolean;
+
+    function GetLine (index : Integer) : String;
+    procedure SetLine (index : Integer; aValue : String);
+    function GetText : String;
+    function GetRows : Integer;
+    procedure SetText (aValue : String);
+  protected
+  public
+    property Owner : TLMDCustomMemo read FOwnerMemo;
+    constructor CreateExt (aOwner : TLMDCustomMemo);
+    procedure Assign(Source: TPersistent); override;
+    procedure SaveToStream(Stream: TStream);
+    procedure LoadFromStream(Stream: TStream);
+    procedure SaveToFile(Filename : String);
+    procedure LoadFromFile(Filename : String);
+
+    procedure BeginUpdate;
+    procedure EndUpdate;
+
+    procedure Insert(Index: LongInt; const S: string);
+    procedure Append (const S : String);
+    function Add (const S : String) : Integer;
+    procedure AddStrings (aValue : TStrings);
+    procedure GetAsStrings (aValue : TStrings);
+    procedure Move (CurIndex, NewIndex : Integer);
+    procedure Delete (Index : Integer);
+    procedure Exchange (FirstIndex, SecondIndex : Integer);
+    procedure Clear;
+
+    procedure SetTextStr (const Value : String);
+    function GetTextStr : String;
+
+    property Count : Integer read GetRows;
+    property Text : String read GetText write SetText;
+    property Strings[Index: Integer]: string read GetLine write SetLine; default;
+    property AdditiveLoadFrom : Boolean read FAdditiveLoadFrom write FAdditiveLoadFrom default false;
+  end;
+
+{  TLMDTabModes = (tmPixel, tmSpaces, tmNone, tmDefault);
+
+  TLMDTabObject = class (TLMDObject)
+  private
+    FTabLength : Integer;
+    FTabMode   : TLMDTabModes;
+    FEditControl : TLMDCustomMemo;
+
+    procedure SetTabLength (aValue : Integer);
+  public
+    property Width      : Integer read FTabLength;
+    procedure Assign (Source : TPersistent); override;
+    constructor Create; override;
+  published
+    property TabLength  : Integer read FTabLength write SetTabLength default 20;
+    property TabMode    : TLMDTabModes read FTabMode write FTabMode default tmPixel;
+  end;}
+
+  TLMDMarginAlignment = (maLeft, maRight);
+  { ----------------------------- TLMDMarginObject --------------------------- }
+  TLMDMarginObject = class(TLMDObject)
+  private
+    FWidth : Integer;
+    FFillObject : TLMDFillObject;
+    FAlignment : TLMDMarginAlignment;
+    procedure SetFillObject (aValue : TLMDFillObject);
+    procedure SetInteger (aValue : Integer);
+    procedure SetAlignment (aValue : TLMDMarginAlignment);
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+  published
+    property FillObject : TLMDFillObject read FFillObject write SetFillObject;
+    property Width : Integer read FWidth write SetInteger default 0;
+    property Alignment : TLMDMarginAlignment read FAlignment write SetAlignment
+                         default maLeft;
+  end;
+
+  TLMDOnMarginRowPaint = procedure (Sender : TObject; Canvas : TCanvas;
+                                    aRect : TRect;
+                                    firstChar, length : Integer) of object;
+
+  { ----------------------------- TLMDCustomMemo ----------------------------- }
+  TLMDCustomMemo = class(TLMDBaseEdit)
+  private
+    FHScroll,
+    FVScroll      : TLMDScrollBar;
+
+    FHScrollObj,
+    FVScrollObj   : TLMDScrollBarObject;
+
+    FScrollBars   : TLMDScrollBarKind;
+
+    FStrings      : TLMDMemoStrings;
+
+    FVScrollFactor: Single;
+
+    FOldHiddenLeft,
+    FOldFirstRow,
+    FOldCurrentRow, //needed for  repaint
+
+    FRowHeight,
+    FFirstRowOut,     //the first visible row (number) of the memo (cursor independend)
+    FRows,            //number of rows
+    FWorkRowCount,    //helper for handling of removed and inserted text, JH Oct 03
+    FCurrentRow,      //currently active row number (cursor depended)
+    FCursorRowStart,
+    FCursorRowFirst,
+    FCursorFirst,     // if the cursor is not visible it is necessary to know where the current line starts
+    FHideLeftRight,   // how many pixels are hidden on a side
+    FLongRow,
+    FRowsDrawnCount,      //NUMBER of rows currently printed!!
+    FFirstCharOut : Integer; // points to the first char out LA[1]
+
+    FSoftLineBreak,
+    FScrolled,
+    FLined,
+    FTextEnd,
+    FWantTabs,
+    FWantReturns,
+    FWordWrap     : Boolean;
+
+    FMargin       : TLMDMarginObject;
+    FMarginRect   : TRect;
+
+    FLineStyle    : TPen;
+ //   FTabs         : TLMDTabObject;
+    FTabChars     : Integer;
+
+    CharWidth     : Array[0..255] of Integer; //a table which is recreated each time the font changes
+                                              //it speeds up text parsing enormesly
+    LA            : Array[1..LMDMaxVisibleLines] of Integer; //the visible ro line starts ... does anyone needs more than 150 visible lines?
+
+    FOnMarginRowPaint : TLMDOnMarginRowPaint;
+    FOnRowChange,
+    FOnRowCountChange : TNotifyEvent;
+
+    procedure UpdateVScrollBar;
+    procedure SetRows (index, aValue : Integer);
+    procedure SetScrollBars (aValue : TLMDScrollBarKind);
+    procedure SetStrings (aValue : TLMDMemoStrings);
+    procedure SetBoolean (index : Integer;aValue : Boolean);
+    function GetRowCount : Integer;
+    procedure SetLineStyle (aValue : TPen);
+    procedure SetScrollObj (index : Integer;aValue : TLMDScrollBarObject);
+//    procedure SetTabs (aValue : TLMDTabObject);
+    procedure SetMargin (aValue : TLMDMarginObject);
+    procedure SetTabChars (aValue : Integer);
+
+    function GetStrings : TLMDMemoStrings;
+
+    function GetRowNr : Integer;
+    function GetColumn : Integer;
+    function GetColumns : Integer;
+
+    procedure ScrollUp (Rows : Integer);
+    procedure ScrollDown (Rows : Integer);
+    procedure DoOnVScroll (Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
+    procedure DoOnHScroll (Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
+
+    procedure WMGetDlgCode(var Message: TWMGetDlgCode); message WM_GETDLGCODE;
+    procedure CMFontChanged (var Msg : TMessage); message CM_FONTCHANGED;
+    procedure DoFontChanged;
+    procedure MakeCursorVisible;
+    function CalcRowNr (pos : Integer) : Integer;
+    function CalcRowFromChar (pos : Integer) : Integer;
+    function CalcCharRowStart (pos : Integer;var crow : Integer) : Integer;
+    function CalcRowStart (row : Integer) : Integer;
+
+    procedure GetNextLine (var LineStart : PChar; TextEnd : PChar);
+    procedure GetPrevLine (var LineStart : PChar; TextStart : PChar);
+    procedure PaintMargin (toCanvas : TCanvas);
+
+    //EM_XXX message handling
+    procedure EMFMTLINES (var Message : TMessage); message EM_FMTLINES;
+    procedure EMGETFIRSTVISIBLELINE (var Message : TMessage); message EM_GETFIRSTVISIBLELINE;
+    procedure EMGETHANDLE (var Message : TMessage); message EM_GETHANDLE;
+    procedure EMGETLINE (var Message : TMessage); message EM_GETLINE;
+    procedure EMGETLINECOUNT (var Message : TMessage); message EM_GETLINECOUNT;
+    procedure EMGETMARGINS (var Message : TMessage); message EM_GETMARGINS;
+    procedure EMGETTHUMB (var Message : TMessage); message EM_GETTHUMB;
+    procedure EMLINEFROMCHAR (var Message : TMessage); message EM_LINEFROMCHAR;
+    procedure EMLINEINDEX (var Message : TMessage); message EM_LINEINDEX;
+    procedure EMLINELENGTH (var Message : TMessage); message EM_LINELENGTH;
+    procedure EMLINESCROLL (var Message : TMessage); message EM_LINESCROLL;
+    procedure EMPOSFROMCHAR (var Message : TMessage); message EM_POSFROMCHAR;
+    procedure EMSCROLL (var Message : TMessage); message EM_SCROLL;
+    procedure EMSCROLLCARET (var Message : TMessage); message EM_SCROLLCARET;
+    procedure EMSETMARGINS (var Message : TMessage); message EM_SETMARGINS;
+    procedure EMSETTABSTOPS (var Message : TMessage); message EM_SETTABSTOPS;
+  protected
+    procedure CreateBack; override;
+    procedure GetChange(Sender : TObject); override;
+    procedure RepaintBack (aRect : TRect); override;
+    procedure DoAlignmentChange; override;
+    procedure InitScrollBars;
+    function RowWidth (s : String) : LongInt;
+    function RowHeight (s : String) : LongInt; override;
+    procedure CursorPosChanged; override;
+    function getRow(ch : Integer) : Integer;
+    procedure AlignControls (AControl: TControl; var Rect: TRect); override;
+    function GetClientRect : TRect; override;
+    function CountRows(var ctext : string) : Integer;
+
+    function DoMouseWheel(Shift: TShiftState; WheelDelta: Integer;
+                          MousePos: TPoint): Boolean; override;
+
+    { abstract routines from BaseEdit }
+    procedure SetCaret; override;
+    procedure SetNewText; override;
+    procedure GetNewText; override;
+    procedure DrawText(from : Integer); override;
+    function CalcMousePos(Pos : TSmallPoint) : LongInt; override;
+    function CalcMouseCol(XPos : Integer) : Integer; override;
+    function CalcMouseRow(YPos : Integer) : Integer; override;
+    procedure ChangedText (At : Integer); override;
+    procedure GetCommandKey (var KeyCode : Word; Shift : TShiftState); override;
+    procedure HandleInsertText (at : Integer; var aValue : String); override;
+    procedure HandleReplaceText (at : Integer; aValue : String); override;
+    procedure DoThemeChanged; override;
+    
+    //the following 4 properties are needed to keep control of the changes made to the text concerning the output
+    property RowCounter : Integer index 0 read FRows write SetRows;
+    property RowFirst : Integer index 1 read FFirstRowOut write SetRows;
+    property RowLength : Integer index 2 read FLongRow write SetRows;
+    property RowHide : Integer index 3 read FHiddenLeft write SetRows;
+    property RowCurrent : Integer index 4 read FCurrentRow write SetRows;
+  public
+    constructor Create (aOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Loaded; override;
+    procedure Paint; override;
+    procedure ModifyTextRect; override;
+    procedure ModifyPaintRect; override;
+
+    procedure LoadFromFile (Filename : String);
+    procedure SaveToFile (Filename : String);
+
+    procedure AddLine (s : String);
+    procedure InsertAtLine (Index : LongInt; S : String);
+    procedure DeleteLine (Index : LongInt);
+    function GetLineParas (Index : Integer; var Start, Count : Integer) : String;
+    function GetLine (Index : LongInt) : String;    
+    procedure MoveLine (CurIndex, NewIndex : LongInt);
+    procedure ExchangeLines (FirstIndex, SecondIndex : Integer);
+    procedure SetLine (Index : Integer; S : String);
+
+    property Column : Integer read GetColumn;
+    property Row : Integer read GetRowNr;
+    property Rows : Integer read GetRowCount;
+    property Columns : Integer read GetColumns;
+    property FirstRow : Integer read FFirstRowOut;
+    property Margin : TLMDMarginObject read FMargin write SetMargin;
+
+    property ScrollBars : TLMDScrollBarKind read FScrollBars write SetScrollBars
+                          default skNone;
+    property WordWrap : Boolean index 0 read FWordWrap write SetBoolean
+                        default true;
+    property WantTabs : Boolean index 1 read FWantTabs write SetBoolean
+                        default false;
+    property WantReturns : Boolean index 2 read FWantReturns write SetBoolean
+                           default true;
+    property Lines : TLMDMemoStrings read GetStrings write SetStrings
+                     stored false;
+
+//    property Tabs : TLMDTabObject read FTabs write SetTabs;
+    property TabChars : Integer read FTabChars write SetTabChars default 8;
+    property Lined : Boolean index 3 read FLined write SetBoolean default false;
+    property LineStyle : TPen read FLineStyle write SetLineStyle;
+    property HorizScrollBar : TLMDScrollBarObject index 0 read FHScrollObj
+                                                          write SetScrollObj;
+    property VertScrollBar : TLMDScrollBarObject index 1 read FVScrollObj
+                                                         write SetScrollObj;
+
+    property OnMarginRowPaint : TLMDOnMarginRowPaint read FOnMarginRowPaint
+                                                     write FOnMarginRowPaint;
+    property OnCurrentRowChanged : TNotifyEvent read FOnRowChange
+                                                write FOnRowChange;
+    property OnRowCountChanged : TNotifyEvent read FOnRowCountChange
+                                              write FOnRowCountChange;
+
+  end;
+
+implementation

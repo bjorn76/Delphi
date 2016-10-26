@@ -1,0 +1,88 @@
+
+uses
+  dialogs,
+  Windows,
+  Classes,
+  Messages,
+  Menus,
+  LMDProcs,
+  LMDClass,
+  LMDWndProcComponent;
+
+const
+  defShowEntries:TLMDSysMenuEntries=[smRestore, smMove, smSize, smMinimize, smMaximize, smClose, smSwitch];
+
+type
+  {------------------------- TLMDSysMenu --------------------------------------}
+  TLMDSysMenuClickEvent=procedure(Sender:TObject; Index:Integer; aCaption:String) of object;
+
+  TLMDSysMenuMode=(mmItems, mmMenu);
+
+  TLMDSysMenu = class(TLMDWndProcComponent)
+  private
+    FFirst:Integer;
+    FActive:Boolean;
+    FMenuList,
+    FItems:TStringList;
+    FSysEntries:TLMDSysMenuEntries;
+    FMenu:TPopUpMenu;
+    it:TMenuItem; {dummy variable}
+    FMode:TLMDSysMenuMode;
+
+    FOnClick:TLMDSysmenuClickEvent;
+    FOnChange:TNotifyEvent;
+
+    procedure ActivateMenu(aValue:Boolean);
+    procedure ActivatePopUpMenu;
+    procedure CheckSysEntries(hMenu, hAppMenu:THandle);
+    procedure DeActivateMenu(aValue:Boolean);
+    procedure UpdatePopUpMenu;
+
+    function GetSystemMenuHandle:THandle;
+    function GetItems:TStrings;
+    function GetItemsCount:Integer;
+
+    procedure SetItems(aValue:TStrings);
+    procedure SetFirst(aValue:Integer);
+    procedure SetMenu(aValue:TPopUpMenu);
+    procedure SetMode(aValue:TLMDSysMenuMode);
+  protected
+    procedure Init;override;
+    procedure RestoreState;override;
+    procedure GetChange(Sender:TObject);override;
+    procedure Notification(AComponent:TComponent;Operation:TOperation);override;
+
+    function AppWndProc(var Message: TMessage):Boolean;override;
+    procedure WndProc(var Message: TMessage);override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+
+    procedure SetChecked(Index:Integer; aValue:Boolean);
+    procedure SetEnabled(Index:Integer; aValue:Boolean);
+    function GetChecked(Index:Integer):Boolean;
+    function GetEnabled(Index:Integer):Boolean;
+
+    procedure UpdateMenu;
+    procedure ForceUpdate;
+    function MenuString(Index:Integer):String;
+
+    property MenuCount:Integer read GetItemsCount;
+  published
+    property About;
+    property Enabled;
+    property Items:TStrings read GetItems write SetItems;
+    property InsertFrom:Integer read FFirst write SetFirst default -1;
+    property HandleApp;
+    property Menu:TPopUpMenu read FMenu write SetMenu;
+    property Mode:TLMDSysMenuMode read FMode write SetMode default mmItems;
+    property ShowEntries:TLMDSysMenuEntries read FSysEntries write FSysEntries default
+             [smRestore, smMove, smSize, smMinimize, smMaximize, smClose, smSwitch];
+
+
+    property OnClick:TLMDSysMenuClickEvent read FOnClick write FOnClick;
+    property OnChange:TNotifyEvent read FOnChange write FOnChange;
+  end;
+
+
+implementation

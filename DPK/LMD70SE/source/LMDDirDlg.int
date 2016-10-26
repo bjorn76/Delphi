@@ -1,0 +1,55 @@
+
+uses
+  Classes,
+  FileCtrl,
+  Forms,
+  LMDClass,
+  LMDBaseDialog;
+
+type
+  TLMDDirDlg = class(TLMDBaseDialog)
+  private
+    FOnError:TNotifyEvent;
+    FInitialDir,
+    FPath:String;
+    FAllowDir,
+    FShowDir:Boolean;
+    FCharCase:TLMDCharCase;
+    dirlistbox: TDirectoryListBox;
+    drivecombo: TDriveComboBox;
+    procedure drivecomboChange(Sender: TObject);
+    procedure newPathClick(Sender: TObject);
+  public
+    constructor Create(AOwner:TComponent);override;
+    procedure RaiseError;
+    function Execute:Boolean;override;
+    function ExecuteEnh(Main:TForm):Boolean;
+    Procedure GetDir(const title:String; var aPath:String);
+  published
+    property About;
+    property AllowNewDir:Boolean read FAllowDir write FAllowDir default false;
+    property CaptionFill;
+    property CaptionTitle;
+    property CharCase:TLMDCharCase read FCharCase write FCharCase default ccNormal;
+    property CustomButton;
+    property CtlXP;
+    property Colors;
+    property Effect;
+    property Hints;
+    property ImageList;
+    property ImageIndex;
+    Property InitialDir:String read FInitialDir write FInitialDir;
+    property ListIndex;
+    Property Path:String read FPath write FPath stored false;
+    property Position;
+    property RelatePos;
+    property ShowHints;
+    property ShowLabelDir:Boolean read FShowDir write FShowDir default false;
+    {Events}
+    property OnCustomize;
+    property OnCustomClick;
+    property OnFolderError:TNotifyEvent read FOnError write FOnError;
+  end;
+
+
+implementation

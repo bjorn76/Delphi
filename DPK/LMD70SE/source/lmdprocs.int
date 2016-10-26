@@ -1,0 +1,105 @@
+
+uses
+  Windows, SysUtils, controls;
+
+const
+  MaxBufferSize=32767;
+  MaxBufferIndex=MaxBufferSize+14;
+
+type
+  TLMDRectAlignment = (raLeft, raCenter, raRight);
+  TLMDAlignRect = record
+    align: TLMDRectAlignment;
+    index: Integer;
+    rect : TRect;
+  end;
+  PLMDAlignRect = ^TLMDAlignRect;
+
+  //Aligns rects in the given array a according to their alignment, index
+  //and (implicit) widths settings given in the array items
+  procedure LMDAlignRects(inRect: TRect; var a: Array of TLMDAlignRect);
+  procedure LMDCheckRects (var a: Array of TLMDAlignRect);
+
+{Some helpful func's}
+{------------------------------------------------------------------------------}
+{Rects}
+function  LMDExpandRect(const aRect:TRect; aValue:Integer):TRect;
+procedure LMDAdjustRect(var aRect:TRect; dx, dy:Integer);
+procedure LMDAdjustRectExt(var aRect:TRect; dx, dy, dx1, dy1:Integer);
+function LMDAffineRect(const srcRect, destRect:TRect):TRect;
+function LMDRectinRect(const first, second:TRect):Boolean;
+procedure LMDGetRectWH(const srcRect:TRect; var w,h:Integer);
+
+{Rotation}
+procedure LMDCalcRotRect(var aRect:TRect; anAngle :integer);
+function LMDRotatedXPos(Anangle, AWidth, AHeight :integer):integer;
+function LMDRotatedYPos(Anangle, AWidth, AHeight :integer):integer;
+{Points}
+procedure LMDMidpoint(const X :array of TPoint; var Mid :TPoint);
+procedure LMDOffsetPoints(var X :array of TPoint; dx, dy: integer);
+procedure LMDNullPoints(var X :array of TPoint);
+{General}
+function LMDMax(const X:array of Longint):Longint;
+function LMDMin(const X:array of Longint):Longint;
+function LMDMidI(x,y:LongInt):LongInt;
+function LMDMaxR(const X:array of Extended):Extended;
+function LMDMinR(const X:array of Extended):Extended;
+procedure LMDSwapInt(var x,y:Integer);
+procedure LMDSwapString(var x,y:String);
+
+{SetBit/GetBit for one Byte flags}
+{----------------------------------------------------------------------------}
+procedure LMDSetBit(var holder:Byte; bit:Byte; aValue:Boolean);
+procedure LMDSetBitUpTo(var Holder:Byte; upTo:Byte);
+function LMDGetBit(holder, bit:Byte):Boolean;
+
+{Math}
+function LMDExp(base, exp:LongInt):Int64;
+
+{Path}
+{------------------------------------------------------------------------------}
+type
+  TLMDPathPrefix=(ppWindows, ppSystem, ppProgram, ppFixed);
+
+function LMDAppPath:String;
+function LMDAppIniName:String;
+function LMDExtractFileName(const FileName:String):String;
+function LMDCreatePathPrefix(aValue:TLMDPathPrefix; Slash:Boolean):String;
+function LMDSystemDirectory:String;
+function LMDWindowsDirectory:String;
+function LMDShrunkFileName(const Filename:String; MaxLen:Integer):String;
+function LMDInc(var i: Integer): Integer;
+function LMDDec(var i: Integer): Integer;
+
+// Version 6.0
+procedure LMDMailTo(const aAddress: String; const aSubject:String='');
+procedure LMDJumpTo(const aAddress: String; local:Boolean=false);
+
+{Misc}
+{------------------------------------------------------------------------------}
+procedure LMDDelay(ms:LongWord);
+
+type
+  TLMDCompressionType=(ctLZRW); {more to come later}
+
+  TBufferSize=0..MaxBufferSize;
+  TBufferIndex=0..MaxBufferIndex;
+  TABuffer=array[TBufferIndex] of Byte;
+  {$IFNDEF CLR}
+  PBuffer=^TABuffer;
+  {$ENDIF}
+
+{Compression}
+{------------------------------------------------------------------------------}
+function LMDLZRWCompress({$IFDEF CLR}var{$ENDIF} Source, Dest: {$IFDEF CLR}TABuffer{$ELSE}PBuffer{$ENDIF}; SourceSize: TBufferSize): TBufferSize;
+function LMDLZRWDecompress({$IFDEF CLR}var{$ENDIF} Source, Dest: {$IFDEF CLR}TABuffer{$ELSE}PBuffer{$ENDIF}; Size: TBufferSize): TBufferSize;
+
+{System Menu}
+{------------------------------------------------------------------------------}
+type
+  TLMDSysMenuEntry=(smRestore, smMove, smSize, smMinimize, smMaximize, smClose, smSwitch);
+  TLMDSysMenuEntries=set of TLMDSysMenuEntry;
+
+procedure LMDCheckSystemMenu(aFlag:TLMDSysMenuEntries; aHandle:THandle; aW:Boolean);
+
+implementation

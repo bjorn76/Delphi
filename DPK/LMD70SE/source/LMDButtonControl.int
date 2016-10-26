@@ -1,0 +1,164 @@
+
+uses
+  Windows,
+  actnlist,
+  Messages,
+  Graphics,
+  Classes,
+  Controls,
+  intfLMDFaceControllerEditable,
+  intfLMDFaceControllerPressable,
+  LMDCont,
+  LMDUtils,
+  LMDGlyphTextLayout,
+  LMD3DCaption,
+  LMDGraph,
+  LMDCustomPanel;
+
+type
+  {----------------------- TLMDButtonControl ----------------------------------}
+  TLMDButtonControl = class(TLMDCustomPanel, ILMDFaceControllerEditable,
+                            ILMDFaceControllerPressable)
+  private
+    FAlignment        : TLMDGlyphTextLayout;
+    FDownCtrlState,
+    FDown,
+    FSaveRes,
+    FAutoSize,
+    FUseBitmap,
+    FClicksDisabled   : Boolean;
+    FGlyphFlat        : Boolean;
+    FFont3D           : TLMD3DCaption;
+    FFocusStyle       : TLMDGlyphTextFocusStyle;
+    FFocusColor       : TColor;
+    FUseFocusColor    : Boolean;
+    FOnChange         : TNotifyEvent;
+    FReadOnly         : Boolean;
+    function IsCheckedStored: Boolean;
+    procedure SetAlignment(aValue:TLMDGlyphTextLayout);
+    procedure SetBool(index:integer;aValue : Boolean);
+    procedure SetFocusStyle(aValue:TLMDGlyphTextFocusStyle);
+    procedure SetFocusColor(aValue:TColor);
+    procedure SetGlyphSize(aValue:Byte);
+    procedure SetUseFocusColor(aValue:Boolean);
+    procedure SetFont3D (aValue : TLMD3DCaption);
+    procedure SetTransparentColor(aValue:TColor);
+
+    procedure WMSetFocus (var Message: TMessage); message WM_SETFOCUS;
+    procedure WMKillFocus (var Message: TMessage); message WM_KILLFOCUS;
+    procedure CMEnabledChanged(var Message: TMessage); message CM_ENABLEDCHANGED;
+    procedure CMFontChanged(var Message: TMessage); message CM_FONTCHANGED;
+    procedure CMTextChanged(var Message: TMessage); message CM_TEXTCHANGED;
+    procedure WMSize(var Message: TMessage); message WM_SIZE;
+  protected
+    FGlyph            : TBitmap;
+    FInternal         : Integer;
+    FGlyphSize        : Byte;
+    // 7.0
+    FGlyphHeight      : Integer;
+    // ---
+    FTransparentColor : TColor;
+    FUpdating,
+    FGlyphTransparent : Boolean;
+    FItemPositions    : TLMDWhereRect; //JH March, 2. 2001
+
+    function fcGetModified: Boolean; virtual;
+    function fcGetReadOnly: Boolean; virtual;
+    function fcGetInvalidData: Boolean; virtual;
+    function fcGetPressed: Boolean; virtual;
+
+    procedure RestoreBorderFront; override;
+    procedure RestoreBorderBack; override;
+    procedure WndProc(var Message: TMessage); override;
+    procedure CreateStandardGlyph;virtual;
+    function GetChecked:Boolean; virtual;
+    procedure SetChecked(aValue:Boolean); virtual;
+    procedure ActionChange(Sender:TObject;CheckDefaults: Boolean); override;
+    function GetActionLinkClass:TControlActionLinkClass; override;
+    procedure DoTxtChange (Sender : TObject);virtual;
+    //procedure DoXPSupportChanged; override;    
+    function CanModify:Boolean;virtual;
+    function HasDown:Boolean; virtual;
+    procedure CorrectBounds; virtual;
+    procedure CreateParams(var Params:TCreateParams); override;
+    procedure DoThemeChanged; override;
+    function GetFocusRect: TRect;
+    function ControlSupportsXP: Boolean; override;
+    procedure CreateGlyph; virtual;
+    procedure RemoveGlyph;
+    procedure DrawFocus(target:TCanvas; aRect:TRect);
+    procedure DrawFace (aCanvas: TCanvas;
+          const aString:String;
+          Effects:TLMD3DCaption;
+          aDest: TRect;
+          srcCanvas: TCanvas;
+          var srcRect:TRect;
+          aMaskCanvas: TCanvas;
+          TransColor:TColor;
+          aLayout: TLMDGlyphTextLayout;
+          MultiLine,
+          Accel,
+          Transparent:Boolean;
+          ExtFlags:TLMDDrawTextStyles;
+          flags:LongInt); virtual; abstract;
+
+    function DrawItem(target:TCanvas; toDraw:Boolean; flag:Byte):TRect;virtual;abstract;
+    procedure DrawGlyph(Target:TCanvas=nil); virtual; abstract;
+    procedure DoExit; override;
+    procedure MouseEnter; override;
+    procedure MouseExit; override;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure GetChange(Sender:TObject);override;
+    function GetPalette:HPalette; override;
+    procedure Loaded; override;
+    procedure Paint; override;
+
+    property Checked: Boolean read GetChecked write SetChecked stored IsCheckedStored default False;
+
+    property AutoSize:Boolean index 0 read FAutoSize write SetBool default false;
+    property FocusStyle:TLMDGlyphTextFocusStyle read FFocusStyle write SetFocusStyle default fcText;
+    property FocusColor:TColor read FFocusColor write SetFocusColor default clGray;
+    property GlyphTransparent:Boolean index 1 read FGlyphTransparent write SetBool default false;
+    property GlyphTransparentColor:TColor read FTransparentColor write SetTransparentColor default clOlive;
+    property UseBitmap:Boolean read FUseBitmap write FUseBitmap default false;
+    property UseFocusColor:Boolean read FUseFocusColor write SetUseFocusColor default false;
+    property ClicksDisabled:Boolean read FClicksDisabled;
+    property SaveRes:Boolean read FSaveRes write FSaveRes default true;
+    property Down:Boolean read FDown write FDown;
+  public
+    constructor Create(aOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure PaintToControl(flag:Byte);
+    procedure UpDateNow (enabled : Boolean);
+
+    property GlyphSize:Byte read FGlyphSize write SetGlyphSize;
+    property GlyphFlat:Boolean index 2 read FGlyphFlat write SetBool default false;
+    property Alignment:TLMDGlyphTextLayout read FAlignment write SetAlignment;
+    property Flat;
+    property Font;
+    property Font3D:TLMD3DCaption read FFont3D write SetFont3D;
+    property Transparent;
+    property ImageList;
+    property ImageIndex;
+    property ListIndex;
+    property ReadOnly:Boolean read FReadOnly write FReadOnly default false;
+    property OnClick;
+    property OnChange:TNotifyEvent read FOnChange write FOnChange;
+  published
+    property CtlXP;
+    property Caption;
+    property DownGlyph:Boolean read FDownCtrlState write FDownCtrlState default false;
+    property ParentColor default True;
+  end;
+
+  {--------------------- TLMDButtonActionLink ---------------------------------}
+  TLMDButtonActionLink=class(TWinControlActionLink)
+  protected
+    FClient: TLMDButtonControl;
+    procedure AssignClient(aClient: TObject); override;
+    function IsCheckedLinked: Boolean; override;
+    procedure SetChecked(aValue: Boolean); override;
+  end;
+
+implementation

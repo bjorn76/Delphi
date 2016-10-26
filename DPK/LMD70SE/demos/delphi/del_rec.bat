@@ -1,0 +1,16 @@
+del *.obj /s
+del *.dcu /s
+del *.~* /s
+del *.hpp /s
+del *.dcp /s
+del *.dpl /s
+del *.bak /s
+del *.ini /s
+del *.log /s
+del *.exe /s
+del *.dof /s
+del *.cfg /s
+del *.dti /s
+del *.ddp /s
+del *.map /s
+del *.drc /s

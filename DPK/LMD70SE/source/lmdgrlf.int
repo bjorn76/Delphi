@@ -1,0 +1,46 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  lmdgraph, LMDClass, lmdutils, LMDFXCaption;
+
+Type
+  TLMDToggle = -180..180;
+
+  TLMDTransLabelTypes = (tmWave, tmNone, tmHalfcircle, tmArrow, tmSpeaker, tmInvSpeaker,
+                         tmFly, tmChair, tmStairs, tmInvStairs, tmBuckled, tmEnterprise,
+                         tmLNoseUp, tmLNoseDown, tmRNoseUp, tmRNoseDown,  tmCube,
+                         tmHalfmoon);
+  TLMDTransLabelAttributes = (taPerspective, taToggled, taAutoToggled, taEqualLetters);
+  TLMDTransLabelAttr = set of TLMDTransLabelAttributes;
+  TLMDPerspective = (tpFrog, tpBird);
+
+{ procedures and functions used by the component LMDGraphicLabel }
+
+{ the procedure CalcSize returns the width and height of the transformed text }
+procedure CalcSize       (Canvas : TCanvas;Var aRect : TRect;FFont : TFont;
+                          FFontFX : TLMDFXCaption; Caption : String;
+                          FTransform:TLMDTransLabelTypes;FToggle :TLMDToggle;
+                          FFactor : Integer;FInvertCaption : Boolean;
+                          FPerspective : TLMDPerspective;FPerspectiveDepth : Integer;
+                          FTransAttr : TLMDTransLabelAttr);
+{ the procedure CalcPosAndSize returns the position of one single letter in a
+  text transfomation. it is used by the procedures CalcSize and the procedure
+  SpecialTextOut }
+procedure CalcPosAndSize (X, Y, i, FFactor, MinSize, FToggle, FPerspectiveDepth : Integer;
+                          FFont : TFont;FTransAttr : TLMDTransLabelAttr;
+                          FTransform : TLMDTransLabelTypes;bm : single;
+                          DCaption : String;Canvas : TCanvas; Var LogRec: TLOGFONT;
+                          FFontFX : TLMDFXCaption; Var TS : TSize;
+                          Var X2, Y2 : Integer);
+
+{ the procedure SpecialTextOut paints the transformed text on the Canvas }
+procedure SpecialTextOut (Canvas : TCanvas; var aRect : TRect;FFont : TFont;
+                          FFontFX : TLMDFXCaption; Caption : String;
+                          FTransform:TLMDTransLabelTypes;FToggle :TLMDToggle;
+                          FFactor : Integer;FInvertCaption : Boolean;
+                          FPerspective : TLMDPerspective;FPerspectiveDepth : Integer;
+                          FTransAttr : TLMDTransLabelAttr);
+
+
+
+implementation

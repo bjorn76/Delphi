@@ -1,0 +1,65 @@
+
+uses
+  Classes,
+  Controls,
+  StdCtrls,
+  Windows,
+  Graphics,
+  LMDCustomExtCombo;
+
+type
+  TLMDDropDownStyle = (csDropDown, csDropDownList);
+
+  TLMDCustomListComboBox = class (TLMDCustomExtCombo)
+  private
+    FOld           : String;
+    FItemIndex,
+    FDropDownCount : Integer;
+    FSorted        : Boolean;
+    FDropDownStyle : TLMDDropDownStyle;
+    FOnSelected    : TNotifyEvent;
+    procedure SetItems (aValue : TStrings);
+    procedure SetSorted (aValue : Boolean);
+    function GetItems : TStrings;
+    procedure SetDropDownStyle (aValue: TLMDDropDownStyle);
+    function GetListBox:TListBox;
+    procedure SetItemIndex (aValue: Integer);
+  protected
+    procedure CreateControl; override;
+    procedure ModifyControl; override;
+    procedure ReModifyControl; override;
+    procedure DisplayControl; override;
+    procedure BeforeDropDown; override;
+    procedure Cancel; override;
+    function NoneSelected: Boolean; //added April 02, JH
+    function GetSelectedText: String; //added April 02, JH
+    procedure Accept; override;
+    function GetControl : TWinControl; override;
+    procedure DoDownKey; override;
+    procedure DoUpKey; override;
+    //JH March 2002
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    function DoMouseWheel(Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint): Boolean;override;
+    procedure DrawSpecialTextBackground (aCanvas: TCanvas; aRect: TRect); override; //JH March 2002
+    procedure ModifyTextRect; override;
+    function RedrawOnExit: Boolean; override;
+    function RedrawOnEnter: Boolean; override;
+
+    property Sorted: Boolean read FSorted write SetSorted default false;
+
+    property Items : TStrings read GetItems write SetItems;
+    property Style: TLMDDropDownStyle read FDropDownStyle write SetDropDownStyle default csDropDown;
+    property DropDownCount : Integer read FDropDownCount write FDropDownCount default 8;
+    property OnSelected: TNotifyEvent read FOnSelected write FOnSelected;
+  public
+    procedure Loaded; override;
+    constructor Create (aOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Init; override;
+    procedure SelectItem (const anItem: String);
+    property ItemIndex: Integer read FItemIndex write SetItemIndex;
+    property ListBox:TListBox read GetListBox;
+  published
+  end;
+
+implementation

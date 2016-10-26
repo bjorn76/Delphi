@@ -1,0 +1,226 @@
+
+uses
+  Windows, SysUtils, Classes, Graphics, Controls, Menus, stdctrls, forms, messages,
+  LMDBase,
+  LMDButton,
+  LMDConst,
+  LMDCustomControl,
+  LMDCustomComboBox;
+
+type
+
+  {********************* TLMDAssist control ***********************************}
+  TLMDAssist = class;
+
+  {------------------------- TLMDAssistPage -----------------------------------}
+  TLMDAssistPage = class(TLMDCustomControl)
+  private
+    FAssistControl:TLMDAssist;
+    FInclude: Boolean;
+    FOnComplete: TLMDStandardEvent;
+    FOnBeforeShowPage,
+    FOnAfterShowPage:TNotifyEvent;
+    FOnNextPage,
+    FOnPrevPage: TLMDStandardEvent;
+    procedure SetAssistControl(aValue:TLMDAssist);
+    procedure SetInclude(aValue:Boolean);
+    procedure SetPageIndex(aValue:Integer);
+    function GetPageIndex: Integer;
+  protected
+    procedure CreateParams(var Params:TCreateParams);override;
+    procedure Paint;override;
+    procedure ReadState(Reader:TReader);override;
+    property Visible default False;
+  public
+    constructor Create(AOwner: TComponent);  override;
+    destructor Destroy; override;
+    function CheckCompleted: Boolean;
+    property AssistControl: TLMDAssist read FAssistControl write SetAssistControl;
+    property Completed:Boolean read CheckCompleted;
+  published
+    property About;
+    property Align default alClient;
+    property Color;
+    property DragCursor;
+    property DragMode;
+    property Enabled;
+    property Font;
+
+    property Included:Boolean read FInclude write SetInclude default True;
+    property PageIndex: Integer read GetPageIndex write SetPageIndex stored False;
+
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+
+    property OnCompleted: TLMDStandardEvent read FOnComplete write FOnComplete;
+    property OnNextPage: TLMDStandardEvent read FOnNextPage write FOnNextPage;
+    property OnPrevPage: TLMDStandardEvent read FOnPrevPage write FOnPrevPage;
+
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDrag;
+
+    //4.01
+    property OnBeforeShowPage:TNotifyEvent read FOnBeforeShowPage write FOnBeforeShowPage;
+    property OnAfterShowPage:TNotifyEvent read FOnAfterShowPage write FOnAfterShowPage;
+
+    // V4 enhancements
+    property Anchors;
+    property Constraints;
+    property DragKind;
+    property BiDiMode;
+    property ParentBiDiMode;
+    property OnEndDock;
+    property OnStartDock;
+  end;
+
+
+  TLMDAssistButton = (abCustom, abHelp, abCancel);
+  TLMDAssistButtons = set of TLMDAssistButton;
+
+  TLMDInternalButtons = (btnCustom, btnhelp, btnPrev, btnNext, btnCancel);
+  TLMDInternalButtonStrings=(asCustom, asHelp, asPrev, asNext, asCancel, asFinish, asClose);
+
+  TLMDAssistPageChangeEvent=procedure(Sender:TObject; NewPage:TLMDAssistPage; var Cancel:Boolean) of object;
+
+  {------------------------- TLMDAssist ---------------------------------------}
+  TLMDAssist = class(TCustomControl)
+  private
+    FAbout:TLMDAboutVar;
+    FActivePage:TLMDAssistPage;
+    FButtons: TLMDAssistButtons;
+    FBtns:array[TLMDInternalButtons] of TLMDButton;
+    FShowLine,
+    FCompleted: Boolean;
+    FCustomStrings:TStrings;
+    FLineMargin,
+    FBtnWidth,
+    FBtnGap,
+    FBtnMargin,
+    FBtnHeight:Integer;
+
+
+    FOnCancel,
+    FOnChange,
+    FOnCustom:TNotifyEvent;
+    FOnComplete:TLMDStandardEvent;
+    FOnPageChange:TLMDAssistPageChangeEvent;
+    {internal}
+    FPages:TList;
+    FCRect:TRect;
+
+    procedure SetActivePage(aValue:TLMDAssistPage);
+    procedure SetButtons(aValue:TLMDAssistButtons);
+    procedure SetBoolean(Index:Integer; aValue:Boolean);
+    procedure SetButtonCaption(Index:TLMDInternalButtons; aValue:TLMDInternalButtonStrings);
+    procedure SetCustomStrings(aValue:TStrings);
+    procedure SetInteger(Index:Integer; aValue:Integer);
+    procedure SetMoveBtnState;
+    function GetCount:Integer;
+    function GetButton(Index:TLMDInternalButtons):TLMDButton;
+    function GetButtonCaption(Index:Integer):String;
+    function GetPage(Index:Integer):TLMDAssistPage;
+
+    procedure OnBtnsClick(Sender:TObject);
+    procedure CMEnabledChanged(var Message: TMessage); message CM_ENABLEDCHANGED;
+  protected
+    procedure AlignControls(aControl:TControl;var Rect:TRect);override;
+    procedure AssignBtnCaptions;
+    procedure AssignBtnProperties;
+    procedure CreateParams(var Params: TCreateParams);  override;
+    function FindNextPage(CurPage:TLMDAssistPage; GoForward, CheckInclude: Boolean):TLMDAssistPage;
+    procedure Loaded;override;
+    procedure Paint;override;
+    procedure GetChildren(Proc: TGetChildProc; Root: TComponent); override;
+    function GetChildOwner: TComponent; override;
+  public
+    constructor Create(AnOwner: TComponent);  override;
+    destructor Destroy;  override;
+
+    procedure FirstPage;
+    procedure InitPages;
+    procedure InsertPage(aValue:TLMDAssistPage);
+    procedure LastPage;
+    procedure MovePage(OldIndex, NewIndex: Integer);
+    procedure NextPage;
+    procedure PrevPage;
+    procedure RemovePage(aValue:TLMDAssistPage);
+    procedure VerifyNext;
+
+    property Count:Integer read GetCount;
+    property Completed:Boolean index 0 read FCompleted write SetBoolean;
+
+    {array properties}
+    property Button[Index:TLMDInternalButtons]:TLMDButton read GetButton;
+    property Page[Index:Integer]:TLMDAssistPage read GetPage;
+  published
+    property About:TLMDAboutVar read FAbout write FAbout stored False;
+    property ActivePage: TLMDAssistPage read FActivePage write SetActivePage;
+    property Align default alClient;
+
+    property BtnGap:Integer index 0 read FBtnGap write SetInteger default 8;
+    property BtnHeight:Integer index 1 read FBtnHeight write SetInteger default 25;
+    property BtnMargin:Integer index 2 read FBtnMargin write SetInteger default 12;
+    property BtnWidth:Integer index 3 read FBtnWidth write SetInteger default 75;
+    property Color;
+
+    property CustomStrings:TStrings read FCustomStrings write SetCustomStrings;
+    property DragCursor;
+    property DragMode;
+    property Enabled;
+    property Font;
+    property Buttons:TLMDAssistButtons read FButtons write SetButtons default [abCancel];
+    //5.06
+    property LineMargin:Integer index 4 read FLineMargin write SetInteger default 4;
+    // --
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property ShowLine:Boolean index 1 read FShowLine write SetBoolean default True;
+    property TabOrder;
+    property TabStop;
+    property Visible;
+
+
+    {own events}
+    property OnCancelClick: TNotifyEvent read FOnCancel write FOnCancel;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    property OnCustomClick: TNotifyEvent read FOnCustom write FOnCustom;
+    property OnCompleted: TLMDStandardEvent read FOnComplete write FOnComplete;
+    property OnChanging:TLMDAssistPageChangeEvent read FOnPageChange write FOnPageChange;
+
+    {inherited events}
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDrag;
+
+    // V4 enhancements
+    property Anchors;
+    property Constraints;
+    property DragKind;
+    property BiDiMode;
+    property ParentBiDiMode;
+    property OnEndDock;
+    property OnStartDock;
+  end;
+
+implementation

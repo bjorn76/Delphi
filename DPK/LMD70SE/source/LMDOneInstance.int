@@ -1,0 +1,26 @@
+
+uses
+  Classes,
+  LMDCustomComponent;
+
+type
+  TLMDOneInstanceMode=(oiActivateOnly, oiDefaultMessage, oiCustom);
+
+  TLMDOneInstance = class(TLMDCustomComponent)
+  private
+    FMode:TLMDOneInstanceMode;
+    FEnabled:Boolean;
+    FCustomEvent:TNotifyEvent;
+  protected
+    procedure Loaded;override;
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+  published
+    property About;
+    property Enabled:Boolean read FEnabled write FEnabled default True;
+    property Mode:TLMDOneInstanceMode read FMode write FMode default oiActivateOnly;
+    property OnCustom:TNotifyEvent read FCustomEvent write FCustomEvent;
+  end;
+
+implementation

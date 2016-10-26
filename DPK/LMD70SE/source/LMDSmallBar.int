@@ -1,0 +1,32 @@
+
+uses
+  Graphics,
+  Classes,
+  lmdgraph,
+  LMDObject;
+
+type
+  TLMDSmallBar = class(TLMDObject)
+    private
+      FAutosize:Boolean;
+      FBarCount:byte;
+      FColor:TColor;
+      FHSpace:Byte;
+      FVSpace:Byte;
+      Procedure SetAutosize(aValue:Boolean);
+      procedure SetByte(Index:Integer; aValue:Byte);
+      procedure SetColor(aValue:TColor);
+    public
+      constructor Create;override;
+      procedure Assign(Source:TPersistent);override;
+      function GetBarExtend(Direction:TLMDMeterDirection; w,h:Integer):Integer;
+    published
+      property AutoSize:Boolean read FAutosize write SetAutosize default True;
+      property BarColor:TColor read FColor write SetColor default clNavy;
+      property BarCount:Byte index 0 read FBarCount write SetByte default 10;
+      property HSpace:Byte index 1 read FHSpace write SetByte default 3;
+      property VSpace:Byte index 2 read FVSpace write SetByte default 3;
+  end;
+
+
+implementation

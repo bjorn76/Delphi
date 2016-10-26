@@ -1,0 +1,101 @@
+
+uses
+  Windows,
+  Graphics,
+  Messages,
+  Classes,
+  Controls,
+  lmdgrlf, //Graphic Label functions
+  LMDGraph,
+  LMDFillObject,
+  LMDFXCaption,
+  LMDGraphicControl,
+  LMDCustomImageList;
+
+type
+  {-------------------------- TLMDGraphicLabel --------------------------------}
+  TLMDCustomGraphicLabel = class(TLMDGraphicControl)
+  private
+    FToggle : TLMDToggle; { positive: toggles letters in tenth of degree left
+                            negative: toggles letters in tenth of degree right }
+    FFontFX : TLMDFXCaption;
+    FPerspectiveDepth,
+    FFactor : Integer;
+    FTransform : TLMDTransLabelTypes;
+    FTransAttr : TLMDTransLabelAttr;
+    FPerspective : TLMDPerspective;
+    FInvertCaption,
+    FAutoSize : Boolean;
+    FFillObject : TLMDFillObject;
+    FBrushBack  : TColor;
+    procedure SetBrushBack(aValue:TColor);
+    procedure SetToggle (Value : TLMDToggle);
+    procedure SetInteger (Index, Value: Integer);
+    procedure SetBoolean (Index : Integer; Value : Boolean);
+    procedure SetFontFX (Value : TLMDFXCaption);
+    procedure SetTransform (Value : TLMDTransLabelTypes);
+    procedure SetTransAttr (Value : TLMDTransLabelAttr);
+    procedure SetPerspective (Value : TLMDPerspective);
+    procedure SetFillObject (Value : TLMDFillObject);
+    procedure CMFontChanged(var Message:TMessage);message CM_FONTCHANGED;
+    procedure CMTextChanged(var Message:TMessage);message CM_TEXTCHANGED;
+  protected
+    procedure GetChange(Sender: TObject);override;
+    procedure GetIMLChange(Sender:TObject); override;
+    function GetLabelText:String;virtual;
+    function GetPalette:HPalette; override;
+    procedure Paint; override;
+  public
+    constructor Create (aOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Assign(Source:TPersistent); override;    
+  published
+    property About;
+    property Align;
+    property Bevel;
+    property BrushBackColor: TColor read FBrushBack write SetBrushBack default clBtnFace;
+    property Font;
+    property Toggle : TLMDToggle read FToggle write SetToggle default 0;
+    property FontFX : TLMDFXCaption read FFontFX write SetFontFX;
+    property Factor : Integer index 2 read FFactor write SetInteger default 5;
+    property Transform : TLMDTransLabelTypes read FTransform write SetTransform default tmWave;
+    property Attributes : TLMDTransLabelAttr read FTransAttr write SetTransAttr default [taAutoToggled];
+    property Perspective : TLMDPerspective read FPerspective write SetPerspective default tpBird;
+    property PerspectiveDepth : Integer index 4 read FPerspectiveDepth write SetInteger default 5;
+    property AutoSize : Boolean index 1 read FAutoSize write SetBoolean default false;
+    property InvertCaption : Boolean index 2 read FInvertCaption write SetBoolean default false;
+    property FillObject : TLMDFillObject read FFillObject write SetFillObject;
+    property ImageList;
+    property ImageIndex;
+    property ListIndex;
+    property Color;
+    property ParentColor;
+    property ParentFont;
+    property Transparent default false;
+    { events }
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnMouseDown;
+    property OnMouseEnter;
+    property OnMouseExit;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDrag;
+    
+    {4.0}
+    //properties
+    property Anchors;
+    //property BiDiMode;
+    property DragKind;
+    property Constraints;
+    //property ParentBiDiMode;
+    //events
+    property OnEndDock;
+    property OnStartDock;
+  end;
+
+
+implementation

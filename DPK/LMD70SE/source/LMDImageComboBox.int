@@ -1,0 +1,11 @@
+
+uses
+  LMDCustomImageComboBox;
+
+type
+  TLMDImageComboBox=class(TLMDCustomImageComboBox)
+  published
+    property ItemIndex;
+  end;
+
+implementation

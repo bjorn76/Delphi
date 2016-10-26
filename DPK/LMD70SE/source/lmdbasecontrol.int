@@ -1,0 +1,62 @@
+
+uses
+  controls,     //TGraphicControl
+  classes,      //TNotifyEvent
+  messages,     //TMessage
+  windows,      //TPoint, Rect, ...
+  graphics,     //clBlack, ...
+  LMDCont,      //TLMDCustomImageList,
+  LMDBitmapEffectObject,
+  LMDCustomImageList,
+  LMDBaseController,
+  LMDBase,
+  LMDControl;      //TLMDControl
+
+
+type
+  TLMDBaseControl=class(TLMDControl)
+  private
+    FImageList     : TLMDCustomImageList;
+    FIndex,
+    FListIndex     : Integer;
+    FChangeLink    : TLMDChangeLink;
+    FBackFX        : TLMDBitmapEffectObject;
+    procedure SetImageList(aValue:TLMDCustomImageList);
+    procedure SetIndex(index, aValue:Integer);
+    procedure SetBackFX (aValue : TLMDBitmapEffectObject);
+    {saving}
+    {----}
+    procedure ReadIdent(Reader:TReader);
+    procedure WriteIdent(Writer:TWriter);
+    function  CheckCont:Boolean;
+    function HasControl:Boolean;
+    {function HasIML:Boolean;}
+    {----  }
+  protected
+    {Transparenz}
+    function CheckOptimized:Boolean;virtual;
+    //function BackMapPoint(x1,y1:Integer):TPoint;
+    //function BackMapPoint (const aValue: TPoint): TPoint;override;
+    {------------}
+
+    procedure DefineProperties(Filer:TFiler);override;
+    function IMLEmpty:Boolean;
+    procedure GetIMLChange(Sender:TObject);virtual;
+    function GetScreenRect(aRect:TRect):TRect;
+    procedure Loaded;override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override ;
+    procedure SetImageIndex(aValue:Integer);
+
+    // Properties
+    property BackFX : TLMDBitmapEffectObject read FBackFX write SetBackFX;
+    property ImageList:TLMDCustomImageList read FImageList write SetImageList stored HasControl;
+    property ImageIndex:Integer index 0 read FIndex write SetIndex default 0;
+    property ListIndex:Integer index 1 read FListIndex write SetIndex default 0;
+  public
+    constructor Create(aOwner:TComponent);override;
+    destructor Destroy;override;
+    procedure BackUpdate; override;
+  end;
+
+
+implementation

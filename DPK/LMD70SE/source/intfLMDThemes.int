@@ -1,0 +1,25 @@
+
+uses
+  Windows,
+  Forms,
+  Graphics,
+  Controls,
+  Classes,
+  intfLMDBase;
+
+type
+  ILMDThemes = interface(IInterface)
+    ['{E795105E-6BB6-4A44-84D3-2E9664BBC1FE}']
+
+    function GetCtlXP:Boolean;
+    procedure SetCtlXP (aValue: Boolean);
+    function ControlSupportsXP: Boolean;
+
+    property CtlXP:Boolean read GetCtlXP write SetCtlXP;
+  end;
+
+  // set CtlXP property for all controls on aParen form
+  procedure LMDSetCtlXP(aParent: TCustomForm; Value:Boolean);overload;
+  procedure LMDSetCtlXP(aParent: TWinControl; Value:Boolean);overload;
+
+implementation

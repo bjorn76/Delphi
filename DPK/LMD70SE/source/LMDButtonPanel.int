@@ -1,0 +1,110 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  LMDCustomControl, LMDCustomPanel, LMDCustomBevelPanel, LMDCustomParentPanel,
+  LMDCustomPanelFill, lmdsbtn, LMDGraph, LMDButtonBase;
+
+type
+  TLMDBtnClickEvent = procedure (Sender : TObject; SendBtn : TObject; Btn : Integer) of object;
+
+  TLMDButtonPanel = class(TLMDCustomPanelFill)
+  private
+    FButtons   : TLMDSpecialButtons;
+    FBtnSize   : TPoint;
+    FBtnStyle  : TLMDUserButtonStyle;
+    FOnBtnClick: TLMDBtnClickEvent;
+    FSetBorders: Boolean;
+    FCustomXP: Boolean;
+    procedure SetCustomButtonXP(const Value: Boolean);
+    procedure SetButtons (aValue : TLMDSpecialButtons);
+    procedure SetBtnStyle (aValue : TLMDUserButtonStyle);
+    procedure SetBtnSize (index : Integer; aValue : Integer);
+    function GetBtnSize (index : Integer) : Integer;
+    procedure WMSize (var Msg : TWMSize); message WM_SIZE;
+  protected
+    procedure DoThemeChanged;override;
+    procedure InitBtnStyle;
+    function GetEmpty : Boolean; override;
+    procedure GetBtnsChange(Sender:TObject);
+    procedure GetChange (Sender : TObject); override;
+    procedure DoBtnClick (Sender : TObject);
+    procedure SetCustomButtonsXPMode(Value:Boolean);
+  public
+    constructor Create (aOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Loaded; override;
+    //use this function to add btns during runtime
+    //if you use Buttons.Add you have to call SetBorders manually!
+    procedure SetBorders;
+    function AddButton : Integer;
+    procedure InsertButton (index : Integer);
+  public
+    property DockManager;
+  published
+    // V4 enhancements
+    property Anchors;
+    property AutoSize;
+    property CtlXP;
+    property Constraints;
+    property UseDockManager default false;
+    property DockSite;
+    property DragKind;
+    property BiDiMode;
+    property ParentColor;
+    property ParentBiDiMode;
+
+    property OnCanResize;
+    property OnConstrainedResize;
+    property OnDockDrop;
+    property OnDockOver;
+    property OnEndDock;
+    property OnGetSiteInfo;
+    property OnStartDock;
+    property OnUnDock;
+
+    property About;
+    property Buttons : TLMDSpecialButtons read FButtons write SetButtons;
+    property ButtonHeight : Integer index 0 read GetBtnSize write SetBtnSize default 20;
+    property ButtonWidth : Integer index 1 read GetBtnSize write SetBtnSize default 20;
+    property ButtonStyle : TLMDUserButtonStyle read FBtnStyle write SetBtnStyle default ubsWin40;
+    property ButtonParentCtlXP:Boolean read FCustomXP write SetCustomButtonXP default true;
+    property Color;
+    property Align;
+    {$IFNDEF LMDTOOLS_SPECIALEDITION}
+      property BackFX;
+    {$ENDIF}
+    property Bevel;
+    property DragMode;
+    property DragCursor;
+    property Enabled;
+    property FillObject;
+    property Flat;
+    property ImageIndex;
+    property ImageList;
+    property ListIndex;
+    property Visible;
+    property PopupMenu;
+    property TabStop;
+    property TabOrder;
+    property Transparent;
+    property ShowHint;
+    property ParentShowHint;
+    //events
+    property OnButtonClick : TLMDBtnClickEvent read FOnBtnClick write FOnBtnClick;
+    property OnClick;
+    property OnDblClick;
+    property OnEnter;
+    property OnExit;
+    property OnResize;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseEnter;
+    property OnMouseExit;
+    property OnKeyDown;
+    property OnKeyUp;
+    property OnStartDrag;
+    property OnMouseWheel;
+  end;
+
+implementation

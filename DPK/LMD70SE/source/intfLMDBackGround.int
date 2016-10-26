@@ -1,0 +1,34 @@
+
+uses
+  Windows,
+  Graphics,
+  Controls,
+  Classes,  
+  intfLMDBase;
+
+type
+  ILMDBackground = interface(IInterface)
+    ['{0068598D-C5C6-488F-8E00-D813525C9163}']
+    function BackBitmap: TBitmap;
+    function BackBitmapCheck: Boolean;
+    function BackDrawArea(Canvas: TCanvas; const dest: TRect; const src: TPoint;
+                          flags:Word=0): Boolean;
+    function isTransparentSet: Boolean;
+    function BackMapPoint(const aValue: TPoint):TPoint;
+    function BackBitmapPalette: HPalette;
+    procedure BackUpdate;
+    function BackControl (index: Integer): TControl;
+    function BackControlCount: Integer;
+  end;
+
+  //helpers which can be used by controls implementing the ILMDBackground
+  function LMDBackBitmap (aControl: TControl): TBitmap;
+  function LMDBackBitmapCheck (aControl: TControl): Boolean;
+  function LMDBackDrawArea(aControl: TControl; Canvas: TCanvas; const dest: TRect; const src: TPoint;
+                        flags:Word): Boolean;
+  function LMDBackMapPoint(aControl: TControl; const aValue: TPoint):TPoint;
+  function LMDBackBitmapPalette(aControl: TControl): HPalette;
+  procedure LMDBackUpdate (aControl: TControl); overload;
+  procedure LMDBackUpdate (notComponent: TComponent; aControl: TControl); overload;
+
+implementation

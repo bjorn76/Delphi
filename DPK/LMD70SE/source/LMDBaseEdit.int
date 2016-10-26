@@ -1,0 +1,458 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  ExtCtrls, StdCtrls, Clipbrd, Menus,
+  lmdcaret,  lmdconst,
+  lmdutils, lmdgraph, lmdclass,
+
+  intfLMDFaceControllerEditable,
+  LMDBase,
+  LMDBoundLabel,
+  LMD3DCaption,
+  LMDDynLIFOBuffer,
+  LMDCustomBevelPanel;
+
+type
+
+  PLMDUndoRecord = ^TLMDUndoRecord;
+  TLMDUndoRecord = record
+    newText,             //text to be inserted
+    oldText : Pointer;    //text to be replaced
+    selstart, sellength,
+    newlength,
+    current : Integer;
+  end;
+
+  TLMDSearchStart = (stTop, stBottom, stCursor);
+  TLMDSearchDirection = (sdUp, sdDown);
+
+  TLMDEditOption = (eoNarrowHeight, eoSuppressDefaultMenu);
+  TLMDEditOptions = set of TLMDEditOption;
+
+  TLMDDelimiters = Set of Char;
+
+  TLMDTextChangeEvent=procedure(sender:TObject;At : Integer) of object;
+
+  TLMDBaseEdit = class(TLMDCustomBevelPanel, ILMDFaceControllerEditable)
+  private
+    FMousePos      : TSmallPoint;
+    FCaret         : TLMDCaret;
+    FTabEnter,
+    FEnableKeyInput,
+    FHasBoundLabel,
+    FSaveRes,
+    FDraggingAllowed,
+    FAskForLoop,
+    FRedoing,
+    FUndoing,
+    FCanUndo,
+    FCanRedo       : Boolean;
+
+    FOptions       : TLMDEditOptions;
+
+    FAlignment     : TAlignment;
+
+    FFont3D        : TLMD3DCaption;
+
+    FCursor        : TCursor; //needed to save the selected mouse cursor when dragging
+
+    // 7.0 RM
+    FTimerID       : TLMDTimer;
+    FTextRectBorderY,
+    // -----
+    //FUpdateCount,
+    FPrevCharPos,
+    FFirstLine,                    //first visible line (multiline)
+    FMaxLength,                    //max length of input
+    FSelLength     : Integer;      //length of selection
+
+    FUndoBuffer,
+    FRedoBuffer    : TLMDDynLIFOBuffer;
+
+    FHighTextColor,
+    FHighBackColor : TColor;
+
+    FDragging, //moving text with the mouse
+    FLeftButtonPressed,
+    FGetFocusOnMouseAbove,
+    FOEMConvert,
+    FAutoSelect,
+    FModified,
+    FReadOnly,
+    FInsert,
+    FHideSelection : Boolean;
+
+    FDelimiters    : TLMDDelimiters;
+
+    FOnTextChange  : TLMDTextChangeEvent;
+    FOnCursorPosChanged,
+    FOnModified,
+    FOnChange      : TNotifyEvent;
+
+    FCharCase      : TEditCharCase;
+
+    //support of bound labels, JH April 02
+    FEditLabel    : TLMDBoundLabel;
+    FLabelPosition: TLabelPosition;
+    FLabelSpacing : Integer;
+    FLabelSync:Boolean;
+    FUseGlobalTimer: Boolean;
+    procedure SetLabelPosition(const Value: TLabelPosition);
+    procedure SetLabelSpacing(const Value: Integer);
+    procedure SetHasLabel(aValue: Boolean);
+    procedure SetLabelSync(const Value: Boolean);
+    // 7.0
+    procedure ReadEditLabel(Stream: TStream);
+    {$IFNDEF LMDCOMP6}
+    procedure WriteEditLabel(Stream: TStream);
+    {$ENDIF}
+
+    procedure CMLMDBOUNDLABELCHANGE(var Message: TMessage); message CM_LMDBOUNDLABELCHANGE;
+    procedure CMVisibleChanged(var Message: TMessage); message CM_VISIBLECHANGED;
+    procedure CMEnabledChanged (var Message : TMessage); message CM_ENABLEDCHANGED;
+    procedure CMBiDiModeChanged(var Message: TMessage); message CM_BIDIMODECHANGED;
+    procedure CMTextChanged(var Msg: TMessage);message CM_TEXTCHANGED;
+    // --
+
+    procedure SetFont3D (aValue : TLMD3DCaption);
+    procedure SetInteger (Index : Integer; aValue : Integer);
+    procedure SetAlignment (aValue : TAlignment);
+    procedure SetBoolean (Index : Integer; aValue : Boolean);
+    procedure SetCaretVal (aValue : TLMDCaret);
+    procedure SetCharCase (aValue : TEditCharCase);
+    procedure SetText (aValue : String);
+    function GetText : String;
+
+    procedure SetSelText (aValue : String);
+    function GetSelText : String;
+
+    procedure DoUndo (Sender : TObject);
+    procedure DoCopy (Sender : TObject);
+    procedure DoCut (Sender : TObject);
+    procedure DoPaste (Sender : TObject);
+    procedure DoClear (Sender : TObject);
+    procedure DoOnTimer (Sender : TObject);
+    procedure DoSelectAll (Sender : TObject);
+    procedure DoLeftMouseBtn;
+    procedure CMMouseEnter(var Message: TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Message: TMessage); message CM_MOUSELEAVE;
+    procedure UpdateCaret;
+    procedure CMFontChanged (var Msg : TMessage); message CM_FONTCHANGED;
+    procedure WMChar(var Msg : TWMChar); message WM_CHAR;
+    procedure WMClear(var Msg : TWMClear); message WM_CLEAR;
+    procedure WMCopy(var Msg : TWMCopy); message WM_COPY;
+    procedure WMCut(var Msg : TWMCut); message WM_CUT;
+    procedure WMPaste(var Msg : TWMPaste); message WM_PASTE;
+    procedure WMSize(var Msg : TWMSize); message WM_SIZE;
+    procedure WMEraseBkGnd(var Msg : TWMEraseBkGnd); message WM_ERASEBKGND;
+    procedure WMLButtonDblClk(var Msg : TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
+    procedure WMLButtonDown(var Msg : TWMLButtonDown); message WM_LBUTTONDOWN;
+    procedure WMLButtonUp (var Msg : TWMLButtonUp); message WM_LBUTTONUP;
+    procedure WMRButtonUp (var Msg : TWMRButtonUp); message WM_RBUTTONUP;
+    procedure WMMouseActivate(var Msg : TWMMouseActivate); message WM_MOUSEACTIVATE;
+    procedure WMMouseMove(var Msg : TWMMouseMove); message WM_MOUSEMOVE;
+    procedure WMGetDlgCode(var Msg : TWMGetDlgCode); message WM_GETDLGCODE;
+    //
+    //procedure CMEnter(var Message: TCMGOTFOCUS);message CM_ENTER;
+    procedure WMSetFocus(var Msg : TWMSetFocus); message WM_SETFOCUS;
+    //
+    procedure WMKillFocus(var Msg : TWMKillFocus); message WM_KILLFOCUS;
+    procedure WMSetText(var Msg : TWMSetText); message WM_SETTEXT;
+    procedure WMGetText(var Msg : TWMGetText); message WM_GETTEXT;
+    procedure WMGetTextLength(var Message : TMessage); message WM_GETTEXTLENGTH;
+    procedure WMQuit(var Msg : TWMQuit); message WM_QUIT;
+    procedure EMCANUNDO (var Message : TMessage); message EM_CANUNDO;
+    procedure EMCHARFROMPOS (var Message : TMessage); message EM_CHARFROMPOS;
+    procedure EMEMPTYUNDOBUFFER (var Message : TMessage); message EM_EMPTYUNDOBUFFER;
+    procedure EMFMTLINES (var Message : TMessage); message EM_FMTLINES;
+    procedure EMGETFIRSTVISIBLELINE (var Message : TMessage); message EM_GETFIRSTVISIBLELINE;
+    procedure EMGETHANDLE (var Message : TMessage); message EM_GETHANDLE;
+    procedure EMGETLIMITTEXT (var Message : TMessage); message EM_GETLIMITTEXT;
+    procedure EMGETLINE (var Message : TMessage); message EM_GETLINE;
+    procedure EMGETLINECOUNT (var Message : TMessage); message EM_GETLINECOUNT;
+    procedure EMGETMARGINS (var Message : TMessage); message EM_GETMARGINS;
+    procedure EMGETMODIFY (var Message : TMessage); message EM_GETMODIFY;
+    procedure EMGETPASSWORDCHAR (var Message : TMessage); message EM_GETPASSWORDCHAR;
+    procedure EMGETRECT (var Message : TMessage); message EM_GETRECT;
+    procedure EMGETSEL (var Message : TMessage); message EM_GETSEL;
+    procedure EMGETTHUMB (var Message : TMessage); message EM_GETTHUMB;
+    procedure EMGETWORDBREAKPROC (var Message : TMessage); message EM_GETWORDBREAKPROC;
+    procedure EMLIMITTEXT (var Message : TMessage); message EM_LIMITTEXT;
+    procedure EMLINEFROMCHAR (var Message : TMessage); message EM_LINEFROMCHAR;
+    procedure EMLINEINDEX (var Message : TMessage); message EM_LINEINDEX;
+    procedure EMLINELENGTH (var Message : TMessage); message EM_LINELENGTH;
+    procedure EMLINESCROLL (var Message : TMessage); message EM_LINESCROLL;
+    procedure EMPOSFROMCHAR (var Message : TMessage); message EM_POSFROMCHAR;
+    procedure EMREPLACESEL (var Message : TMessage); message EM_REPLACESEL;
+    procedure EMSCROLL (var Message : TMessage); message EM_SCROLL;
+    procedure EMSCROLLCARET (var Message : TMessage); message EM_SCROLLCARET;
+    procedure EMSETHANDLE (var Message : TMessage); message EM_SETHANDLE;
+//    procedure EMSETLIMITTEXT (var Message : TMessage); message EM_SETLIMITTEXT;
+    procedure EMSETMARGINS (var Message : TMessage); message EM_SETMARGINS;
+    procedure EMSETMODIFY (var Message : TMessage); message EM_SETMODIFY;
+    procedure EMSETPASSWORDCHAR (var Message : TMessage); message EM_SETPASSWORDCHAR;
+    procedure EMSETREADONLY (var Message : TMessage); message EM_SETREADONLY;
+    procedure EMSETRECT (var Message : TMessage); message EM_SETRECT;
+    procedure EMSETRECTNP (var Message : TMessage); message EM_SETRECTNP;
+    procedure EMSETSEL (var Message : TMessage); message EM_SETSEL;
+    procedure EMSETTABSTOPS (var Message : TMessage); message EM_SETTABSTOPS;
+//    procedure EMSETWORDBREAK (var Message : TMessage); message EM_SETWORDBREAK;
+    procedure EMSETWORDBREAKPROC (var Message : TMessage); message EM_SETWORDBREAKPROC;
+    procedure EMUNDO (var Message : TMessage); message EM_UNDO;
+  protected
+    FBack          : TBitmap;
+    //we need to redefine this var because of the limitation to word size of the inherited Text
+    FText          : String;
+    FCursor2EndOnSelectAll,
+    FUserSelect,   //is user allowed to select text by himself?
+    //FNoUpdate,     //internally used - if true EndUpdate will not call DrawText!
+    FOutBuffered,
+    FSelMode,
+    FSettingText,
+    FNoSelection   : Boolean;
+    FInnerRect,
+    FPaintRect,
+    FTextRect      : TRect;
+    //FColumn and FSelStart must be accessible without calling
+    //SetInteger (it would call itself recursivley)
+    FCurrentChar,
+    FLineStart,
+    FLineEnd,
+    FSelStart,                     //selection start
+    FHiddenLeft    : Integer;
+    procedure SetupRects; virtual;
+    procedure CreateBack; virtual;
+    procedure FillControl; override;
+    procedure GetCommandKey (var KeyCode : Word; Shift : TShiftState); dynamic;
+    function CalcMouseCol(XPos : Integer) : Integer; virtual; abstract;
+    function CalcMouseRow(YPos : Integer) : Integer; virtual; abstract;
+    procedure DoAlignmentChange; virtual;
+    procedure SetCaret; virtual; abstract;
+    function BackOneMore: Boolean; virtual; //default false, otherwise backspace will delete the char before the selection in addition
+    procedure Change;virtual;
+    procedure GetChange (Sender : TObject); override;
+    function GetReadOnly: Boolean; override;
+    procedure SetNewText; virtual; abstract;
+    procedure GetNewText; virtual; abstract;
+    procedure DrawText(from : Integer); virtual; abstract;
+    function CalcMousePos(Pos : TSmallPoint) : Integer; virtual; abstract;
+    function RowHeight (s : String) : Integer; virtual;
+    function RowWidth (s : String) : Integer;
+    procedure CursorPosChanged; virtual;
+    procedure ChangedText (At : Integer); virtual;
+    procedure BeforeChangeText; virtual;
+    procedure FinishedSetSelText; virtual;
+    procedure HandleInsertText (at : Integer;var aValue : String); virtual;
+    procedure HandleReplaceText (at : Integer;aValue : String); virtual;
+    procedure RepaintBack (aRect : TRect); virtual;
+    function AllowedOperation(textToInsert : String) : Boolean; virtual;
+    procedure DoDestroyBufferEntry (Sender : TObject; item : Pointer);
+    function AllowCopyPaste : Boolean; virtual;
+    function RedrawOnExit: Boolean; virtual; //JH March 2002
+    function RedrawOnEnter: Boolean; virtual; //JH March 2002    
+    function ControlSupportsXP: Boolean; override;
+    function IsXPPartiallyTransparent:Boolean;override;
+    procedure DoThemeChanged; override; //JH March 2002
+
+    procedure SetLMDCaretPos (X, Y : integer);
+
+    procedure KeyDown(var Key: Word; Shift: TShiftState); override;
+    procedure KeyUp(var Key: Word; Shift : TShiftState); override;
+    procedure RestoreBorderFront; override;
+    procedure RestoreBorderBack; override;
+
+    //support of bound label, April 02
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure SetName(const Value: TComponentName); override;
+    procedure SetParent(AParent: TWinControl); override;
+
+    // 7.0 -----------------------------------------------
+    //procedure GetChildren(Proc: TGetChildProc; Root: TComponent);override;
+    procedure DefineProperties(Filer:TFiler);override;
+
+    function fcGetModified: Boolean; virtual;
+    function fcGetReadOnly: Boolean; virtual;
+    function fcGetInvalidData: Boolean; virtual;
+
+    // ---
+    property EditLabel: TLMDBoundLabel read FEditLabel;
+    property LabelSpacing: Integer read FLabelSpacing write SetLabelSpacing default 3;
+    property HasBoundLabel: Boolean read FHasBoundLabel write SetHasLabel;
+    //----------------------------------------------------
+
+    procedure FreeTimer;
+
+    procedure ModifyTextRect; virtual;
+    procedure ModifyPaintRect; virtual;
+    procedure ModifyInnerRect; virtual;
+
+    property Undoing : Boolean read FUndoing;
+    property TabOnEnter: Boolean read FTabEnter write FTabEnter default false;
+
+    //bounded label support, April 02, JH
+    property LabelPosition: TLabelPosition read FLabelPosition write SetLabelPosition default lpAbove;
+    property LabelSync:Boolean read FLabelSync write SetLabelSync default false;
+    property DraggingAllowed : Boolean read FDraggingAllowed write FDraggingAllowed default true;
+    property EnableKeyInput: Boolean read FEnableKeyInput write FEnableKeyInput;
+  public
+    constructor Create (AOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Paint; override;
+    procedure Loaded; override;
+
+    // 7.0
+    //procedure BeginUpdate;
+    //procedure EndUpdate;
+    procedure EndUpdate(repaint: Boolean=false);override; // 7.0 RM
+    // ---
+    //support of bound label, JH April 02
+    procedure SetBounds(ALeft: Integer; ATop: Integer; AWidth: Integer; AHeight: Integer); override;
+    procedure SetupEditLabel;
+    //
+
+    procedure SetSelection;
+    //selects the current word with the start, end of line and the space as delimiters
+    procedure SelectCurrentWord; virtual;
+    procedure SelectRightWord;
+    procedure SelectLeftWord;
+
+    procedure SetSelTextBuf(Buffer: PChar);
+    function GetSelTextBuf(Buffer: PChar; BufSize: Integer): Integer; virtual;
+
+    function Search (s : String;from : TLMDSearchStart;caseSensitive, wholeWords : Boolean;
+                      direction : TLMDSearchDirection) : Boolean;
+
+    function SearchAndReplace (s, r : String;from : TLMDSearchStart;caseSensitive, wholeWords : Boolean;
+                      direction : TLMDSearchDirection; ask, all : Boolean) : Boolean;
+
+    procedure GotoParaStart;
+    procedure GotoParaEnd;
+    procedure GotoNextWord;
+    procedure GotoPrevWord;
+    function GetCurrentWord : String;
+    function GetLength : Integer;
+
+    function CountWords : Integer;
+
+    procedure Replace (start, count : Integer; s : String);
+    procedure Upper (start, count : Integer);
+    procedure Lower (start, count : Integer);
+    function Cut (start, count : Integer) : String;
+    procedure Add (S : String);
+    procedure Insert (at : Integer; S : String);
+    function Copy (start, count : Integer) : String;
+
+    //select all text in the EditControl
+    procedure SelectAll;
+    procedure Clear; virtual;
+    procedure ClearSelection;
+    procedure CopyToClipboard;
+    procedure CutToClipboard; virtual; //needs to be overridden in db version
+    procedure PasteFromClipboard; virtual; //needs to be overridden in db version
+    procedure Undo;
+    procedure ClearUndo;
+    procedure Redo;
+
+    property Text : String read GetText write SetText stored true;
+
+    property CurrentChar : Integer index 5 read FCurrentChar write SetInteger;
+
+    property Delimiters : TLMDDelimiters read FDelimiters write FDelimiters;
+
+    property Font;
+    property Font3D : TLMD3DCaption read FFont3D write SetFont3D;
+
+    property MaxLength : Integer index 0 read FMaxLength write SetInteger default 0;
+    property SelStart : Integer index 1 read FSelStart write SetInteger default 0;
+    property SelLength : Integer index 2 read FSelLength write SetInteger default 0;
+    property FirstLine : Integer read FFirstLine;
+
+    property SelText : String read GetSelText write SetSelText;
+    property HideSelection : Boolean index 0 read FHideSelection write SetBoolean default true;
+    property Alignment : TAlignment read FAlignment write SetAlignment default taLeftJustify;
+    property ReadOnly : Boolean index 1 read FReadOnly write SetBoolean default false;
+    property Modified : Boolean index 2 read FModified write SetBoolean default false;
+    property AutoSelect : Boolean index 4 read FAutoSelect write SetBoolean default false;
+    property OEMConvert : Boolean index 5 read FOEMConvert write SetBoolean default false;
+    property CharCase : TEditCharCase read FCharCase write SetCharCase default ecNormal;
+//    property MouseAbove : Boolean read FMouseAbove;
+
+    property AskForLoop : Boolean read FAskForLoop write FAskForLoop default true;
+  published
+    property About;
+//    property BorderStyle;
+    {.$IFNDEF LMDTOOLS_SPECIALEDITION}
+      property BackFX;
+      property FaceController;
+    {.$ENDIF}
+    property HighlightBack : TColor read FHighBackColor write FHighBackColor default clHighLight;
+    property HighlightText : TColor read FHighTextColor write FhighTextColor default clHighLightText;
+    property Bevel;
+    property FocusOnMouseAbove : Boolean index 6 read FGetFocusOnMouseAbove write SetBoolean default false;
+    property Caret : TLMDCaret read FCaret write SetCaretVal;
+    property Color default clWindow;
+    property Cursor default crIBeam;
+    property Ctl3D;
+    property CtlXP;
+    property DragCursor;
+    property DragMode;
+    property Enabled;
+    property Flat;
+    property Hint;
+    property ImageList;
+    property ImageIndex;
+    property ImeMode;
+    property ImeName;
+    property ListIndex;
+    property ParentColor default false;
+    property ParentCtl3D;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property TabOrder;
+    property TabStop default true;
+    property Tag;
+    property Transparent;
+    // 7.0 RM
+    property UseGlobalTimer:Boolean read FUseGlobalTimer write FUseGlobalTimer default false;
+    // ---
+    property Visible;
+
+    property Options : TLMDEditOptions read FOptions write FOptions default [];
+
+    property OnCursorPosChanged : TNotifyEvent read FOnCursorPosChanged write FOnCursorPosChanged;
+    property OnTextChangedAt : TLMDTextChangeEvent read FOnTextChange write FOnTextChange;
+    property OnChange : TNotifyEvent read FOnChange write FOnChange;
+    property OnModified : TNotifyEvent read FOnModified write FOnModified;
+    property OnContextPopup;
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDrag;
+    property OnAfterEnter;
+    property OnAfterExit;
+    property OnMouseEnter;
+    property OnMouseExit;
+    property OnMouseWheel;
+
+    // V4 enhancements
+    property Anchors;
+    property Constraints;
+    property DragKind;
+    property BiDiMode;
+    property ParentBiDiMode;
+    property OnEndDock;
+    property OnStartDock;
+  end;
+
+implementation

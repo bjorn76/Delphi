@@ -1,0 +1,121 @@
+
+uses
+  Windows,
+  Graphics,
+  Messages,
+  Classes,
+  LMDBase,
+  LMDClass,
+  LMDTimer,
+  LMDCustomLImage;
+
+type
+  {3.0}
+  TLMDAnimationStyle=(asLoop,           {loop animation}
+                      asLoopHide,       {loop animation, hide ctrl when stopped}
+                      asLoopReverse,    {loop and flip direction}
+                      asRepeat,           {play animation 'repetitions' times, last picture is shown}
+                      asRepeatFirst,      {play animation 'repetitions' times, first picture is shown}
+                      asRepeatHide);      {play animation 'repetitions' times, hide ctrl then}
+
+
+  {--------------------------- TLMDAniCtrl ------------------------------------}
+  TLMDAniCtrl=class(TLMDCustomLImage)
+  private
+    {Background}
+    FBack:TBitmap;
+    FRestore:Boolean;
+    FMakeVisible,
+    FForward,           {internal, current direction}
+    FUseBitmap,
+    FReverse,
+    FPlaying:Boolean;   {are we currently playing?}
+    FInterval:TLMDTimerInterval;
+    FAniStyle:TLMDAnimationStyle;
+    FStartFrame, FStopFrame:Integer;
+    FRepeat, FCounter:Byte;
+    FTimerId:TLMDTimer;
+    //4.0
+    FTimerMode:TLMDTimerMode;
+    FTimer:TLMDHiTimer;
+    FThreadPriority:TThreadPriority;
+    //--
+    FOnStart,
+    FOnAnimate,
+    FOnStop:TNotifyEvent;
+
+    procedure SetAniStyle(aValue:TLMDAnimationStyle);
+    procedure SetBool(Index:Integer; aValue:Boolean);
+    procedure SetInterval(aValue:TLMDTimerInterval);
+    procedure SetRepetitions(aValue:Byte);
+    procedure SetStartFrame(aValue:Integer);
+    procedure SetStopFrame(aValue:Integer);
+    procedure SetThreadPriority(aValue:TThreadPriority);
+    procedure SetTimerMode(aValue:TLMDTimerMode);
+    procedure GetTimer(Sender:TObject);
+    function  GetCurrentFrame:Integer;
+    function  GetFirstFrame:Integer;
+    function  GetLastFrame:Integer;
+    //4.0
+    procedure ActivateTimer;
+    procedure DeActivateTimer(aValue:TLMDTimerMode);
+    procedure EnableTimer(aValue:Boolean);
+    //--
+    procedure CMTRANSPARENTCHANGED(var Message: TMessage); message CM_TRANSPARENTCHANGED;
+  protected
+    procedure BoundsChange(State:TLMDBoundsChangeStates);override;
+    function GetEmpty:Boolean;override;
+    procedure GetIMLChange(Sender:TObject);override;
+    procedure Loaded; override;
+    procedure Paint; override;
+    procedure PaintImage(f:Boolean);
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+    procedure Invalidate;override;
+    procedure BackUpdate;override;
+    
+    {Play/Stop -Routines}
+    procedure Play;
+    procedure Stop;
+
+    {Movement-Routines}
+    procedure First;
+    procedure Last;
+    procedure Move(aValue:Integer);
+    procedure Next;
+    procedure Prev;
+
+    property Current:Integer read GetCurrentFrame;
+  published
+    property Animate:Boolean index 0 read FPlaying write SetBool stored false;
+    property AnimationStyle:TLMDAnimationStyle read FAniStyle write SetAniStyle default asLoop;
+    property Bevel;
+    property MakeVisible:Boolean index 1 read FMakeVisible write SetBool default True;
+    property Interval:TLMDTimerInterval read FInterval write SetInterval default 200;
+    property Repetitions:Byte read FRepeat write SetRepetitions default 1;
+    property Reverse:Boolean index 3 read FReverse write SetBool default false;
+    property StartFrame:Integer read FStartFrame write SetStartFrame;
+    property StopFrame:Integer read FStopFrame write SetStopFrame;
+    property UseBitmap:Boolean index 2 read FUseBitmap write SetBool default True;
+
+    {enthalten}
+    property ForceTransparent default True;
+    property ImageList;
+    property ListIndex;
+    property SilentMove;
+    property Style;
+    property Transparent default false;
+
+    // NEW from 4.0
+    property TimerMode:TLMDTimerMode read FTimerMode write SetTimerMode default tmNormal;
+    property ThreadPriority:TThreadPriority read FThreadPriority write SetThreadPriority default tpNormal;
+
+    {events}
+    property OnStart:TNotifyEvent read FOnStart write FOnStart;
+    property OnAnimate:TNotifyEvent read FOnAnimate write FOnAnimate;
+    property OnStop:TNotifyEvent read FOnStop write FOnStop;
+  end;
+
+
+implementation

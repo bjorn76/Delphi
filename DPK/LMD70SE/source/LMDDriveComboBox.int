@@ -1,0 +1,91 @@
+
+uses
+  Windows,
+  Messages,
+  Classes,
+  Controls,
+  StdCtrls,
+  Graphics,
+  LMDCustomComboBox;
+
+type
+  TLMDDriveType = (dtUnknown, dtNoRoot, dtRemovable, dtFixed, dtNetwork, dtCDROM, dtRAM);
+
+  { ************************* TLMDDriveComboBox ****************************** }
+  TLMDDriveComboBox = class(TLMDCustomComboBox)
+  private
+    iml    : TImageList;
+    FDrive : Char;
+//    FTextCase: TTextCase;
+    procedure CMFontChanged(var Message: TMessage); message CM_FONTCHANGED;
+    procedure SetDrive(NewDrive: Char);
+//    procedure SetTextCase(NewTextCase: TTextCase);
+    procedure ReadBitmaps;
+    procedure ResetItemHeight;
+
+//    procedure WMDEVICECHANGE (var Msg : TMessage); message CM_DEVICECHANGE;
+  protected
+    CDROMBMP, RAMBMP: TBitmap;
+    procedure CreateWnd; override;
+    procedure DrawItem(Index: Integer; Rect: TRect; State: TOwnerDrawState); override;
+    procedure Click; override;
+    procedure BuildList; virtual;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    property Text;
+    property Drive: Char read FDrive write SetDrive;
+  published
+//    property TextCase: TTextCase read FTextCase write SetTextCase default tcLowerCase;
+    property About;
+    property Color;
+    property Ctl3D;
+    property DragMode;
+    property DragCursor;
+    property DropDownCount;
+    property DropDownWidth;
+    property Enabled;
+    property Flat;
+    property FocusControl;
+    property Font;
+    property ParentColor;
+    property ParentCtl3D;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    //property Search;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    property UseGlobalTimer;
+    property Visible;
+
+   {Events}
+   property OnSelect;
+   property OnChange;
+   property OnClick;
+   property OnDblClick;
+   property OnDragDrop;
+   property OnDragOver;
+   property OnDropDown;
+   property OnEndDrag;
+   property OnEnter;
+   property OnExit;
+   property OnKeyDown;
+   property OnKeyPress;
+   property OnKeyUp;
+   property OnStartDrag;
+
+    // V4 enhancements
+    property Anchors;
+    property Constraints;
+    property DragKind;
+    property BiDiMode;
+    property ParentBiDiMode;
+    property OnEndDock;
+    property OnStartDock;
+
+  end;
+
+
+implementation

@@ -1,0 +1,143 @@
+
+
+uses
+  windows, graphics, classes, controls, forms, dialogs, sysutils, messages,
+  LMDClass, lmdgraph, lmdcont, lmdbase,
+
+  LMDCustomImageList,
+  LMDBaseController,
+  LMDPointList,
+  LMDObject,
+  LMDFillObject,
+  LMDWndProcComponent,
+  LMDRegionMask,
+  LMDRgnShadow;
+
+type
+  TLMDRegionShape = (rsRect, rsRoundRect, rsBitmap, rsNoseRect, rsRoundNoseRect,
+                     rsElliptic, rsStar, rsRoundShield, rsSharpShield, rsDiamond,
+                     rsOctagon, rsComb, rsHalfRound, rsUserRegion, rsThinkBubble, rsRoundThinkBubble, rsEllipticThinkBubble,
+                     rsPointList);
+
+  TLMDRegionBorderStyle = (rbNone, rbLowered, rbRaised, rbSingle, rbSingleRaised, rbSingleLowered, rbRaisedpsb, rbLoweredpsb);
+  TLMDBorderDrawEvent = procedure (Sender : TObject; Canvas : TCanvas; Rect : TRect) of object;
+  TLMDExtPos = (epLeftTop, epTopLeft,  epTopRight, epRightTop,  epRightBottom, epBottomRight, epBottomLeft, epLeftBottom);
+
+  { -------------------------------------------------------------------------- }
+  TLMDRegionBorder = class(TLMDObject)
+  private
+    FBorderStyle : TLMDRegionBorderStyle;
+    FUpColor,
+    FDnColor,
+    FSiColor     : TColor;
+
+    procedure SetBorderStyle (aValue : TLMDRegionBorderStyle);
+    procedure SetColor (index : integer; aValue : TColor);
+  public
+    constructor Create; override;
+    procedure Assign (Source : TPersistent); override;
+  published
+    property Style : TLMDRegionBorderStyle read FBorderStyle write SetBorderStyle default rbSingle;
+    property LightColor  : TColor index 0 read FUpColor write SetColor default clBtnHighLight;
+    property ShadowColor : TColor index 1 read FDnColor write SetColor default clBtnShadow;
+    property SingleColor : TColor index 2 read FSiColor write SetColor default clBlack;
+  end;
+
+  { -------------------------------------------------------------------------- }
+  TLMDRegion = class(TLMDObject)
+  private
+    FShape    : TLMDRegionShape;
+    FBorder   : TLMDRegionBorder;
+    FMask     : TLMDRegionMask;
+    FBubbleCount,
+    FUserRgnDataSize,
+    FRoundX,
+    FRoundY      : Integer;
+    FNewHandle,
+    FHandleInUse : HRGN;
+    FOwner       : TWinControl;
+    FUserRgnData : PRGNDATA;
+    FNosePos     : TLMDExtPos;
+    FShadow      : TLMDRgnShadow;
+    FOffsetRgn   : TPoint;
+    FTurnOffShadow : Boolean;
+    FPointList   : TLMDPointList;
+
+    procedure SetRegionShape (aValue : TLMDRegionShape);
+    procedure SetBorder (aValue : TLMDRegionBorder);
+    procedure SetMask (aValue : TLMDRegionMask);
+    procedure SetInteger (index : Integer; aValue : Integer);
+    procedure SetShadow (aValue : TLMDRgnShadow);
+    procedure SetNosePos (aValue : TLMDExtPos);
+
+//    procedure DeleteHandle (var aValue : HRGN);
+    procedure GetPointListChange (Sender : TObject);
+
+    procedure WriteData (Writer : TWriter);
+    procedure ReadData (Reader : TReader);
+  protected
+    procedure DefineProperties (Filer : TFiler); override;
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+
+    procedure Assign (Source : TPersistent); override;
+
+    procedure CreateRegion (aRect : TRect); dynamic;
+    procedure CreateSpecialRectRgn (aRect : TRect);
+    procedure SetRegion;
+    procedure DrawShadow(aCanvas : TCanvas;var aRect : TRect);
+    procedure FreeRegion;
+    procedure PaintRegionShape (aCanvas : TCanvas;aRect : TRect); dynamic;
+    procedure SetUserRgn (aRGN : HRGN);
+    procedure SetUserPolygonRgn (const points : array of TPoint);
+
+    property CreatedHandle : HRGN read FNewHandle;//new creted handle - use SetRegion to make it the currently used one
+    property Handle : HRGN read FHandleInUse;     //handle currently used by a control
+    property Border : TLMDRegionBorder read FBorder write SetBorder;
+    property Owner : TWinControl read FOwner write FOwner;
+    property OffsetRegion : TPoint read FOffsetRgn write FOffsetRgn;
+    property TurnOffShadow : Boolean read FTurnOffShadow write FTurnOffShadow default false;
+  published
+    property Points : TLMDPointList read FPointList write FPointList;
+    property Shape  : TLMDRegionShape read FShape write SetRegionShape default rsRoundRect;
+    property ExtPos : TLMDExtPos read FNosePos write SetNosePos default epLeftTop;
+    property Mask   : TLMDRegionMask read FMask write SetMask;
+    property RoundX : Integer index 0 read FRoundX write SetInteger default 20;
+    property RoundY : Integer index 1 read FRoundY write SetInteger default 20;
+    property Shadow : TLMDRgnShadow read FShadow write SetShadow;
+  end;
+
+  { -------------------------------------------------------------------------- }
+  TLMDBorderRegion = class (TLMDRegion)
+  published
+    property Border;
+  end;
+
+  function LMDCreateDiamondRgn (aRect : TRect) : HRGN;
+  function LMDCreateStarRgn (aRect : TRect) : HRGN;
+  function LMDCreateOctagonRgn (aRect : TRect) : HRGN;
+  function LMDCreateCombRgn (aRect : TRect) : HRGN;
+  function LMDCreateRoundShieldRgn (aRect : TRect) : HRGN;
+  function LMDCreateSharpShieldRgn (aRect : TRect) : HRGN;
+  function LMDCreateNoseRectRgn (aRect : TRect; ns : Integer; Pos : TLMDExtPos) : HRGN;
+  function LMDCreateRoundNoseRectRgn (aRect : TRect; ns, xround, yround : Integer; Pos : TLMDExtPos) : HRGN;
+  function LMDCreateThinkBubbleRgn (aRect : TRect; bs, bc : Integer; Pos : TLMDExtPos) : HRGN;
+  function LMDCreateRoundThinkBubbleRgn (aRect : TRect; bs, bc : Integer; Pos : TLMDExtPos; roundx, roundy : Integer) : HRGN;
+  function LMDCreateEllipticThinkBubbleRgn (aRect : TRect; bs, bc : Integer; Pos : TLMDExtPos) : HRGN;
+
+  procedure LMDFrameDiamondRgn (aCanvas : TCanvas;aRect : TRect; colorUp, colorDn, colorSi : TColor; style : TLMDRegionBorderStyle);
+  procedure LMDFrameStarRgn (aCanvas : TCanvas;aRect : TRect; colorUp, colorDn, colorSi : TColor; style : TLMDRegionBorderStyle);
+  procedure LMDFrameOctagonRgn (aCanvas : TCanvas;aRect : TRect; colorUp, colorDn, colorSi : TColor; style : TLMDRegionBorderStyle);
+  procedure LMDFrameCombRgn (aCanvas : TCanvas;aRect : TRect; colorUp, colorDn, colorSi : TColor; style : TLMDRegionBorderStyle);
+  procedure LMDFrameRoundShieldRgn (aCanvas : TCanvas;aRect : TRect; colorUp, colorDn, colorSi : TColor; style : TLMDRegionBorderStyle);
+  procedure LMDFrameSharpShieldRgn (aCanvas : TCanvas;aRect : TRect; colorUp, colorDn, colorSi : TColor; style : TLMDRegionBorderStyle);
+  procedure LMDFrameEllipticRgn (aCanvas : TCanvas;aRect : TRect; colorUp, colorDn, colorSi : TColor; style : TLMDRegionBorderStyle);
+  procedure LMDFrameRoundRectRgn (aCanvas : TCanvas;aRect : TRect; colorUp, colorDn, colorSi : TColor; style : TLMDRegionBorderStyle; RX, RY : Integer);
+  procedure LMDFrameHalfRoundRgn (aCanvas : TCanvas;aRect : TRect; colorUp, colorDn, colorSi : TColor; style : TLMDRegionBorderStyle);
+  procedure LMDFrameRectRgn (aCanvas : TCanvas;aRect : TRect; colorUp, colorDn, colorSi : TColor; style : TLMDRegionBorderStyle);
+  procedure LMDFrameThinkBubbleRgn (aCanvas : TCanvas;aRect : TRect; bs, bc : Integer; Pos : TLMDExtPos;colorUp, colorDn, colorSi : TColor; style : TLMDRegionBorderStyle);
+  procedure LMDFrameRoundThinkBubbleRgn (aCanvas : TCanvas;aRect : TRect; bs, bc : Integer; Pos : TLMDExtPos; roundx, roundy : Integer;colorUp, colorDn, colorSi : TColor; style : TLMDRegionBorderStyle);
+  procedure LMDFrameEllipticThinkBubbleRgn (aCanvas : TCanvas;aRect : TRect; bs, bc : Integer; Pos : TLMDExtPos;colorUp, colorDn, colorSi : TColor; style : TLMDRegionBorderStyle);
+
+implementation

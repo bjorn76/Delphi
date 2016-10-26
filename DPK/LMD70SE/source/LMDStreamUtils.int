@@ -1,0 +1,38 @@
+
+uses
+  Windows, Classes, Forms, Graphics, Controls, SysUtils,
+  LMDClass,
+  LMDGraph,
+  LMDWave,
+  LMDStrings,
+  LMDBase;
+
+procedure LMDBmpSaveDIBStream(Stream:TStream; Bitmap: TBitmap; Colors: Integer);
+
+{Streaming Support for TLMDItem/TLMDList}
+{----------------------------------------------------------------------------}
+{Procedures/Funcs for internal Streaming-System -> TLMDList/TLMDListItem
+ compatible with 16/32bit}
+
+procedure LoadCompressedStream(src, target:TStream);
+procedure SaveCompressedStream(src, target:TStream; size:LongInt);
+
+{Writing Procedures}
+procedure stWriteByte(Stream:TStream; aValue:Byte);
+procedure stWriteInteger(Stream:TStream; aValue:LongInt);
+procedure stWriteWord(Stream:TStream; aValue:Word);
+procedure stWriteString(Stream:TStream; const aValue:String);
+procedure stWriteStringList(Stream:TStream; aValue:TStrings; Compressed:Boolean);
+procedure stWriteWave(Stream:TStream; aValue:TLMDWave; Compressed:Boolean);
+procedure stWriteBitmap(Stream:TStream; aValue:TBitmap; Compressed:Boolean; Colors:Integer);
+
+{Reading Functions/Procs}
+function stReadInteger(Stream:TStream):LongInt;
+function stReadByte(Stream:TStream):Byte;
+function stReadWord(Stream:TStream):Word;
+function stReadString(Stream:TStream):String;
+procedure stReadStringList(Stream:TStream; aValue:TStrings; Compressed:Boolean);
+procedure stReadWave(Stream:TStream; aValue:TLMDWave; Compressed:Boolean);
+procedure stReadBitmap(Stream:TStream; aValue:TBitmap; Compressed:Boolean);
+
+implementation

@@ -1,0 +1,8 @@
+
+uses
+  LMDCustomShapeButton;
+
+type
+  TLMDShapeButton=class(TLMDCustomShapeButton);
+
+implementation

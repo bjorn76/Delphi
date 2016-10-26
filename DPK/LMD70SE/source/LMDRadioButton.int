@@ -1,0 +1,125 @@
+
+uses
+  Windows,
+  Messages,
+  Controls,
+  Classes,
+  Graphics,
+  LMDButtonControl,
+  LMD3DCaption,
+  LMDGlyphTextLayout,
+  LMDGraph,
+  LMDCustomImageList;
+
+type
+  {------------------------- TLMDRadioButton ----------------------------------}
+  TLMDRadioButton=class(TLMDButtonControl)
+  private
+    FTurnSibling,
+    FChecked:Boolean;
+    procedure CMDialogChar(var Message: TCMDialogChar); message CM_DIALOGCHAR;
+  protected
+    function isSibling (aControl: TControl) : Boolean; virtual;
+    procedure DoFlatChanged; override;
+    procedure CreateGlyph; override;
+    procedure CreateStandardGlyph;override;
+    function GetChecked:Boolean;override;
+    procedure SetChecked(aValue:Boolean);override;
+    procedure DoEnter; override;
+    function GetGlyphNumber(flag: Word) : Integer;    
+    procedure DrawFace (aCanvas: TCanvas; const aString:String;
+                    Effects:TLMD3DCaption;
+                    aDest: TRect; srcCanvas: TCanvas; var srcRect:TRect;
+                    aMaskCanvas: TCanvas; TransColor:TColor;
+                    aLayout: TLMDGlyphTextLayout; MultiLine, Accel,
+                    Transparent:Boolean; ExtFlags:TLMDDrawTextStyles;
+                    flags:LongInt); override;
+    function DrawItem(target:TCanvas; toDraw:Boolean; flag:Byte):TRect;override;
+    procedure DrawGlyph(Target:TCanvas=nil); override;
+    procedure GetIMLChange(Sender:TObject);override;
+  public
+    constructor Create(aOwner : TComponent); override;
+    destructor Destroy; override;
+
+    property TurnSibling : Boolean read FTurnSibling write FTurnSibling default false;
+  published
+    property About;
+    property Alignment;
+    property AutoSize;
+    {$IFNDEF LMDTOOLS_SPECIALEDITION}
+      property BackFX;
+    {$ENDIF}
+    property Caption;
+    property Checked:Boolean read GetChecked write SetChecked;
+    property Color;
+    property Ctl3D;
+    property Cursor;
+    property DragCursor;
+    property DragMode;
+    property Enabled;
+    property Flat;
+    property FocusColor;
+    property FocusStyle;
+    property Font;
+    property Font3D;
+    property GlyphTransparent default True;
+    property GlyphTransparentColor;
+    property GlyphFlat;
+    property GlyphSize default 13;
+    property Height;
+    property HelpContext;
+    property Hint;
+    property ImageList;
+    property ImageIndex;
+    property Left;
+    property ListIndex;
+    property ParentColor;
+    property ParentCtl3D;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ReadOnly;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    property Tag;
+    property Top;
+    property Transparent;
+    property UseBitmap;
+    property UseFocusColor;
+    property Visible;
+    property Width;
+
+    property OnClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDrag;
+    property OnMouseEnter;
+    property OnMouseExit;
+
+    {4.0}
+    {$IFNDEF LMDCOMP3}
+    //properties
+    property Action;
+    property Anchors;
+    property BiDiMode;
+    property DragKind;
+    property Constraints;
+    property ParentBiDiMode;
+    //events
+    property OnEndDock;
+    property OnStartDock;
+    {$ENDIF}
+
+  end;
+
+implementation

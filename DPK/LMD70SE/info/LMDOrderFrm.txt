@@ -1,0 +1,65 @@
+Print the following order form, fill it out, and place your order by:
+
+Fax: 
++49-271-356952
+
+Mail:
+LMD Innovative
+Hubertusweg 25
+57072 Siegen, Germany
+==========================================================================
+ 
+Name:    _________________________	e-mail: __________________________
+
+Company: _________________________              __________________________
+
+Address: _________________________ 	Phone:  __________________________
+
+         _________________________	Fax:    __________________________
+
+
+Please send me / us  (underline selected option):   
+
+Product                                 Qty     Price          	Total
+---------------------------------------------------------------------------
+
+LMD Tools CE (Complete Edition)
+   SingleUser 	 Full / Update			EUR 299/219	
+   Site (3 User) Full / Update			EUR 579/379
+   Site (unl.)   Full / Update 		___	EUR 849/649	EUR ______
+
+LMD Tools Professional
+   SingleUser Full / Update			EUR 219/135
+   Site (3 User) Full / Update			EUR 429/269
+   Site (unl.)   Full / Update		___	EUR 649/459	EUR ______
+
+LMD Tools Standard Full / Update	___	EUR 169/99	EUR ______
+
+LMD BarPack  	Single / Site(5 User)          	EUR 59/139      
+LMD DesignPack 	Single / Site(5 User)          	EUR 59/139      
+LMD StoragePack Single / Site(5 User)          	EUR 59/139      
+LMD WebPack  	Single / Site(5 User)	___  	EUR 59/139      EUR ______
+
+LMD RichPack 	Single / Site(5 User)          	EUR 39/99      
+LMD SearchPack 	Single / Site(5 User)          	EUR 39/99
+LMD ShellPack 	Single / Site(5 User)          	EUR 39/99
+LMD SysPack 	Single / Site(5 User)  	___ 	EUR 39/99	EUR ______
+
+---------------------------------------------------------------------------  
+  + Shipping Charge (ID-Only/Airmail)           EUR 0/15       	EUR ______
+	                                                      =============
+                                                    	Total	EUR ______	
+Payment is made by
+
+[ ] Check (see ordering infos)
+[ ] Money order (US funds or EURO)
+[ ] Euro-/Mastercard      [ ] Visa-Card    	Security Code ________     
+
+    Card # _______ ________ ________ _________ 	Expiration Date ___ / ___
+    
+    Card owner    [ ] like above     [ ] ________________________________
+
+
+Date, Signature
+
+_______________________________________

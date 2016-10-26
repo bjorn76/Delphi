@@ -1,0 +1,47 @@
+
+uses
+  Classes,
+  Graphics,
+  lmdgraph,
+  LMDObject;
+
+type
+  TLMD3DCaption = class(TLMDObject)
+  private
+    Procedure SetDepth(Index:Integer; aValue:Byte);
+    procedure SetDisabledStyle(aValue:TLMDDisabledStyle);
+    Procedure SetColor(Index:Integer; aValue:TColor);
+    Procedure SetStyle(aValue:TLMDThreeDStyle);
+    Procedure SetOrientation(aValue:TLMDThreeDOrientation);
+    procedure SetTracing(aValue: Integer);
+    {$IFDEF LMDTOOLS10}
+    procedure ReadInteger(Reader:TReader);
+    {$ENDIF}
+  protected
+    FDisabledStyle : TLMDDisabledStyle;
+    FLightDepth,
+    FShadowDepth   : Byte;
+    FLightColor,
+    FShadowColor   : TColor;
+    FStyle         : TLMDThreedStyle;
+    FOrientation   : TLMDThreeDOrientation;
+    FTracing       : Integer;
+    {$IFDEF LMDTOOLS10}
+    procedure DefineProperties(Filer:TFiler);override;
+    {$ENDIF}
+  public
+    constructor Create;override;
+    procedure Assign(Source: TPersistent); override;
+    function GetSetStr : String; override;
+  published
+    property DisabledStyle:TLMDDisabledStyle read FDisabledStyle write SetDisabledStyle default dsAuto;
+    property LightDepth:Byte index 0 read FLightDepth write SetDepth default 1;
+    property ShadowDepth:Byte index 1 read FShadowDepth write SetDepth default 1;
+    property LightColor:TColor index 0 read FLightColor write SetColor default clBtnHighlight;
+    property Orientation:TLMDThreeDOrientation read FOrientation write SetOrientation default toTopLeft;
+    property ShadowColor:TColor index 1 read FShadowColor write Setcolor default clBtnShadow;
+    property Style:TLMDThreeDStyle read FStyle write SetStyle default tdNone;
+    property Tracing: Integer read FTracing write SetTracing default 0;
+  end;
+
+implementation

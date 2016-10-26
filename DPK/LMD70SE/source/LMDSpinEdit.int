@@ -1,0 +1,90 @@
+
+uses
+  Windows, SysUtils, Menus, Messages, Classes, Graphics, Controls, Forms,
+  LMDCustomExtSpinEdit;
+
+type
+
+  {************************* TLMDCustomSpinEdit *******************************}
+  TLMDCustomSpinEdit = class(TLMDCustomExtSpinEdit)
+  private
+    procedure SetInteger(Index:Integer; aValue:Integer);
+    function GetInteger(Index:Integer): Integer;
+    procedure ReadIdent(Reader:TReader);
+  protected
+    procedure DefineProperties(Filer:TFiler);override;
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property About;
+    property AutoSelect;
+
+    property AutoSize default true;
+    property Alignment;
+    property Suffix;
+    property EditorEnabled;
+    property TabOnEnter;
+
+    property LineSize:Integer index 0 read GetInteger write SetInteger default 1;
+    property PageSize:Integer index 1 read GetInteger write SetInteger default 10;
+    property MinValue:Integer index 2 read GetInteger write SetInteger default 0;
+    property MaxValue:Integer index 3 read GetInteger write SetInteger default 100;
+    property Value:Integer index 4 read GetInteger write SetInteger default 0;
+
+    // RangeCheck!
+    //property OnRangeError;
+    property Color;
+    property Ctl3D;
+    property DragCursor;
+    property DragMode;
+    property Enabled;
+    property Font;
+    property ImeMode;
+    property ImeName;
+    property MaxLength;
+    property ParentColor;
+    property ParentCtl3D;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ReadOnly;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    property Visible;
+
+    property OnChange;
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDrag;
+
+    // V4 enhancements
+    property Anchors;
+    property Constraints;
+    property DragKind;
+    property BiDiMode;
+    property ParentBiDiMode;
+    property OnEndDock;
+    property OnStartDock;
+    property OnMouseWheelDown;
+    Property OnMouseWheelUp;
+
+  end;
+
+  TLMDSpinEdit=class(TLMDCustomSpinEdit)
+  published
+    property Value;
+  end;
+
+implementation

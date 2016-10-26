@@ -1,0 +1,86 @@
+
+uses
+  Windows,
+  Messages,
+  Classes,
+  Graphics,
+  Controls,
+  LMDGraph,
+  LMDFillObject,
+  LMDCustomLabel;
+
+type
+  {------------------------ TLMDCustomLabelFill -------------------------------}
+  TLMDCustomLabelFill = class(TLMDCustomLabel)
+  private
+    FBrushBack:TColor;
+    FFillObject: TLMDFillObject;
+//    FTransparent:Boolean;
+    procedure SetBrushBack(aValue:TColor);
+    procedure SetFillObject(aValue:TLMDFillObject);
+//    procedure SetTransparent(aValue:Boolean);
+    procedure CMEnabledChanged(var Message: TMessage);message CM_ENABLEDCHANGED;
+  protected
+    procedure GetIMLChange(Sender:TObject); override;
+    procedure GetChange(Sender: TObject);override;
+    procedure Paint;override;
+  public
+    constructor Create(aOwner: TComponent);override;
+    destructor Destroy;override;
+  published
+    property ImageList;
+    property ImageIndex;
+    property ListIndex;
+    property BrushBackColor: TColor read FBrushBack write SetBrushBack default clBtnFace;
+    property FillObject: TLMDFillObject read FFillObject write SetFillObject;
+    property About;
+    property Align;
+    property Alignment;
+    property AutoSize;
+    property Color;
+    property DragCursor;
+    property DragMode;
+    property Enabled;
+    property FocusControl;
+    property Font;
+    property FontFX;
+    //property FontSmoothing;
+    property MultiLine;
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowAccelChar;
+    property ShowHint;
+
+//    property Transparent:Boolean read FTransparent write SetTransparent default false;
+
+    property Visible;
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnMouseDown;
+    {3.0}
+    property OnMouseEnter;
+    property OnMouseExit;
+    {---}
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDrag;
+
+    {4.0}
+    //properties
+    property Anchors;
+    property BiDiMode;
+    property DragKind;
+    property Constraints;
+    property ParentBiDiMode;
+    //events
+    property OnEndDock;
+    property OnStartDock;
+  end;
+
+
+implementation

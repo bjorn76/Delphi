@@ -1,0 +1,72 @@
+
+uses
+  Windows,
+  Classes,
+  Forms,
+  StdCtrls,
+  {$IFDEF LMDCOMP6}
+  controls,
+  {$ENDIF}
+  intfLMDThemes,
+  LMDClass,
+  LMDFormStyler,
+  LMDBack,
+  LMDContainerComponent;
+
+type
+  TLMDDlgEffect=(deNone, deExplode, deExplodeExt);
+
+  {------------------------- TLMDBaseDialog -----------------------------------}
+  TLMDBaseDialog=class(TLMDContainerComponent)
+  private
+    FCaptionTitle :String;
+    FCustomButton :String;
+    FEffect       :TLMDDlgEffect;
+    FHints        :TStringList;
+    FCtlXP,
+    FShowHint,
+    FFillCaption  :Boolean;
+    FColors       :Byte;
+    FPosition     :TLMDDlgPosition;
+    FDlgPosRel    :TLMDDlgPosRel;
+    FOnCustomize,
+    FOnCustomClick:TNotifyEvent;
+    //V6, JH June 02
+    FOpenedDlg    :TCustomForm;
+
+    procedure SetCaptionTitle (aValue: String);
+    procedure SetHints(aValue:TStrings);
+    procedure SetCtlXP(const Value: Boolean);
+    function GetHints:TStrings;
+    function GetCtlXP: Boolean;
+  protected
+    function BaseExecute(aForm, aParentForm:TCustomForm; Custom:TButton;
+                         fs:TLMDFormStyler; b:TLMDBack;
+                         defCaption:String):TModalResult;
+    procedure DoCustomize(Sender:TObject);virtual;
+    {base properties}
+    property CaptionFill: Boolean read FFillCaption write FFillCaption default false;
+    property CaptionTitle:String read FCaptionTitle write SetCaptionTitle;
+    property CustomButton:String read FCustomButton write FCustomButton;
+    property Effect: TLMDDlgEffect read FEffect write FEffect default deNone;
+    property Colors: Byte read FColors write FColors default 32;
+    property Hints:TStrings read GetHints write SetHints;
+    property ShowHints:Boolean read FShowHint write FShowHint default True;
+    property CtlXP:Boolean read GetCtlXP write SetCtlXP default true;
+    {events}
+    property OnCustomize:TNotifyEvent read FOnCustomize write FOnCustomize;
+    property OnCustomClick:TNotifyEvent read FOnCustomClick write FOnCustomClick;
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+    function ControlSupportsXP: Boolean;
+    function Execute:Boolean;virtual;
+    property ImageList;
+    property ImageIndex;
+    property ListIndex;
+    property Dlg: TCustomForm read FOpenedDlg; //only available if the dialog is opened!
+    property Position:TLMDDlgPosition read FPosition write FPosition default bpCenter;
+    property RelatePos:TLMDDlgPosRel read FDlgPosRel write FDlgPosRel default brScreen;
+  end;
+
+implementation

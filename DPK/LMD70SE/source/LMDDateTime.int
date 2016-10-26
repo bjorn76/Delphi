@@ -1,0 +1,39 @@
+
+uses
+  Classes,
+  LMDObject;
+
+type
+  { ------------------------------- class TLMDDateTime ----------------------- }
+  TLMDDateTime = class(TLMDObject)
+  private
+    FDateTime : TDateTime;
+    procedure SetDay (aValue : Byte);
+    procedure SetMonth (aValue : Byte);
+    procedure SetYear (aValue : LongInt);
+    procedure SetMinute (aValue : Byte);
+    procedure SetHour (aValue : Byte);
+    procedure SetSecond (aValue : Byte);
+    procedure SetDateTime (aValue : TDateTime);
+
+    function GetDay : Byte;
+    function GetMonth : Byte;
+    function GetYear : LongInt;
+    function GetHour : Byte;
+    function GetMinute : Byte;
+    function GetSecond : Byte;
+  public
+    constructor Create; override;
+    procedure Assign (Source : TPersistent);override;
+    property DateTimeValue : TDateTime read FDateTime write SetDateTime;
+  published
+    property Day: Byte read GetDay write SetDay default 1;
+    property Month: Byte read GetMonth write SetMonth default 1;
+    property Year: LongInt read GetYear write SetYear default 1990;
+    property Hour: Byte read GetHour write SetHour default 0;
+    property Minute: Byte read GetMinute write SetMinute default 0;
+    property Second: Byte read GetSecond write SetSecond default 0;
+  end;
+
+
+implementation

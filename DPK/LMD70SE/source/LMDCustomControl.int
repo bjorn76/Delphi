@@ -1,0 +1,298 @@
+
+uses
+  controls, classes, messages, windows, graphics, forms,
+  intfLMDBackground,
+  intfLMDControlPosSize,
+  intfLMDFaceController,
+  intfLMDThemes,
+  LMDFaceController,
+  LMDXPStyles,
+
+  LMDFillObject,
+  LMD3DCaption,
+  LMDBevel,
+
+  LMDBase,
+  LMDConst,
+  LMDCont,
+  LMDGraph,
+  LMDBitmapEffectObject,
+  LMDRegion,
+  LMDCustomImageList,
+  LMDBaseController;
+
+const
+  def_BorderSense=4;
+
+type
+
+  TLMDTransparencyMode = (tmLMD, tmReal);
+
+  {-------------------TLMDCustomControl----------------------------------------}
+  TLMDCustomControl=class(TCustomControl, ILMDControlPosSize, ILMDBackground, ILMDFaceController, ILMDThemes)
+  private
+    FAbout         : TLMDAboutVar;
+    FAutoBring,
+    FXPTransparency,
+    FInternalMouseAbove,
+    FFwdBackFX,
+    FMouseAbove,
+    FEntered,
+    FFlat,
+    FTransparent,
+    FNeedInvalidate: Boolean;
+    FImageList     : TLMDCustomImageList;
+    FIndex,
+    FListIndex     : Integer;
+    FChangeLink    : TLMDChangeLink;
+    {4.0}
+    FOnAfterEnter,
+    FOnAfterExit,
+    FOnMouseEnter,
+    FOnMouseExit   : TNotifyEvent;
+    //FXPSupport     : TLMDXPSupport;
+
+    // 7.0 --> ILMDControlPosSize
+    FAllowMove,
+    FAllowSize,
+    FShowGrip,
+    FMoving,
+    FWindowed,
+    FLocked        : Boolean;
+    FBorderSense   : Byte;
+    FOnMove        : TNotifyEvent;
+
+    FFaceController: TLMDFaceController;
+
+    FBackFX        : TLMDBitmapEffectObject;
+    FTransparency  : TLMDTransparencyMode;
+    FUpdateCount:LongInt;
+    procedure SetImageList(aValue:TLMDCustomImageList);
+    procedure SetIndex(index, aValue:Integer);
+    procedure SetTransparent(aValue:Boolean);
+    procedure SetFlat (aValue:Boolean);
+    procedure SetBoolean (aValue : Boolean);
+    procedure SetPassBackFX (aValue: Boolean);
+    procedure SetBackFXObject (aValue : TLMDBitmapEffectObject);
+    {saving}
+    {----}
+    procedure ReadIdent(Reader:TReader);
+    procedure WriteIdent(Writer:TWriter);
+    function  CheckCont:Boolean;
+    function HasControl:Boolean;
+    {----  }
+
+    {-- 4.0}
+    procedure CMMouseLeave(var Message: TMessage); message CM_MOUSELEAVE;
+    procedure CMMouseEnter(var Message: TMessage); message CM_MOUSEENTER;
+    procedure CMLMDAfterEnter(var Message: TMessage); message CM_LMDAFTERENTER;
+    procedure CMLMDAfterExit(var Message: TMessage); message CM_LMDAFTEREXIT;
+    {--}
+
+    // 6.1
+    procedure CMLMDThemeChanged(var Message: TMessage); message CM_LMDTHEMECHANGED;
+    procedure WMThemeChanged(var Msg:TMessage); message WM_THEMECHANGED;
+    // --
+
+    // 7.0 ILMDControlPosSize
+    procedure WMNCHitTest(var Message: TWMNCHitTest);message WM_NCHitTest;
+    function GetAllowMove: Boolean;
+    procedure SetAllowMove(const aValue: Boolean);
+    function GetAllowSize: Boolean;
+    procedure SetAllowSize(const aValue: Boolean);
+    function GetLocked: Boolean;
+    procedure SetLocked(const aValue: Boolean);
+    procedure SetShowGrip(const aValue: Boolean);
+    procedure SetOnMove(const aValue:TNotifyEvent);
+    function GetOnMove:TNotifyEvent;
+    // ---
+    procedure SetFaceController (aValue: TLMDFaceController);
+
+    // intfLMDThemes
+    procedure SetCtlXP (aValue: Boolean);
+    function GetCtlXP: Boolean;
+    
+    // generated when Transparent property is changed
+    procedure CMTRANSPARENTCHANGED(var Message: TMessage); message CM_TRANSPARENTCHANGED;
+    //---
+
+    procedure CMLMDSCROLLBOXSCROLLEVENT (var Message : TMessage); message CM_LMDSCROLLBOXSCROLLEVENT;
+
+    procedure CMSYSCOLORCHANGE(var Message: TMessage); message CM_SYSCOLORCHANGE;
+    procedure WMERASEBKGND(var Message: TWMERASEBKGND); message WM_ERASEBKGND;
+    procedure WMKILLFOCUS(var Message: TMessage); message WM_KILLFOCUS;
+    procedure WMMOVE(var Message: TWMMOVE); message WM_MOVE;
+    procedure WMSETFOCUS(var Message: TMessage); message WM_SETFOCUS;
+    procedure WMSIZE(var Message: TWMSIZE); message WM_SIZE;
+    procedure WMMOUSEMOVE(var Message:TWMMouseMove); message WM_MOUSEMOVE;
+//    procedure WMCAPTURECHANGED(var Message: TMessage); message WM_CAPTURECHANGED;
+  protected
+    FXP:Boolean;
+
+    // XP-Support
+    //***********
+    //handle theme changes
+    procedure DoThemeChanged; virtual;
+
+    // specifies whether XP Style covers full client area
+    function  IsXPPartiallyTransparent:Boolean;virtual;
+
+    //UseXP will return true,
+    //if the system supports xp, xp theme support is switched on, the components
+    //local variable supportXp is active or global (and global settings are active)
+    //and if ControlSupportsXp returns true ...
+    function UseXP: Boolean;
+
+    //this method must be overwritten by controls supporting a special WinXP
+    //look for being able to use the Bevel bmWindows mode correctly under all
+    //circumstances
+    function ControlSupportsXP: Boolean; virtual;
+
+    // returns whether XP transparency is supported
+    function XPSupportsTransparency: Boolean; virtual;
+    //***********
+
+    // 7.01
+    property AutoBringToFront:Boolean read FAutoBring write FAutoBring default true;
+
+    // 7.0 --> Move and size features
+    // called when Movement feature was used
+    procedure DoMove; virtual;
+    function GetMoveRect:TRect;virtual;
+    function GetSizeRect:TRect;virtual;
+
+    // if Move feature is enabled: If HandleNonWindowedControls is set to true,
+    // TGraphicControl descendants will handle nouseclicks.
+    property HandleNonWinControls:Boolean read FWindowed write FWindowed default false;
+
+    property AllowMoving:Boolean read GetAllowMove write SetAllowMove default false;
+    property AllowSizing:Boolean read GetAllowSize write SetAllowSize default false;
+    property ControlLocked:Boolean read GetLocked write SetLocked default false;
+
+    property SizeGrip:Boolean read FShowGrip write SetShowGrip default false;
+    property OnMove:TNotifyEvent read GetOnMove write SetOnMove;
+
+    property BorderSensitivity:Byte read FBorderSense write FBorderSense default def_BorderSense;
+
+    // --------------------------------------
+    //helper functions for easy integration of the face controller concept
+
+    function fcGetFocused: Boolean; virtual;
+    function fcGetMouseAbove: Boolean; virtual;
+    function fcGetTransparent : Boolean; virtual;
+    function fcGetBackCtlXP   : Boolean; virtual;
+    function fcGetBorderCtlXP : Boolean; virtual;
+    function fcGetBorderCtl3D : Boolean; virtual;
+    function fcGetEnabled     : Boolean; virtual;    
+    function fcGetBackColor   : TColor; virtual;
+
+    function GetFont        : TFont; virtual;
+    function GetFont3D      : TLMD3DCaption; virtual;
+    function GetTransparent : Boolean; virtual;
+    function GetBackCtlXP   : Boolean; virtual;
+    function GetBackColor   : TColor; virtual;
+    function GetFillObject  : TLMDFillObject; virtual;
+    function GetBackFX      : TLMDBitmapEffectObject; virtual;
+    function GetBorderCtlXP : Boolean; virtual;
+    function GetBorderCtl3D : Boolean; virtual;
+    function GetBevel       : TLMDBevel; virtual;
+
+    procedure ForceMouseAbove;
+    procedure ForceMouseNotAbove;
+
+    //end of helping functions for the face controller concept
+
+    procedure DoForwardBackFX; virtual;
+    procedure DoFlatChanged; virtual;
+    procedure SetMouseAbove (aValue : Boolean);
+    procedure AlignControls(AControl: TControl; var Rect : TRect); override;
+    procedure CreateParams(var Params: TCreateParams); override;
+    function CheckOptimized:Boolean; virtual;
+    procedure DefineProperties(Filer:TFiler); override;
+    procedure DrawDashedFrame;
+    procedure RepBack (aRect: TRect);
+    procedure FillControl; virtual;
+    procedure GetChange(Sender: TObject); virtual;
+    function GetEmpty: Boolean; virtual;
+    function GetReadOnly: Boolean; virtual;
+    procedure GetIMLChange(Sender: TObject); virtual;
+    function GetScreenRect(aRect: TRect):TRect;
+    function IMLEmpty: Boolean;
+    procedure InvalidateFrame;
+    procedure Loaded; override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure Paint; override;
+
+    function GetPalette: HPalette; override;
+    {-- 4.0}
+    procedure MouseEnter; virtual;
+    procedure MouseExit; virtual;
+    {------}
+
+    {-- 7.0}
+//    procedure MouseMove(Shift: TShiftState; X, Y: Integer);override;
+    {------}
+
+    procedure DoEnter; override;
+    procedure DoExit; override;
+
+    procedure RestoreBorderBack; dynamic;
+    procedure RestoreBorderFront; dynamic;
+
+    procedure GetXPBevelParams (var aClassName: WideString; var aPartId, aStateId : Integer); dynamic;
+    procedure BevelXP(aCanvas: TCanvas; aRect: TRect);
+
+    //is true if the control or a control placed on it has the focus
+    property Entered : Boolean read FEntered write SetBoolean;
+
+    property BackFX : TLMDBitmapEffectObject read FBackFX write SetBackFXObject;
+    property About:TLMDAboutVar read FAbout write FAbout;
+    property Flat:Boolean read FFlat write SetFlat default false;
+    property NeedInvalidate:Boolean read FNeedInvalidate write FNeedInvalidate default True;
+    property ImageList:TLMDCustomImageList read FImageList write SetImageList stored HasControl;
+    property ImageIndex:Integer index 0 read FIndex write SetIndex default 0;
+    property ListIndex:Integer index 1 read FListIndex write SetIndex default 0;
+    property Transparent:Boolean read FTransparent write SetTransparent default false;
+
+    // Changed 6.1
+    property CtlXP:Boolean read GetCtlXP write SetCtlXP default true;
+
+    //if enabled the BackFX changes to the background will be forwarded to child controls
+    //the backfx settings will be passed in anyway if the control is holding the top most background, whatever the state of this property is
+    property BackFXPass: Boolean read FFwdBackFX write SetPassBackFX default false;
+
+     {-- 4.0}
+    property OnMouseEnter: TNotifyEvent read FOnMouseEnter write FOnMouseEnter;
+    property OnMouseExit: TNotifyEvent read FOnMouseExit write FOnMouseExit;
+    property OnAfterEnter: TNotifyEvent read FOnAfterEnter write FOnAfterEnter;
+    property OnAfterExit: TNotifyEvent read FOnAfterExit write FOnAfterExit;
+    property TabStop default false;
+    {------}
+
+  public
+    constructor Create(AOwner: TComponent);override;
+    destructor Destroy;override;
+
+    //7.0
+    procedure BeginUpdate;
+    function IsUpdating:Boolean;
+    procedure EndUpdate(repaint: Boolean=false);virtual;
+
+    // intfLMDBackGround
+    function BackBitmap: TBitmap; virtual;
+    function BackBitmapCheck: Boolean; virtual;
+    function BackDrawArea(Canvas: TCanvas; const dest: TRect; const src: TPoint; flags:Word=0): Boolean; virtual;
+    function isTransparentSet: Boolean; virtual;
+    function BackMapPoint (const aValue: TPoint): TPoint; virtual;
+    function BackBitmapPalette: HPalette; virtual;
+    procedure BackUpdate; virtual;
+    function BackControl (index: Integer): TControl; virtual;
+    function BackControlCount: Integer; virtual;
+    // --
+
+    property MouseAbove : Boolean read FMouseAbove;
+    property FaceController: TLMDFaceController read FFaceController
+                                                write SetFaceController;
+  end;
+
+implementation

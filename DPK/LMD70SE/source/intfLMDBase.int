@@ -1,0 +1,11 @@
+uses
+  sysutils;
+
+{$IFNDEF LMDCOMP6}
+type
+  IInterface=IUnknown;
+{$ENDIF}
+
+  function LMDSupports(const Instance: TObject; const IID: TGUID; out Intf): Boolean;
+
+implementation

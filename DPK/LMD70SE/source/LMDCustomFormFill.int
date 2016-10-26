@@ -1,0 +1,81 @@
+
+uses
+  Windows,
+  Graphics,
+  Classes,
+  Messages,
+  Controls,
+  intfLMDBackground,
+  LMDBaseController,
+  LMDWndProcComponent,
+  LMDCont,
+  LMDCustomImageList;
+
+type
+  TLMDPaintMode=(pcNone, pcControl, pcOwnerDraw);
+  TLMDPaintEvent=procedure(Sender:TObject; aCanvas:TCanvas; Dest:TRect) of object;
+
+  TLMDCustomFormFill = class(TLMDWndProcComponent, ILMDBackground)
+  private
+    {imagelist support}
+    FImageList  : TLMDCustomImageList;
+    FIndex,
+    FListIndex  : Integer;
+    FChangeLink : TLMDChangeLink;
+    FDefaultFill: Boolean;
+    FPaintMode  : TLMDPaintMode;
+    FOnPaint    : TLMDPaintEvent;
+    FBuffered   : Boolean;
+    procedure SetImageList(aValue:TLMDCustomImageList);
+    procedure SetIndex(index, aValue:Integer);
+    {saving}
+    {--- }
+    procedure ReadIdent(Reader:TReader);
+    procedure WriteIdent(Writer:TWriter);
+    function  CheckCont:Boolean;
+    function HasControl:Boolean;
+    {function HasIML:Boolean;}
+    {----  }
+    procedure SetPaintMode(aValue:TLMDPaintMode);
+  protected
+    FFlag,  
+    EraseBack   : Boolean;
+    FBack       : TBitmap;
+    function  IMLEmpty: Boolean;
+    procedure GetChange(Sender: TObject); override;
+    procedure GetIMLChange(Sender: TObject); virtual;
+    procedure Init; override;
+    procedure DestroyBuffer;
+    procedure Invalidate(flag: Boolean);
+    function  PaintClientArea(DC: HDC):Boolean; virtual;
+    procedure RestoreState; override;
+    procedure WndProc(var Message: TMessage); override;
+    property  Buffered: Boolean read FBuffered write FBuffered default false;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure DefineProperties(Filer: TFiler); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+
+    function  BackBitmap: TBitmap;
+    function  BackBitmapCheck: Boolean;
+    function  BackDrawArea(Canvas: TCanvas; const dest: TRect; const src: TPoint; flags:Word): Boolean;
+    function  isTransparentSet: Boolean;
+    function  BackMapPoint(const aValue: TPoint):TPoint;
+    function  BackBitmapPalette: HPalette;
+    procedure BackUpdate;
+    function BackControl (index: Integer): TControl;
+    function BackControlCount: Integer;
+
+  published
+    property About;
+    property DefaultFill:Boolean read FDefaultFill write FDefaultFill default True;
+    property Enabled;
+    property ImageList:TLMDCustomImageList read FImageList write SetImageList stored HasControl;
+    property ImageIndex:Integer index 0 read FIndex write SetIndex default 0;
+    property ListIndex:Integer index 1 read FListIndex write SetIndex default 0;
+    property PaintMode:TLMDPaintMode read FPaintMode write SetPaintMode default pcControl;
+    property OnPaint:TLMDPaintEvent read FOnPaint write FOnPaint;
+  end;
+
+implementation

@@ -1,0 +1,86 @@
+
+uses
+  Windows,
+  Classes,
+  Controls,
+  Messages,
+  LMDStringList,
+  LMDBaseEdit,
+  LMDCont,
+  LMDCustomComponent;
+
+type
+  TLMDAutoCompleteSource = (asStringList //use a StringList as lookup source
+                            );
+  TLMDAutoCompleteSources = set of TLMDAutoCompleteSource;
+  TLMDAutoCompleteMode = (amText,  //add suggestion to the text in the edit, highlight the added chars
+                          amPopup  //popup window with all strings in the source which match the current input
+                         );
+  TLMDAutoCompleteModes = set of TLMDAutoCompleteMode;
+  TLMDAutoCompleteAddOn = (aaControlExit, //add unknown strings to the lookupsource if the control looses the focus
+                           aaControlReturn //add unknown strings to the lookupsource if the return key is pressed in the control
+                          );
+  TLMDAutoCompleteAddOns = set of TLMDAutoCompleteAddOn;
+
+  //parameters
+  // - Sender: instance of TLMDEditAutoComplete calling the event handler
+  // - editControl: LMDBaseEdit descendant editcontrol which tries to add a string to the lookup source
+  // - addText: the string which shall be added
+  // - add: default true, set to false if the string shall not be added
+  // - addTo: lookup source the string shall be added to
+  TLMDAutoCompleteAddEvent = procedure (Sender: TObject; editControl: TLMDBaseEdit; var addText: String; var add: Boolean; var addTo: TLMDAutoCompleteSource) of object;
+
+  TLMDEditAutoComplete = class (TLMDCustomComponent)
+  private
+    FCaseSensitive,
+    FEnabled       : Boolean;
+    FBuffered      : String;
+    FStringList    : TLMDStringList;
+    FDropDownRows,
+    FStrListIndex  : Integer;
+    FSource        : TLMDAutoCompleteSources;
+    FMode          : TLMDAutoCompleteModes;
+    FAdd           : TLMDAutoCompleteAddOns;
+    FOnAdd         : TLMDAutoCompleteAddEvent;
+    FEdit          : TLMDBaseEdit;
+    FPopupWindow   : TWinControl;
+    FControlWndProc,
+    FControlOldWndProc : TFarProc;
+
+    procedure SetStringList (aValue: TLMDStringList);
+    procedure SetStrListIndex (aValue: Integer);
+    function getS (const s: String): String;
+    procedure CMCancelMode(var Message: TCMCancelMode); message CM_CANCELMODE;
+    procedure WMCancelMode (var Msg: TMessage); message WM_CANCELMODE;
+    procedure WMKillFocus (var Msg : TMessage); message WM_KILLFOCUS;
+  protected
+    procedure Popup (anEditControl: TLMDBaseEdit; aText: String);
+    procedure ControlWndProc(var Message: TMessage); virtual;
+    //source to be looked up
+    property Source: TLMDAutoCompleteSources read FSource write FSource;
+  public
+    procedure Notification (AComponent: TComponent; Operation: TOperation); override;
+    constructor Create (aOwner: TComponent); override;
+    procedure CancelPopup;
+    procedure CreatePopup (anEditcontrol: TLMDBaseEdit; strings: TStrings);
+    procedure SetControl (anEditcontrol: TLMDBaseEdit);
+    function CompleteText (anEditControl: TLMDBaseEdit; aText: String): String;
+    procedure AutoCompleteText (anEditControl: TLMDBaseEdit; aText: String);
+    procedure Add (anEditControl: TLMDBaseEdit; aText: String);
+  published
+    property About;
+    property StringList: TLMDStringList read FStringList write SetStringList;
+    property StringListIndex:  Integer read FStrListIndex write SetStrListIndex;
+    property Mode: TLMDAutoCompleteModes read FMode write FMode;
+    //if an unknown string has been entered in the control this can be added to
+    //the lookup source. This property sets up on which events the string shall
+    //be added
+    property AddUnknownOn: TLMDAutoCompleteAddOns read FAdd write FAdd;
+    property CaseSensitive: Boolean read FCaseSensitive write FCaseSensitive default true;    
+    property Enabled: Boolean read FEnabled write FEnabled default true;
+    //This event can be used for checking the strings to be added according
+    //to the AddUnknownOn property
+    property OnAdd: TLMDAutoCompleteAddEvent read FOnAdd write FOnAdd;
+  end;
+
+implementation

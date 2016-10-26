@@ -1,0 +1,255 @@
+
+uses
+  Windows,
+  SysUtils, Messages, Classes, Graphics, Controls, menus, Forms,
+  LMDConst, LMDLED, LMDObject, LMDGraph, LMDClass,
+  LMDFillObject,
+  LMDDateTime,
+  LMDBase,          //TLMDBoundsChangeStates
+  LMDGraphicControl;
+
+type
+
+  {data types}
+  TLMDClockMode=(cmNormal, cmDate, cmStopwatch, cmCountdown, cmAlarm);
+  TLMDClockStyle=(csSimple, csWin95);
+  TLMDClockOption=(coShowDigital, coShowAnalog, coEnableAlarm, co24Hour, coFixed, coOffset, coShowSecCircle);
+  TLMDClockOptions=set of TLMDClockOption;
+
+
+  {***************************** used objects *********************************}
+  {----------------- TLMDClockHand --------------------------------------------}
+  TLMDClockHand=Class(TLMDObject)
+  private
+    FColor:TColor;
+    FStyle:TLMDClockStyle;
+    FThick:Byte;
+    FVisible:Boolean;
+    procedure SetColor(aColor:TColor);
+    {procedure SetStyle(aStyle:TLMDClockStyle);}
+    procedure SetThickness(aValue:Byte);
+    procedure SetVisible(aBool:Boolean);
+  public
+    constructor Create; override;
+  published
+    property Color:TColor read FColor write SetColor default clBlack;
+    property Visible:Boolean read FVisible write SetVisible default true;
+    property Thickness:Byte read FThick write SetThickness default 2;
+  end;
+
+  {----------------- TLMDTimeInterval -----------------------------------------}
+  TLMDTimeInterval=class(TLMDObject)
+  private
+    FTimeInterval:array[1..3] of word;
+    FEnabled:Boolean;
+    FEndTime:TDatetime;
+    procedure SetEnabled(aBool:Boolean);
+    procedure SetEndtime(aDatetime:TDatetime);
+    procedure SetTime(anIndex:Integer; aWord:Word);
+    function GetEndtime:TDatetime;
+    function GetTime(anIndex:Integer):Word;
+  public
+    constructor Create; override;
+  published
+    property Enabled:Boolean read FEnabled write SetEnabled default false;
+    property EndTime:TDatetime read GetEndtime write SetEndtime stored FEnabled;
+    property Hour:Word index 1 read GetTime write SetTime default 0;
+    property Minute:Word index 2 read GetTime write SetTime default 1;
+    property Second:Word index 3 read GetTime write SetTime default 0;
+  end;
+
+  { ******************** object TLMDTimeOffset ******************************* }
+  TLMDTimeOffset = class (TLMDObject)
+  private
+    FDays,
+    FHours,
+    FMinutes,
+    FSeconds  : Integer;
+  public
+    constructor Create; override;
+    procedure Assign (Source : TPersistent); override;
+    procedure Offset (var time : TDateTime);
+  published
+    property Days : Integer read FDays write FDays default 0;
+    property Hours : Integer read Fhours write FHours default 0;
+    property Minutes : Integer read FMinutes write FMinutes default 0;
+    property Seconds : Integer read FSeconds write FSeconds default 0;
+  end;
+
+
+  TLMDClockFill = (fmControl, fmClock);
+
+  {****************************** Component ***********************************}
+  {---------------------------- TLMDClock -------------------------------------}
+  TLMDClock = class(TLMDGraphicControl)
+  private
+    FAlarm,
+    First            : Boolean;
+    FDigital         : TLMDLed;
+    FUseCustomDT,
+    FDigitalOnly,
+    FDigitalShowSecs : Boolean;
+    FDigitalString   : String;
+    FHourHand,
+    FMinuteHand,
+    FSecondHand      : TLMDClockHand;
+    FTimerIdent      : TLMDTimer;
+    FIsPainting      : Boolean;
+    {clock functions}
+    FAlarmtime,
+    FStopwatch       : TDatetime;
+    FClockMode       : TLMDClockMode;
+    FCountdown       : TLMDTimeInterval;
+    FStopwatchEnabled: Boolean;
+
+    {clock appearance}
+    FPosY,
+    FPosX            : Integer;
+    FStyle           : TLMDClockStyle;
+    FFaceColors      : array[0..3] of TColor;
+    FDigitalColor    : TColor;
+    FOptions         : TLMDClockOptions;
+    FSaveBitmap      : TBitmap;
+    FRepeat          : Word;
+    FRepCount        : Integer; //JH 21.05.99 (:word) <0 not possible
+    FDateTimeFormat  : TLMDDateTimeFormat;
+    FFixedTime       : TLMDDateTime;
+    FTimeOffset      : TLMDTimeOffset;
+    FFillObject      : TLMDFillObject;
+    FFillMode        : TLMDClockFill;
+
+    {helper}
+    FCirclePen       : TPen;
+    FSecMode,
+    FOldSec          : Integer;
+
+    {events}
+    FOnAlarm,
+    FOnCountdownStart,
+    FOnCountdownEnd,
+    FOnStopWatchStart,
+    FOnStopWatchEnd  : TNotifyEvent;
+    FUseGlobalTimer: Boolean;
+    procedure SetUseGlobalTimer(const Value: Boolean);
+    procedure SetDateTimeFormat (aValue : TLMDDateTimeFormat);
+    procedure SetBoolean (Index : Integer; aValue : Boolean);
+    procedure SetClockOptions (aSet : TLMDClockOptions);
+    procedure SetDigital (aValue : TLMDLED);
+    procedure SetFaceColors (anIndex : integer; aColor : TColor);
+    procedure SetPos (Index : Integer; aValue : integer);
+    procedure SetStyle (aStyle : TLMDClockStyle);
+    procedure SetMode (aMode : TLMDClockMode);
+    procedure SetFixed (aValue : TLMDDateTime);
+    procedure SetOffset (aValue : TLMDTimeOffset);
+    procedure SetFillObject (aValue : TLMDFillObject);
+    procedure SetFillMode (aValue : TLMDClockFill);
+    procedure SetCirclePen (aValue: TPen);
+    function GetFaceColors (anIndex : integer) : TColor;
+
+    function  CorrectBounds:Boolean;
+    procedure PaintAnalog(ACanvas:TCanvas);
+    procedure PaintDigital(ACanvas:TCanvas);
+    procedure PaintHands(ACanvas:TCanvas);
+    procedure PaintSmallScale(ACanvas:TCanvas; p1,p2:TPoint);
+    procedure PaintNormalScale(ACanvas:TCanvas; p1,p2:TPoint);
+
+    procedure CMColorChanged(var Message:TMessage);message CM_COLORCHANGED;
+    procedure CMEnabledChanged(var Message:TMessage);message CM_ENABLEDCHANGED;
+  protected
+    function GetDigitalText : String; virtual;
+    procedure GetChange(Sender:TObject);override;
+    procedure BoundsChange(State:TLMDBoundsChangeStates);override;
+    function GetTime : TDateTime; virtual;
+    procedure GetIMLChange (Sender : TObject); override;
+
+    procedure Loaded;override;
+    procedure OnTimer(Sender:TObject);
+    procedure Paint; override;
+
+  public
+    constructor Create(AOwner :TComponent); override;
+    destructor Destroy; override;
+    procedure BackUpdate; override;
+
+    {Methods for clock functions}
+    procedure Alarm; virtual;
+    procedure EndAlarm;
+    {stopwatch}
+    procedure StartStpWatch;
+    procedure EndStpWatch;
+    {countdown}
+    procedure StartCountdown;
+    procedure EndCountdown;
+
+    property Alarmtime:TDateTime read FAlarmtime write FAlarmtime;
+    property Countdown:TLMDTimeInterval read FCountdown write FCountdown;
+  published
+    property About;
+    property Bevel;
+    property Color;
+
+    // 7.0
+    property UseGlobalTimer:Boolean read FUseGlobalTimer write SetUseGlobalTimer default false;
+    // ---
+    property ColorSmallTick :TColor index 0 read GetFaceColors write SetFaceColors default clWhite;
+    property ColorSmallTickShade :TColor index 1 read GetFaceColors write SetFaceColors default clBtnFace;
+    property ColorBigTick :TColor index 2 read GetFaceColors write SetFaceColors default clTeal;
+    property ColorBigTickShade :TColor index 3 read GetFaceColors write SetFaceColors default clAqua;
+    property Digital:TLMDLED read FDigital write SetDigital;
+    property DigitalColor:TColor index 4 read GetFaceColors write SetFaceColors default clBlack;
+    property DigitalOnly:Boolean index 0 read FDigitalOnly write SetBoolean default false;
+    property DigitalShowSecs:Boolean index 1 read FDigitalShowSecs write SetBoolean default True;
+    property DigitalPosX:integer index 0 read FPosx write SetPos default -1;
+    property DigitalPosY:Integer index 1 read FPosy write SetPos default -1;
+    property Enabled;
+    property FillObject : TLMDFillObject read FFillObject write SetFillObject;
+    property FillMode : TLMDClockFill read FFillMode write SetFillMode default fmControl;
+    property FixedTime : TLMDDateTime read FFixedTime write SetFixed;
+    property HourHand:TLMDClockHand read FHourHand write FHourHand;
+    property ImageList;
+    property ListIndex;
+    property MinuteHand:TLMDClockHand read FMinuteHand write FMinuteHand;
+    property Mode:TLMDClockMode read FClockMode write SetMode default cmNormal;
+    property Options:TLMDClockOptions read FOptions write SetClockOptions default [coShowAnalog, co24Hour];
+    property RepeatAlarm:Word read FRepeat write FRepeat default 10;
+    property SecondHand:TLMDClockHand read FSecondHand write FSecondHand;
+    property SecondCircle: TPen read FCirclePen write SetCirclePen;
+    property Stopwatch:TDatetime read FStopwatch;
+    property Style:TLMDClockStyle read FStyle write SetStyle default csWin95;
+    property TimeOffset : TLMDTimeOffset read FTimeOffset write SetOffset;
+    property Transparent nodefault;
+    property CustomDateTimeFormat : TLMDDateTimeFormat read FDateTimeFormat write SetDateTimeFormat;
+    property UseCustomDateTime : Boolean index 2 read FUseCustomDT write SetBoolean default false;
+    {events}
+    property OnAlarm :TNotifyEvent read FOnAlarm write FOnAlarm;
+    property OnCountdownStart :TNotifyEvent read FOnCountdownStart write FOnCountdownStart;
+    property OnCountdownEnd :TNotifyEvent read FOnCountdownEnd write FOnCountdownEnd;
+    property OnStopWatchStart :TNotifyEvent read FOnStopWatchStart write FOnStopWatchStart;
+    property OnStopWatchEnd:TNotifyEvent read FOnStopWatchEnd write FOnStopWatchEnd;
+
+    {inherited}
+    property DragCursor;
+    property DragMode;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property Visible;
+
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDrag;
+
+    property Anchors;
+    property Constraints;
+    property DragKind;
+    property OnEndDock;
+    property OnStartDock;
+  end;
+
+implementation

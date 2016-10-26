@@ -1,0 +1,95 @@
+
+uses
+  Classes,
+  Menus,
+  LMDBaseGraphicButton,
+  LMDCustomIniComponent;
+
+type
+  {------------------------- TLMDMRUList --------------------------------------}
+  TLMDMRUListOption=(moFileNameOnly, moShowAccel, moSubIfEmpty, moSubClearOption);
+  TLMDMRUListOptions=set of TLMDMRUListOption;
+
+  TLMDMRUDisplay=(mdFileName, mdDefault);
+  TLMDMRUListStyle=(msAfterItem, msBeforeItem, msCreateSubMenu);
+
+  TLMDMRUClickEvent=procedure(Sender:TObject; const aValue:String; var Remove:Boolean) of object;
+
+  TLMDMRUList = class(TLMDCustomIniComponent)
+  private
+    FMaxEntries,
+    FMaxLength:Byte;
+    FMenuItem:TMenuItem;
+    FHelpContext:THelpContext;
+    FHint:String;
+    FItems:TStrings;
+    FOnClick:TLMDMRUClickEvent;
+    FOnChange:TNotifyEvent;
+    FOptions:TLMDMRUListOptions;
+    FOnClearListClick:TNotifyEvent;
+    FStyle:TLMDMRUListStyle;
+    FUpdate:Byte;
+    FShared:Boolean;
+    //4.0 final
+    FButton:TLMDBaseGraphicButton;
+    FPopUpMenu:TPopupMenu;
+    //5.0
+    FDisplay:TLMDMRUDisplay;
+    procedure SetDisplay(aValue:TLMDMRUDisplay);
+    procedure SetHelpContext(aValue:THelpContext);
+    procedure SetHint(const aValue:String);
+    procedure SetMaxEntries(aValue:Byte);
+    procedure SetMaxLength(aValue:Byte);
+    procedure SetMenuItem(aValue:TMenuItem);
+    procedure SetStyle(aValue:TLMDMRUListStyle);
+    procedure SetSpeedButton(aValue:TLMDBaseGraphicButton);
+    procedure HandleMenuClick(Sender:TObject);
+    procedure UpdateMenu;
+  protected
+    procedure CreateSectionDefault(var aValue:String);override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure BeginUpdate;
+    procedure EndUpdate;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure Add(const aValue:String);
+    procedure AddItems(aValue:TStrings);
+    procedure ClearMenu;
+    procedure Remove(const aValue:String);
+    procedure RemoveAll;
+    procedure ShareList(aValue:TStrings);
+    procedure RestoreState;override;
+    procedure SaveState;override;
+    procedure ReadData;
+    procedure WriteData;
+
+    //4.0
+    procedure CheckSharedFile(const aValue:String);
+    procedure CheckClearList(Sender:TObject);
+
+    property Items:TStrings read FItems;
+
+  published
+    property About;
+    property Button:TLMDBaseGraphicButton read FButton write SetSpeedButton;
+    property HelpContext:THelpContext read FHelpContext write SetHelpContext default 0;
+    property Display:TLMDMRUDisplay read FDisplay write SetDisplay default mdFileName;
+    property Hint:String read FHint write SetHint;
+    property MaxEntries:Byte read FMaxEntries write SetMaxEntries default 4;
+    property MaxLength:Byte read FMaxLength write SetMaxLength default 255;
+    property MenuItem:TMenuItem read FMenuItem write SetMenuItem;
+    property Options:TLMDMRUListOptions read FOptions write FOptions default [moShowAccel, moSubIfEmpty];
+    property Shared:Boolean read FShared write FShared default false;
+    property Style:TLMDMRUListStyle read FStyle write SetStyle default msAfterItem;
+    property IniLink;
+    property IniUse;
+    property Section;
+    {Events}
+    property OnClick:TLMDMRUClickEvent read FOnClick write FOnClick;
+    property OnClearListClick:TNotifyEvent read FOnClearListClick write FOnClearListClick;
+    property OnChange:TNotifyEvent read FOnChange write FOnChange;
+  end;
+
+
+implementation

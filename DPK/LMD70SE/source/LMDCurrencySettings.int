@@ -1,0 +1,46 @@
+
+uses
+  Classes,
+  LMDObject;
+
+type
+  TLMDCurrencyMode = (cmSystem, cmUser);
+
+  TLMDCurrencySettings = class (TLMDObject)
+  private
+    FSystem            : TLMDCurrencyMode;
+    FPosFormatStr,
+    FNegFormatStr,
+    FSymbol            : String;
+    FGroup,
+    FDigits            : Byte;
+    FCurrencyGroup,
+    FFractionDelim     : Char;
+
+    procedure SetSystemDefaults (aValue : TLMDCurrencyMode);
+    procedure SetString (index : Integer; aValue : String);
+//    function IfNotDefault : Boolean;
+  protected
+  public
+    constructor Create; override;
+    procedure LoadDefaults;
+    procedure Assign (Source : TPersistent); override;
+    function toStr (cur : Currency) : String;
+    function toCur (s : String) : Currency;
+    //determine position of first digit of currency value
+    function firstDigitPos (cur: Currency): Integer;
+    property Digits : Byte read FDigits write FDigits {stored IfNotDefault}; //changed Okt 2001, JH
+    property GroupDelim : Char read FCurrencyGroup write FCurrencyGroup {stored IfNotDefault};
+    property FractionDelim : Char read FFractionDelim write FFractionDelim {stored IfNotDefault};
+  published
+    property SystemDefaults : TLMDCurrencyMode read FSystem write SetSystemDefaults;
+    property PositiveFormatStr : String index 0 read FPosFormatStr write SetString {stored IfNotDefault};
+    property NegativeFormatStr : String index 1 read FNegFormatStr write SetString {stored IfNotDefault};
+    property Symbol : String index 2 read FSymbol write SetString {stored IfNotDefault};
+  end;
+
+  //build up a currency string with user defined, system independent formatting rules
+  function LMDCurrToStr (cur : Currency; CurrencySymbol, PosFormatStr, NegFormatStr : String; CurrencyDelim, GroupDelim : Char; Decimals, GroupSize : Byte) : String;
+
+
+implementation

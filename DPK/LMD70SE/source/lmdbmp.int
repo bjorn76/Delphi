@@ -1,0 +1,43 @@
+
+uses
+  Windows, SysUtils, Graphics;
+
+type
+  ELMDWrongPixelFormat = class (Exception);
+  ELMDWrongBmpSize = class (Exception);
+  TLMDBrightness = -255..255;
+  
+  TLMDStepRGB = packed Record
+    r,g,b : Byte;
+  end;
+
+  PLMDStepRGB = ^TLMDStepRGB;
+
+  PLMDStepArray = ^TLMDStepArray;
+  TLMDStepArray = array[1..11000] of TLMDStepRGB;
+
+
+  TLMDRGB = Record
+    case Integer of
+     0: (R, G, B, further : Byte);
+     1 : ( all : LongInt);
+  end;
+
+  //grayscales a bitmap
+  procedure LMDBMPGrayScale (bmp : TBitmap; bmpRect : TRect; target : TBitmap; targetPt : TPoint);
+  //flips a bitmap horizontally
+  procedure LMDBMPFlipHorizonzal (bmp : TBitmap; bmpRect : TRect; target : TBitmap; targetPt : TPoint);
+  //flips a bitmap vertically
+  procedure LMDBMPFlipVertical (bmp : TBitmap; bmpRect : TRect; target : TBitmap; targetPt : TPoint);
+  //adds an alphablending bitmap to another bitmap
+  procedure LMDBMPAlphaBlend (bmp1, bmp2 : TBitmap; bmpRect : TRect;bmp2Pt : TPoint; target : TBitmap; Strength : Single; targetPt : TPoint);
+  //inverts a bitmap
+  procedure LMDBMPInvert (bmp : TBitmap; bmpRect : TRect; target : TBitmap; targetPt : TPoint);
+  //adds brightness to a bitmap
+  procedure LMDBMPBrightness (bmp : TBitmap; bmpRect : TRect; target : TBitmap; targetPt : TPoint; brightness : TLMDBrightness);
+  //adds brightness to a bitmap - for every pixel <> ec !!!
+  procedure LMDBmpBrightnessEC (bmp : TBitmap; bmpRect : TRect; target : TBitmap; targetPt : TPoint; brightness : TLMDBrightness; ec: TColor);
+
+  // creates Region from a SourceBitmap, aTransparentColor specifies transparent areas
+  function LMDBmpCreateRgn(aSourceBitmap:TBitmap; aTransparentColor:TColor):HRGN;
+implementation

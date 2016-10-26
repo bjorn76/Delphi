@@ -1,0 +1,69 @@
+
+uses
+  Windows,
+  Classes,
+  Messages,
+  Graphics,
+  Controls,
+  LMDFontComboBox,
+  LMDFontSizeComboBox,
+  LMDFontListBox,
+  LMDCustomImageListBox;
+
+type
+  TLMDFontSizeListBox = class(TLMDCustomDerivedImageListBox)
+  private
+    FFontName:TFontName;
+    FFontControl:TWinControl;
+    FUseNearest:Boolean;
+    FDefaultSize,
+    VRES, CHECK, FSIZE:Integer;
+    //procedure SetEditorEnabled(aValue:Boolean);
+
+    procedure SetFontControl (aValue : TWinControl);
+    procedure SetFontComboControl(aValue : TLMDFontComboBox);
+    function GetFontComboControl : TLMDFontComboBox;
+    procedure SetFontListControl(aValue : TLMDFontListBox);
+    function GetFontListControl : TLMDFontListBox;
+
+    procedure SetSelected(aValue:Integer);
+    procedure SetFont(const aValue:TFontName);
+    procedure GetNearestValue(var aValue:Integer);
+    function GetSelected:Integer;
+    function CheckValue(aValue:Integer):Integer;
+    procedure CMExit(var Message: TCMExit); message CM_EXIT;
+    procedure CMFontChanged(var Message: TMessage); message CM_FONTCHANGED;
+    procedure CMFontChange(var Message: TMessage); message CM_FONTCHANGE;
+  protected
+    procedure CreateWnd; override;
+    procedure CreateFontSizeList;
+    procedure GetFontChange(Sender:TObject);
+    procedure InitHeight;
+    function IsValidChar(Key:Char):Boolean;
+    procedure Loaded;override;
+    procedure KeyPress(var Key:Char); override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure Init;
+    property FontSize:Integer read GetSelected write SetSelected;
+  published
+    property About;
+    property DefaultSize:Integer read FDefaultSize write FDefaultSize default 10;
+    property FontCombo:TLMDFontComboBox read GetFontComboControl write SetFontComboControl;
+    property FontList:TLMDFontListBox read GetFontListControl write SetFontListControl;
+    property FontName:TFontName read FFontName write SetFont;
+    property UseNearestSize:Boolean read FUseNearest write FUseNearest default false;
+  end;
+
+  TLMDLabeledFontSizeListBox = class(TLMDFontSizeListBox)
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property LabelPosition;
+    property LabelSpacing;
+    property LabelSync;
+    property EditLabel;
+  end;
+
+implementation

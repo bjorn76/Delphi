@@ -1,0 +1,133 @@
+
+uses
+  Windows,
+  Graphics,
+  LMDClass;
+
+type
+
+  {General}
+  TLMDAngle=0..360;
+  {3.X} TLMDDDArrowSize=2..10;
+  TLMDBevelWidth=0..50;
+  TLMDBorderWidth=0..255;
+  TLMDColorCount=2..236;  
+  TLMDPercent= 0..100;
+  TLMDShadowDepth=0..40;
+  {ShadowStyle}
+  TLMDShadowStyle=(hssNone, hssSolid, hssTracing);
+
+  (*
+  moved to lmdclass ...
+  {TLMDSavePixelFormat}
+  TLMDSavePixelFormat=(spfDefault, spfMono, spf4bit, spf8bit{, spf24bit});
+  *)
+  TLMDOrientation = (toHorizontal, toVertical);
+
+  {TLMBevel}
+  TLMDBevelStyle=(bvNone, bvLowered, bvRaised, bvFrameLowered, bvFrameRaised,
+                  bvNormal, bvShadow);
+  TLMDBevelMode=(bmCustom, bmStandard, bmEdge, bmWindows);
+
+  TLMDBorderStyle=(lsNone, lsSingle,
+                   lsLowered, lsRaised,
+                   lsRaisedspb, lsLoweredspb,
+                   lsRaisedExt, lsLoweredExt,
+                   lsFrameInset, lsFrameOffset,
+                   lsWindowBorder,
+                   lsSingleRaised, lsSingleLowered,
+                   lsDoubleRaised, lsDoubleLowered);
+
+  {3.X, was placed in LMDExtCS before}
+  TLMDEdgeStyle=(etRaisedInner, etRaisedOuter, etSunkenInner, etSunkenOuter,
+                etBump, etEtched, etRaised, etSunken);
+  TLMDFrameSide=(fsBottom, fsLeft, fsRight, fsTop);
+  TLMDPosition=TLMDFrameSide;
+  TLMDFrameSides=set of TLMDFrameSide;
+
+  {3.X -> for TLMDGlyphTextLayout}
+  TLMDTextArrange=(taLeft,taLeftTop,taRight,taRightTop,
+                   taTop,taTopLeft, taBottom, taBottomLeft);
+
+type
+  {Labels}
+  TLMDAlignment=(agTopLeft, agTopCenter, agTopRight, agCenterLeft,
+                 agCenter, agCenterRight, agBottomLeft, agBottomCenter,
+                 agBottomRight);
+
+  TLMDFillStyle=(sfNone, sfBrushBitmap, sfBrush, sfBitmap, sfBitmapList, sfGradient);
+
+  TLMDTileMode=(tmNone, tmCenter, tmStretch, tmTile);
+
+  TLMDGradientStyle=(gstHorizontal, gstVertical, gstSquare, gstElliptic,
+                     gstTopLeft, gstTopRight, gstBottomLeft, gstBottomRight,
+                     gstTopLeftDiagonal, gstTopRightDiagonal{, gstRadial});
+
+  TLMDDrawTextStyle=(dtDisabled,
+                     dtEnabled,      {Draw String Enabled}
+                     dt3DDisabled,   {Disabled State is drawn 3D}
+                     dtClip,         {perform Clipping of Text within Rect}
+                     dtAccelChar,
+                     {--> flags for TLMDGlyphTextLayout}
+                     dtAutoSize,
+                     dtRectText,      {returns in scrRect destination rect of drawn text}
+                     dtRectGlyph,     {returns in scrRect destination rect of drawn glyph}
+                     dtRectGlyphText, {returns in scrRect destination rect of drawn text and glyph}
+                     dtCalculate,     {calculate only, draw nothing}
+                     dtGhostGlyph,    {draw text and use GlyphRect settings to align}
+                     dtRectClip       {clip text output to available destination Rect, required for Path/End Ellipsis}
+                     {--}
+                     );
+  TLMDDrawTextStyles=set of TLMDDrawTextStyle;
+
+  TLMDGlyphTextFocusStyle = (fcControl, fcText, fcGlyph, fcGlyphText, fcNone);
+
+  {3D-Style}
+  TLMDThreeDStyle=(tdNone, tdSunken, tdRaised, tdSunkenShadow, tdRaisedShadow,
+                   tdPColorSunken, tdPColorRaised, tdShadow, tdOutline, tdExtrude, tdExtrudeEnh);
+  TLMDThreeDOrientation=(toBottomLeft, toBottomRight, toTopLeft, toTopRight);
+
+  {Disabled-Style}
+  TLMDDisabledStyle=(dsAuto, dsStandard, ds3d, dsNone);
+
+  {Transparent-Style}
+  TLMDTransparentMode=(tpNone, tpRestoreBack, tpTransparentColor, tpRBTranspColor);
+
+  {3.02, moved default objects and types}
+  {============================================================================}
+  {TLMDBitmapStyle}
+  TLMDBitmapStyle=(sbNone, sbAutosize, sbCenter, sbStretch, sbTile,
+                   sbKeepAspRatio, sbKeepWidth, sbKeepHeight);
+
+  {TLMDDirection}
+  TLMDDirection=(tdRight, tdDown, tdLeft, tdUp);
+
+  {3.5: TLMDBaseMeter Types}
+  TLMDMeterDirection=(mdHorizontal, mdVertical, mdHorizontalReverse, mdVerticalReverse);
+  TLMDMeterTextOptions=(toNoText, toCaption, toPercent);
+
+  {graphical objects}
+
+  {============================================================================}
+
+const
+  {Flags for Label}
+  TLMDALIGNFLAGS:array[TLMDAlignment] of Word=
+     (DT_Left, DT_Center, DT_RIGHT,
+      DT_VCENTER or DT_Left, DT_VCENTER or DT_Center, DT_VCENTER or DT_RIGHT,
+      DT_BOTTOM or DT_Left, DT_BOTTOM or DT_Center, DT_BOTTOM or DT_RIGHT);
+
+type
+  {TLMDSavePixelFormat}
+  TLMDSavePixelFormat=(spfDefault, spfMono, spf4bit, spf8bit{, spf24bit});
+
+  {LightColor-Styles}
+  TLMDLightColor = (lcNone, lcBlue, lcRed, lcGreen, lcYellow, lcMarine, lcPurple);
+
+  {--> TLMDGlyphTextFocusStyle, TLMDExtendedStyle}
+  function LMDConvertFocusStyle(aValue:TLMDGlyphTextFocusStyle):TLMDDrawTextStyles;
+
+  {routines}
+  procedure LMDGetLightColors(aColorStyle:TLMDLightColor; var aC1, aC2:TColor);
+
+implementation

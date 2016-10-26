@@ -1,0 +1,331 @@
+
+uses
+  Windows, Consts, Classes, SysUtils, graphics, Messages, Controls,
+  Menus, Forms,
+  stdctrls,
+  lmdclass, lmdgraph, lmdprocs, lmdutils,
+  LMDBase,
+  LMDScrollBox,
+  LMDIniCtrl,
+  LMDCustomBevelPanel;
+
+const
+  LMDMAXSPLITPANE:BYTE = 4;
+  IDS_SPLITTERSAVE:String='SplitPanel';
+
+type
+  TLMDResizeButtonStyle = (rbsNoButton, rbsGripOnly, rbsGripWithArrows,
+                           rbsFlatGripOnly, rbsFlatGripWithArrows);
+
+  TLMDSplitterOrientation=(spHorzDown, spHorzUp, spVertRight, spVertLeft, spCross);
+  TLMDSplitterPanelEvent = procedure(Sender: TObject; BarIndex:Integer) of object;
+
+  {Ini-Support}
+  TLMDSplitterIniSaveOption=(ssOrderVisible, ssPosition, soColor, soFont);
+  TLMDSplitterIniSaveOptions=set of TLMDSplitterIniSaveOption;
+  TLMDSplitterJump=(sjUpLeft, sjDnRight);
+
+  TLMDSplitterPanel=class;
+
+  {--------------------------- TLMDSplitterBarItem ----------------------------}
+  TLMDSplitterBarItem = class(TCollectionItem)
+  private
+    FBorderStyle  : TLMDBorderStyle;
+    FMaxAbs       : Integer;
+    FMoved,
+    FClosed       : Boolean;
+    FResizeBtn : TLMDResizeButtonStyle;
+    //FResizeBtn,
+    FInvResizeBtn,
+    FTransparent,
+    FHorizontal   : Boolean;
+    FLocked       : Boolean;
+    FMoving       : Boolean;
+    FPosition     : Integer;
+    FGhostPosition: Integer;                  {if InstantUpdate is false}
+    FPosPercent   : TLMDPercent;
+    FSplitterJmp  : TLMDSplitterJump;
+    FOldPos,      //needed for jumping back
+    FMin,
+    FMax          : Integer;
+    FBtnColor,
+    FColor        : TColor;
+    FWidth        : Integer;
+    FSplitControl : TLMDSplitterPanel;
+    FMouseBtn,
+    FSelect       : Boolean;
+    FOnChange     : TNotifyEvent;
+    FBtnRect      : TRect;
+    procedure SetBorderStyle(aValue:TLMDBorderStyle);
+    procedure SetInteger(index: Integer; aValue: Integer);
+    procedure SetBoolean(index : Integer; aValue : Boolean);
+    procedure SetLocked(aValue:Boolean);
+    procedure SetPercent(aValue: TLMDPercent);
+    procedure SetColor(index: Integer; aValue: TColor);
+    procedure SetJumpDir (aValue : TLMDSplitterJump);
+    procedure SetResizeBtn(aValue:TLMDResizeButtonStyle);
+    procedure DoClick (Sender : TObject);
+    // 6.1
+    procedure ReadBoolean(Reader:TReader);
+    function GetResizeBtn:Boolean;
+  protected
+    // compatibility with older versions
+    procedure DefineProperties(Filer:TFiler);override;
+  public
+    constructor Create(Collection: TCollection); override;
+    destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure TrimValues(aValue:Boolean);
+    //Minimize will "close" the specified pane
+    procedure Minimize;
+    //Restore will restore the size of a previously closed pane
+    procedure Restore;
+    property Selected:Boolean read FSelect write FSelect;
+    property Horizontal: Boolean read FHorizontal;
+    property MouseAboveBtn : Boolean index 5 read FMouseBtn write SetBoolean default false;
+
+    //6.1, new: ResizeButtonStyle
+    property ResizeButton : Boolean read GetResizeBtn;
+  published
+    property OldPosition: Integer read FOldPos write FOldPos;
+    property BorderStyle:TLMDBorderStyle read FBorderStyle write SetBorderStyle default lsNone;
+    property Position: Integer index 0 read FPosition write SetInteger;
+    property PosPercent: TLMDPercent read FPosPercent write SetPercent default 50;
+    property Min: Integer index 1 read FMin write SetInteger default 0;
+    property Max: Integer index 2 read FMax write SetInteger default 0;
+    property Locked: Boolean read FLocked write SetLocked default False;
+    property Color: TColor index 0 read FColor write SetColor default clBtnFace;
+    property ResizeButtonStyle:TLMDResizeButtonStyle read FResizeBtn write SetResizeBtn default rbsNoButton;
+    property ResizeDirection : TLMDSplitterJump read FSplitterJmp write SetJumpDir default sjUpLeft;
+    property ResizeColor : TColor index 1 read FBtnColor write SetColor default clBtnFace;
+    property Transparent : Boolean index 1 read FTransparent write SetBoolean default false;
+    property Width: Integer index 3 read FWidth write SetInteger default 3;
+    property OnChange:TNotifyEvent read FOnChange write FOnChange;
+  end;
+
+  {------------------------- TLMDSplitterBarItems -----------------------------}
+  TLMDSplitterBarItems = class(TCollection)
+  private
+    FSplitControl: TLMDSplitterPanel;
+    function GetItem(Index: Integer): TLMDSplitterBarItem;
+    procedure SetItem(Index: Integer; Value: TLMDSplitterBarItem);
+  protected
+    function GetOwner: TPersistent; override;
+    procedure Update(Item: TCollectionItem); override;
+  public
+    constructor Create(SplitControl: TLMDSplitterPanel);
+    function Add: TLMDSplitterBarItem;
+    property Items[Index: Integer]: TLMDSplitterBarItem read GetItem write SetItem; default;
+  end;
+
+  {------------------------- TLMDSplitterBarPane ------------------------------}
+  TLMDSplitterPane=class(TLMDScrollBox)
+  private
+    FPaneIndex:Integer;
+    // 5.03
+    FParentControl:TLMDSplitterPanel;
+    FParentCtlXP:Boolean;
+    procedure SetParentControl(aValue:TLMDSplitterPanel);
+    procedure SetParentCtlXP(aValue: Boolean);
+    // ----
+    function GetAlign:TAlign;
+    procedure CMVisibleChanged(var Message: TMessage); message CM_VISIBLECHANGED;
+    procedure CMLMDParentCtlXPChanged(var Message: TMessage); message CM_LMDParentCtlXPChanged;
+  protected
+    procedure ReadState(Reader: TReader); override;
+  public
+    constructor Create(AOwner : TComponent);override;
+    destructor Destroy; override;
+    // 5.03
+    property ParentControl: TLMDSplitterPanel read FParentControl write SetParentControl;
+    // ----
+    property PaneIndex: Integer read FPaneIndex write FPaneIndex;
+  published
+    property CtlXP default false;
+    property ParentCtlXP:Boolean read FParentCtlXP write SetParentCtlXP default true;
+    property Align:TAlign read GetAlign;
+    property Height stored false;
+    property Left stored False;
+    property ParentColor {stored false};
+    property TabOrder stored False;
+    property Top stored False;
+    property Width stored False;
+  end;
+
+  {------------------------ TLMDSplitterPanel ---------------------------------}
+  TLMDSplitterPanel=class(TLMDCustomBevelPanel)
+  private
+    FSplitterCount : Integer;{default 1}
+    FPanes         : TList;
+    FBars          : TLMDSplitterBarItems;
+
+    {value stored due to performance improvement}
+    FBevelExtend   : Integer;
+    FOrientation   : TLMDSplitterOrientation;
+    FHitTest       : TPoint;      {Helps to get the right coordinates when handling
+                                   the same called events}
+    FActPt,                        {stores the actual point of move}
+    FMouseDownPt   : TPoint;       {stores the point where the drag begins}
+    FInstantUpdate,                {Bar is updated instantly when being moved}
+    FInternal,
+    FMoving        : Boolean;      {indicates that a Bar is being moved}
+    FMovingBar     : Integer;      {index of Bar being moved}
+    FMovable       : Boolean;      {Design Time: Splitters movable or fixed?}
+    FOnSplitChange : TLMDSplitterPanelEvent;
+
+    {Ini-Support}
+    FIniLink       : TLMDIniCtrl;
+    FIniUse        : TLMDIniUse;
+    FSection, FKey : String;
+    FIniOptions    : TLMDSplitterIniSaveOptions;
+    FOnIniReadData,
+    FOnIniWriteData:TLMDIniCtrlEvent;
+
+    procedure SetIniLink(aValue:TLMDIniCtrl);
+    function SaveKey:Boolean;
+    function SaveSection:Boolean;
+    {-----}
+    function HasBars:Boolean;
+    procedure SetBars(aValue: TLMDSplitterBarItems);
+    procedure SetOrientation(aValue: TLMDSplitterOrientation);
+    function GetBarRect(index:Integer): TRect;
+    function GetPane(index:integer): TLMDSplitterPane;
+    function GetPaneCount: Integer;
+    function GetVisibleBarCount:Integer;
+    function GetVisiblePaneCount: Integer;
+    function GetVisiblePanes(index: Integer): TLMDSplitterPane;
+
+    procedure ChangeSplitterBounds;
+    procedure ChangeSplitterOrientation;
+
+    procedure CMDesignHitTest(var Message: TCMDesignHitTest); message CM_DESIGNHITTEST;
+    procedure WMNCHitTest(var Message: TWMNCHitTest); message WM_NCHITTEST;
+    procedure WMSize(var Message: TWMSize); message WM_SIZE;
+    procedure WMSetCursor(var Message: TWMSetCursor); message WM_SetCursor;
+  protected
+    procedure AlignControls(aControl:TControl;var Rect:TRect);override;
+    procedure CreateParams(var Params:TCreateParams);override;
+    procedure DoReadData;dynamic;
+    procedure DoWriteData;dynamic;
+    procedure GetChange(Sender: TObject); override;
+    procedure GetChildren(Proc: TGetChildProc; Root: TComponent);override;
+    function  GetEmpty:Boolean;override;
+    procedure Loaded;override;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseExit; override;
+    procedure Notification(AComponent:TComponent;Operation:TOperation);override;
+    procedure Paint;override;
+    procedure PaintSplitter;
+    procedure ReadState(Reader: TReader); override;
+    procedure Resize; override;
+    procedure UpdateBar(Index:Integer);
+    procedure UpdateBars;
+    procedure ValidatePoint(var aPt: TPoint; OldPt: TPoint);
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy;override;
+
+    //4.51 (RM)
+    procedure EndUpdate(aValue:Boolean);override;
+    //----
+
+    // 6.0 (RM)
+    procedure DoThemeChanged; override;
+    // ---
+
+    function AddPane(aPane: TLMDSplitterPane):Integer;
+    procedure ClearPanes;
+    procedure ExChangePanes(first, second:Integer);
+    procedure MovePane(oldindex, newindex:Integer);
+    procedure RemovePane(aPane: TLMDSplitterPane);
+    procedure RotatePanes;
+
+    procedure WriteData;
+    procedure ReadData;
+
+    // Internal only
+    property Movable:Boolean read FMovable write FMovable;
+    property BarRect[index:Integer]: TRect read GetBarRect;
+    property Panes[index:Integer]:TLMDSplitterPane read GetPane;
+    property PaneCount:Integer read GetPaneCount;
+    property VisibleBarCount:Integer read GetVisibleBarCount;
+    property VisiblePaneCount: Integer read GetVisiblePaneCount;
+    property VisiblePanes[index: Integer]: TLMDSplitterPane read GetVisiblePanes;
+  published
+    property About;
+    {$IFNDEF LMDTOOLS_SPECIALEDITION}
+      property BackFX;
+    {$ENDIF}
+
+    property CtlXP default false;
+    property InstantUpdate: Boolean read FInstantUpdate write FInstantUpdate default false;
+    property Bevel;
+    property Bars: TLMDSplitterBarItems read FBars write SetBars stored HasBars;
+    property Orientation: TLMDSplitterOrientation read FOrientation write SetOrientation default spVertRight;
+    property Transparent;
+
+    {Ini-Support}
+    property IniLink:TLMDIniCtrl read FIniLink write SetIniLink;
+    property IniUse:TLMDIniUse read FIniUse write FIniUse default ioNone; {not active by default}
+    property IniSaveOptions:TLMDSplitterIniSaveOptions read FIniOptions write FIniOptions default [ssPosition, ssOrderVisible];
+    property Section:String read FSection write FSection stored SaveSection;
+    property IniKey:String read FKey write FKey stored SaveKey;
+
+    property Align;
+    property Cursor; //stored false;
+    property DragMode;
+    property DragCursor;
+    property Color;
+    property Ctl3D;
+    property Enabled;
+    property Font;
+    property TabOrder;
+    property TabStop;
+
+    property ParentCtl3D;
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+
+    property Visible;
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnSplitChange: TLMDSplitterPanelEvent read FOnSplitChange write FOnSplitChange;
+    property OnResize;
+
+    //new ini-support
+    property OnIniReadData:TLMDIniCtrlEvent read FOnIniReadData write FOnIniReadData;
+    property OnIniWriteData:TLMDIniCtrlEvent read FOnIniWriteData write FOnIniWriteData;
+
+    // V4 enhancements
+    property Anchors;
+    property AutoSize;
+    property Constraints;
+    property DockSite;
+    property DragKind;
+    property BiDiMode;
+    property ParentBiDiMode;
+    property OnDockDrop;
+    property OnDockOver;
+    property OnEndDock;
+    property OnGetSiteInfo;
+    property OnStartDock;
+    property OnUnDock;
+  end;
+
+implementation

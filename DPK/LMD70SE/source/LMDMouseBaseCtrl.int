@@ -1,0 +1,34 @@
+
+uses
+  Windows,
+  Classes,
+  Controls,
+  LMDWndProcComponent;
+
+type
+  {------------------------- TLMDMouseBaseCtrl --------------------------------}
+  TLMDMousePosStyle=(mpDefaultButton, mpControl, mpClientArea);
+
+  TLMDMouseBaseCtrl = class(TLMDWndProcComponent)
+  private
+    FAutoActive:Boolean;
+    FControl:TControl;
+    FPosStyle:TLMDMousePosStyle;
+    procedure SetControl(aControl:TControl);
+    procedure SetPosStyle(aValue:TLMDMousePosStyle);
+  protected
+    function GetTargetRect(var aRect:TRect):Boolean;
+    function  HasControl:Boolean;
+    procedure Notification(AComponent: TComponent;  Operation: TOperation); override;
+  public
+    Performed:Boolean;
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+  published
+    property About;
+    property AutoActive:Boolean read FAutoActive write FAutoActive default false;
+    property Control:TControl read FControl write SetControl stored HasControl;
+    property Style:TLMDMousePosStyle read FPosStyle write SetPosStyle default mpDefaultButton;
+  end;
+
+implementation

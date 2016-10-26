@@ -1,0 +1,496 @@
+object LMD3DEffectEditorDlg: TLMD3DEffectEditorDlg
+  Left = 203
+  Top = 168
+  BorderStyle = bsDialog
+  Caption = '3DEffect-Editor'
+  ClientHeight = 353
+  ClientWidth = 399
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clBlack
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Font.Style = []
+  OldCreateOrder = True
+  Position = poScreenCenter
+  ShowHint = True
+  OnActivate = FormActivate
+  OnClose = FormClose
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Bevel1: TBevel
+    Left = 6
+    Top = 179
+    Width = 387
+    Height = 8
+    Shape = bsBottomLine
+  end
+  object Bevel2: TBevel
+    Left = 7
+    Top = 191
+    Width = 294
+    Height = 156
+  end
+  object Label4: TLabel
+    Left = 135
+    Top = 213
+    Width = 61
+    Height = 13
+    Caption = 'Bevel-Width:'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlack
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    ParentFont = False
+    Transparent = True
+  end
+  object Label5: TLabel
+    Left = 310
+    Top = 26
+    Width = 79
+    Height = 77
+    Caption = 
+      'Press the '#39'execute'#39'- button to start generating the 3d-effect. T' +
+      'his might take some time. Press stop if you want to abort.'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clNavy
+    Font.Height = -9
+    Font.Name = 'Small Fonts'
+    Font.Style = []
+    ParentFont = False
+    WordWrap = True
+  end
+  object BtnImg: TImage
+    Left = 7
+    Top = 5
+    Width = 294
+    Height = 150
+    Center = True
+  end
+  object Bevel3: TBevel
+    Left = 125
+    Top = 194
+    Width = 2
+    Height = 50
+  end
+  object Label3: TLabel
+    Left = 17
+    Top = 254
+    Width = 60
+    Height = 13
+    Caption = 'Color Bevel: '
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlack
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    ParentFont = False
+    Transparent = True
+  end
+  object Label1: TLabel
+    Left = 17
+    Top = 278
+    Width = 74
+    Height = 13
+    Caption = 'Color Disabled: '
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlack
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    ParentFont = False
+    Transparent = True
+  end
+  object Label2: TLabel
+    Left = 17
+    Top = 302
+    Width = 56
+    Height = 13
+    Caption = 'Color Light: '
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlack
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    ParentFont = False
+    Transparent = True
+  end
+  object Label6: TLabel
+    Left = 17
+    Top = 322
+    Width = 72
+    Height = 13
+    Caption = 'Color Shadow: '
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlack
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    ParentFont = False
+    Transparent = True
+  end
+  object lmdprog: TLMDProgress
+    Left = 7
+    Top = 161
+    Width = 385
+    Height = 20
+    Bevel.StyleOuter = bvLowered
+    Bevel.Mode = bmCustom
+    SmallBar.BarCount = 20
+  end
+  object spind: TLMDSpinEdit
+    Left = 206
+    Top = 208
+    Width = 47
+    Height = 21
+    Hint = 'Specifies the width of the bevel.'
+    Bevel.Mode = bmWindows
+    Caret.BlinkRate = 530
+    CtlXP = False
+    TabOrder = 9
+    OnChange = spindChange
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlack
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    MaxLength = 3
+    AutoSelect = True
+    ParentFont = False
+    CustomButtons = <>
+    SpinBtnDiag = False
+    DateTime = 0
+  end
+  object cmbB: TLMDColorComboBox
+    Left = 97
+    Top = 248
+    Width = 158
+    Height = 21
+    Hint = 'Specifies the color of the bevel.'
+    DlgOptions = []
+    DlgHelpContext = 0
+    Options = [coDefaultColors, coSystemColors, coAllowAnyColor]
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlack
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 0
+    OnChange = cmbBChange
+  end
+  object cmbD: TLMDColorComboBox
+    Left = 97
+    Top = 271
+    Width = 158
+    Height = 21
+    Hint = 'Specifies the color of the disabled style.'
+    DlgOptions = []
+    DlgHelpContext = 0
+    Options = [coDefaultColors, coSystemColors, coAllowAnyColor]
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlack
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 2
+    OnChange = cmbBChange
+  end
+  object cmbL: TLMDColorComboBox
+    Left = 97
+    Top = 294
+    Width = 158
+    Height = 21
+    Hint = 'Specifies the color of the lightened bevel parts.'
+    DlgOptions = []
+    DlgHelpContext = 0
+    Options = [coDefaultColors, coSystemColors, coAllowAnyColor]
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlack
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 4
+    OnChange = cmbBChange
+  end
+  object cmbS: TLMDColorComboBox
+    Left = 97
+    Top = 317
+    Width = 158
+    Height = 21
+    Hint = 'Specifies the color of the darkened bevel parts.'
+    DlgOptions = []
+    DlgHelpContext = 0
+    Options = [coDefaultColors, coSystemColors, coAllowAnyColor]
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlack
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 6
+    OnChange = cmbBChange
+  end
+  object cmbState: TComboBox
+    Left = 310
+    Top = 5
+    Width = 80
+    Height = 21
+    Enabled = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlack
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    ItemHeight = 13
+    ParentFont = False
+    TabOrder = 8
+    Text = 'Original'
+    OnChange = cmbStateChange
+    Items.Strings = (
+      'Up'
+      'Down'
+      'Disabled'
+      'Original')
+  end
+  object dlgb: TLMDDockButton
+    Left = 256
+    Top = 248
+    Width = 22
+    Height = 21
+    TabOrder = 1
+    OnClick = dlgBClick
+    CtlXP = False
+    ButtonStyle = ubsWin40
+    Glyph.Data = {
+      0E030000424D0E0300000000000036000000280000000D0000000E0000000100
+      200000000000D802000000000000000000000000000000000000008080000080
+      8000008080000080800000808000008080000080800000808000008080000080
+      8000008080000080800000808000008080000080800000808000008080000000
+      0000000000000000000000000000000000000080800000808000008080000080
+      80000080800000808000008080000000000000FFFF00C0C0C00000FFFF00C0C0
+      C00000FFFF000000000000000000008080000080800000808000008080000080
+      800000000000C0C0C00000000000C0C0C00000FFFF00C0C0C00000FFFF00C0C0
+      C00000000000008080000080800000808000008080000080800000000000FFFF
+      000000000000C0C0C00000000000C0C0C00000FFFF0000000000008080000080
+      8000008080000080800000000000C0C0C00000000000C0C0C000000000000000
+      FF0000000000C0C0C00000FFFF00000000000080800000000000000000000000
+      000000FFFF00C0C0C00000FFFF00C0C0C00000000000C0C0C00000FFFF00C0C0
+      C000000000000000000000FFFF00C0C0C00000FFFF00C0C0C00000FFFF00C0C0
+      C00000FFFF00C0C0C00000000000C0C0C00000FFFF000000000000000000C0C0
+      C000C0C0C00000000000C0C0C000C0C0C00000FFFF00C0C0C00000000000C0C0
+      C00000000000C0C0C000000000000000000000FFFF0000000000800080000000
+      0000C0C0C00000000000C0C0C000C0C0C00000000000C0C0C00000FFFF000000
+      000000000000C0C0C000C0C0C00000000000C0C0C00000000000FF00FF000000
+      000000FFFF00C0C0C00000FFFF0000000000008080000080800000000000C0C0
+      C00000FFFF00C0C0C000C0C0C00000000000C0C0C000C0C0C00000FFFF000000
+      000000808000008080000080800000808000000000000000000000FFFF00C0C0
+      C00000FFFF00C0C0C00000000000000000000080800000808000008080000080
+      8000008080000080800000808000000000000000000000000000000000000080
+      800000808000008080000080800000808000}
+    Control = cmbB
+    GlyphKind = gkColor
+  end
+  object dlgd: TLMDDockButton
+    Left = 256
+    Top = 271
+    Width = 22
+    Height = 21
+    TabOrder = 3
+    OnClick = dlgBClick
+    CtlXP = False
+    ButtonStyle = ubsWin40
+    Glyph.Data = {
+      0E030000424D0E0300000000000036000000280000000D0000000E0000000100
+      200000000000D802000000000000000000000000000000000000008080000080
+      8000008080000080800000808000008080000080800000808000008080000080
+      8000008080000080800000808000008080000080800000808000008080000000
+      0000000000000000000000000000000000000080800000808000008080000080
+      80000080800000808000008080000000000000FFFF00C0C0C00000FFFF00C0C0
+      C00000FFFF000000000000000000008080000080800000808000008080000080
+      800000000000C0C0C00000000000C0C0C00000FFFF00C0C0C00000FFFF00C0C0
+      C00000000000008080000080800000808000008080000080800000000000FFFF
+      000000000000C0C0C00000000000C0C0C00000FFFF0000000000008080000080
+      8000008080000080800000000000C0C0C00000000000C0C0C000000000000000
+      FF0000000000C0C0C00000FFFF00000000000080800000000000000000000000
+      000000FFFF00C0C0C00000FFFF00C0C0C00000000000C0C0C00000FFFF00C0C0
+      C000000000000000000000FFFF00C0C0C00000FFFF00C0C0C00000FFFF00C0C0
+      C00000FFFF00C0C0C00000000000C0C0C00000FFFF000000000000000000C0C0
+      C000C0C0C00000000000C0C0C000C0C0C00000FFFF00C0C0C00000000000C0C0
+      C00000000000C0C0C000000000000000000000FFFF0000000000800080000000
+      0000C0C0C00000000000C0C0C000C0C0C00000000000C0C0C00000FFFF000000
+      000000000000C0C0C000C0C0C00000000000C0C0C00000000000FF00FF000000
+      000000FFFF00C0C0C00000FFFF0000000000008080000080800000000000C0C0
+      C00000FFFF00C0C0C000C0C0C00000000000C0C0C000C0C0C00000FFFF000000
+      000000808000008080000080800000808000000000000000000000FFFF00C0C0
+      C00000FFFF00C0C0C00000000000000000000080800000808000008080000080
+      8000008080000080800000808000000000000000000000000000000000000080
+      800000808000008080000080800000808000}
+    Control = cmbD
+    GlyphKind = gkColor
+  end
+  object dlgl: TLMDDockButton
+    Left = 256
+    Top = 294
+    Width = 22
+    Height = 21
+    TabOrder = 5
+    OnClick = dlgBClick
+    CtlXP = False
+    ButtonStyle = ubsWin40
+    Glyph.Data = {
+      0E030000424D0E0300000000000036000000280000000D0000000E0000000100
+      200000000000D802000000000000000000000000000000000000008080000080
+      8000008080000080800000808000008080000080800000808000008080000080
+      8000008080000080800000808000008080000080800000808000008080000000
+      0000000000000000000000000000000000000080800000808000008080000080
+      80000080800000808000008080000000000000FFFF00C0C0C00000FFFF00C0C0
+      C00000FFFF000000000000000000008080000080800000808000008080000080
+      800000000000C0C0C00000000000C0C0C00000FFFF00C0C0C00000FFFF00C0C0
+      C00000000000008080000080800000808000008080000080800000000000FFFF
+      000000000000C0C0C00000000000C0C0C00000FFFF0000000000008080000080
+      8000008080000080800000000000C0C0C00000000000C0C0C000000000000000
+      FF0000000000C0C0C00000FFFF00000000000080800000000000000000000000
+      000000FFFF00C0C0C00000FFFF00C0C0C00000000000C0C0C00000FFFF00C0C0
+      C000000000000000000000FFFF00C0C0C00000FFFF00C0C0C00000FFFF00C0C0
+      C00000FFFF00C0C0C00000000000C0C0C00000FFFF000000000000000000C0C0
+      C000C0C0C00000000000C0C0C000C0C0C00000FFFF00C0C0C00000000000C0C0
+      C00000000000C0C0C000000000000000000000FFFF0000000000800080000000
+      0000C0C0C00000000000C0C0C000C0C0C00000000000C0C0C00000FFFF000000
+      000000000000C0C0C000C0C0C00000000000C0C0C00000000000FF00FF000000
+      000000FFFF00C0C0C00000FFFF0000000000008080000080800000000000C0C0
+      C00000FFFF00C0C0C000C0C0C00000000000C0C0C000C0C0C00000FFFF000000
+      000000808000008080000080800000808000000000000000000000FFFF00C0C0
+      C00000FFFF00C0C0C00000000000000000000080800000808000008080000080
+      8000008080000080800000808000000000000000000000000000000000000080
+      800000808000008080000080800000808000}
+    Control = cmbL
+    GlyphKind = gkColor
+  end
+  object dlgs: TLMDDockButton
+    Left = 256
+    Top = 317
+    Width = 22
+    Height = 21
+    TabOrder = 7
+    OnClick = dlgBClick
+    CtlXP = False
+    ButtonStyle = ubsWin40
+    Glyph.Data = {
+      0E030000424D0E0300000000000036000000280000000D0000000E0000000100
+      200000000000D802000000000000000000000000000000000000008080000080
+      8000008080000080800000808000008080000080800000808000008080000080
+      8000008080000080800000808000008080000080800000808000008080000000
+      0000000000000000000000000000000000000080800000808000008080000080
+      80000080800000808000008080000000000000FFFF00C0C0C00000FFFF00C0C0
+      C00000FFFF000000000000000000008080000080800000808000008080000080
+      800000000000C0C0C00000000000C0C0C00000FFFF00C0C0C00000FFFF00C0C0
+      C00000000000008080000080800000808000008080000080800000000000FFFF
+      000000000000C0C0C00000000000C0C0C00000FFFF0000000000008080000080
+      8000008080000080800000000000C0C0C00000000000C0C0C000000000000000
+      FF0000000000C0C0C00000FFFF00000000000080800000000000000000000000
+      000000FFFF00C0C0C00000FFFF00C0C0C00000000000C0C0C00000FFFF00C0C0
+      C000000000000000000000FFFF00C0C0C00000FFFF00C0C0C00000FFFF00C0C0
+      C00000FFFF00C0C0C00000000000C0C0C00000FFFF000000000000000000C0C0
+      C000C0C0C00000000000C0C0C000C0C0C00000FFFF00C0C0C00000000000C0C0
+      C00000000000C0C0C000000000000000000000FFFF0000000000800080000000
+      0000C0C0C00000000000C0C0C000C0C0C00000000000C0C0C00000FFFF000000
+      000000000000C0C0C000C0C0C00000000000C0C0C00000000000FF00FF000000
+      000000FFFF00C0C0C00000FFFF0000000000008080000080800000000000C0C0
+      C00000FFFF00C0C0C000C0C0C00000000000C0C0C000C0C0C00000FFFF000000
+      000000808000008080000080800000808000000000000000000000FFFF00C0C0
+      C00000FFFF00C0C0C00000000000000000000080800000808000008080000080
+      8000008080000080800000808000000000000000000000000000000000000080
+      800000808000008080000080800000808000}
+    Control = cmbS
+    GlyphKind = gkColor
+  end
+  object EXECUTE: TLMDButton
+    Left = 310
+    Top = 104
+    Width = 81
+    Height = 22
+    Hint = 'Executes the 3D-effect routine.'
+    Caption = '&Execute'
+    TabOrder = 10
+    OnClick = EXECUTEClick
+    CtlXP = False
+    ButtonStyle = ubsWin40
+  end
+  object STOP: TLMDButton
+    Left = 310
+    Top = 128
+    Width = 81
+    Height = 22
+    Hint = 'Aborts the 3D effect-routine'
+    Caption = '&Stop'
+    TabOrder = 11
+    OnClick = STOPClick
+    CtlXP = False
+    ButtonStyle = ubsWin40
+  end
+  object Ok: TLMDButton
+    Left = 310
+    Top = 192
+    Width = 81
+    Height = 22
+    Caption = 'OK'
+    Default = True
+    ModalResult = 1
+    TabOrder = 12
+    OnClick = STOPClick
+    CtlXP = False
+    ButtonStyle = ubsWin40
+  end
+  object LMDButton4: TLMDButton
+    Left = 310
+    Top = 216
+    Width = 81
+    Height = 22
+    Cancel = True
+    Caption = 'Cancel'
+    ModalResult = 2
+    TabOrder = 13
+    OnClick = STOPClick
+    CtlXP = False
+    ButtonStyle = ubsWin40
+  end
+  object btngetpic: TLMDButton
+    Left = 13
+    Top = 198
+    Width = 81
+    Height = 22
+    Hint = 'Specify a picture for the 3D-effect.'
+    Caption = '&Picture >>'
+    TabOrder = 14
+    OnClick = btngetpicClick
+    CtlXP = False
+    ButtonStyle = ubsWin40
+  end
+  object btngetcap: TLMDButton
+    Left = 13
+    Top = 224
+    Width = 81
+    Height = 22
+    Hint = 'Specify a LMDCaption for the 3D-effect.'
+    Caption = '&Caption >>'
+    TabOrder = 15
+    OnClick = btngetpicClick
+    CtlXP = False
+    ButtonStyle = ubsWin40
+  end
+  object LMDFormStyler: TLMDFormStyler
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlack
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    Left = 264
+    Top = 202
+  end
+end

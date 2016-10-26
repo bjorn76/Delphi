@@ -1,0 +1,56 @@
+
+uses
+  Classes,
+  Windows,
+  Forms,
+  Messages,
+  LMDCustomComponent;
+
+type
+  {--------- Base Classes used for Window-Hook Procedures ---------------------}
+  {for (MDI-)forms}
+  {new from V2.11: Application Window access}
+  TLMDWndProcComponent=class(TLMDCustomComponent)
+  private
+    FEnabled,
+    FDesignEnabled,
+    FHandleApp,
+    FHooked,
+    FSilent:Boolean;
+    FMDIForm:Byte;
+    FWndProc,
+    FWndProcOld:TFarProc;
+    function GetOwnerForm:TForm;
+    function GetOwnerHandle:HWND;
+    function NewWndProc:Boolean;
+    procedure SetEnabled(aValue:Boolean);
+    procedure SetDesignEnabled(aValue:Boolean);
+    procedure SetHandleApp(aValue:Boolean);
+  protected
+    FDestroying,
+    FHandleMDI:Boolean;
+    function RestoreWndProc:Boolean;
+    function AppWndProc(var Message: TMessage):Boolean;virtual;
+    procedure Init;virtual;
+    procedure RestoreState;virtual;
+    procedure Loaded;override;
+    procedure WndProc(var Message: TMessage);virtual;
+    procedure DesignEnabledChanged; virtual;
+    procedure EnabledChanged; virtual;
+
+    property DesignEnabled: Boolean read FDesignEnabled write SetDesignEnabled default false;
+    property Enabled:Boolean read FEnabled write SetEnabled default True;
+    property HandleApp:Boolean read FHandleApp write SetHandleApp default false; {designtime only!}
+    property MDIForm:Byte read FMDIForm;
+    property PrevWndProc:TFarProc read FWndProcOld;
+    property WndHandle:HWND read GetOwnerHandle;
+    property WndOwner:TForm read GetOwnerForm;
+  public
+    constructor Create(aOwner:TComponent);override;
+    destructor Destroy;override;
+    function ValidOwner:Boolean;
+    procedure SilentRemove;
+  end;
+
+
+implementation

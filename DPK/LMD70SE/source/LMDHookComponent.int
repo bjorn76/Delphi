@@ -1,0 +1,54 @@
+
+uses
+  Windows,
+  Classes,
+  Forms,
+  Controls,
+  Messages,
+  LMDCustomComponent;
+
+type
+  {for all TWinControl components}
+  {-------------------  TLMDCustomHookComponent -------------------------------}
+  TLMDCustomHookComponent=class(TLMDCustomComponent)
+  private
+    FControl:TWinControl;
+    FDestroying:Boolean;
+    FEnabled:Boolean;
+    FWndProc,
+    FWndProcOld:TFarProc;
+    function NewWndProc:Boolean;
+    function RestoreWndProc:Boolean;
+    procedure SetControl(aValue:TWinControl);
+    procedure SetEnabled(aValue:Boolean);
+  protected
+    function  HasControl:Boolean;
+    procedure Init;virtual;
+    procedure Loaded;override;
+    procedure Notification(AComponent: TComponent;Operation:TOperation);override;
+    procedure RestoreState;virtual;
+    procedure WndProc(var Message: TMessage);dynamic;
+    property PrevWndProc:TFarProc read FWndProcOld;
+  public
+    constructor Create(aOwner:TComponent);override;
+    destructor Destroy;override;
+    property Control:TWinControl read FControl write SetControl stored HasControl;
+    property Enabled:Boolean read FEnabled write SetEnabled default True;
+  end;
+
+  TLMDMessageEvent=procedure(Sender:TObject; var Message:TMessage; var Handled:Boolean) of object;
+
+  {-------------------  TLMDHookComponent -------------------------------------}
+  TLMDHookComponent=class(TLMDCustomHookComponent)
+  private
+    FOnMessage:TLMDMessageEvent;
+  protected
+    procedure WndProc(var Message: TMessage);override;
+  published
+    property About;
+    property Control;
+    property Enabled;
+    property OnMessage:TLMDMessageEvent read FOnMessage write FOnMessage;
+  end;
+
+implementation

@@ -1,0 +1,24 @@
+
+uses
+  LMDCustomSpeedButton;
+
+type
+  TLMDSpeedButton=class(TLMDCustomSpeedButton)
+  public
+    property Transparent;
+  published
+    property Align;
+    property ButtonStyle;
+    property AllowAllUp;
+    property GroupIndex;
+    property MultiLine;
+    property Pressed;
+    property DropDownCombo;
+    property DropDownComboWidth;
+    property DropDownMenu;
+    property DropDownIndent;
+    property DropDownRight;
+  end;
+
+
+implementation

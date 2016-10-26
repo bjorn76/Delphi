@@ -1,0 +1,27 @@
+
+uses
+  Graphics,
+  LMDObject;
+
+type
+  {----------------------TLMDShapeButtonColor----------------------------------}
+  TLMDShapeButtonColor=class(TLMDObject)
+  private
+    FDisabled,
+    FDown,
+    FMouseOver,
+    FOptionSet,
+    FUp:TColor;
+    procedure SetColor(index: Integer; aValue: TColor);
+  public
+    constructor Create;override;
+  published
+    property Disabled: TColor index 0 read FDisabled write SetColor default clBtnFace;
+    property Down: TColor index 1 read FDown write SetColor default clBtnFace;
+    property MouseOver: TColor index 2 read FMouseOver write SetColor default clBtnFace;
+    property OptionSet: TColor index 3 read FOptionSet write SetColor default clBtnFace;
+    property Up: TColor index 4 read FUp write SetColor default clBtnFace;
+  end;
+
+
+implementation

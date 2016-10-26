@@ -1,0 +1,73 @@
+
+uses
+  Windows,
+  Classes,
+  Controls,
+  Messages,
+  Graphics,
+  LMDGraph,
+  LMD3DCaption,
+  LMDFXCaption,
+  LMDCustomParentPanel;
+
+type
+  {--------------------- TLMDCustomGroupBox -----------------------------------}
+  TLMDGroupCaptionAlign=(gcaTopLeft, gcaTopCenter, gcaTopRight,
+                         gcaLeftBottom, gcaLeftCenter, gcaLeftTop,
+                         gcaBottomLeft, gcaBottomCenter,
+                         gcaBottomRight, gcaRightTop, gcaRightCenter,
+                         gcaRightBottom);
+
+
+  TLMDCustomGroupBox=class(TLMDCustomParentPanel)
+  private
+    FAccelChar:Boolean;
+    FAlignCaption: TLMDGroupCaptionAlign;
+    FCaptionOffSet: integer;
+    FCaptionFont:TFont;
+    FCaptionParentFont:Boolean;
+    FFont3D:TLMD3DCaption;
+    FCtlXPCaption:Boolean;
+
+    {internal}
+    FCaptionHeight:Integer;
+    FFontFX:TLMDFXCaption;
+    procedure SetAlignCaption(aValue:TLMDGroupCaptionAlign);
+    procedure SetAccelChar(aValue: Boolean);
+    procedure SetCaptionOffset(aValue: integer);
+    procedure SetCaptionFont(aValue:TFont);
+    procedure SetCaptionParentFont(aValue:Boolean);
+    procedure SetFont3D(aValue:TLMD3DCaption);
+    procedure SetCtlXPCaption(Value:Boolean);
+    procedure SetCaptionHeight;
+    function GetCaptionHeight:Integer;
+    procedure CMDialogChar(var Message: TCMDialogChar); message CM_DIALOGCHAR;
+    procedure CMEnabledChanged(var Message: TMessage);message CM_ENABLEDCHANGED;
+    procedure CMParentFontChanged(var Message: TMessage);message CM_PARENTFONTCHANGED;
+    procedure CMTextChanged(var Message: TMessage); message CM_TEXTCHANGED;
+  protected
+    procedure AlignControls(AControl: TControl; var Rect: TRect); override;
+    procedure AdjustClientRect(var Rect: TRect);override;
+    procedure CreateParams(var Params:TCreateParams);override;
+    function ControlSupportsXP: Boolean;override;
+    procedure GetChange(Sender:TObject);override;
+    procedure Paint; override;
+    property CaptionHeight:Integer read GetCaptionHeight;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy;override;
+
+    property Alignment: TLMDGroupCaptionAlign read FAlignCaption write SetAlignCaption default gcaTopLeft;
+    property CaptionFont:TFont read FCaptionFont write SetCaptionFont;
+    property CaptionFont3D:TLMD3DCaption read FFont3D write SetFont3D;
+    property CaptionOffset: integer read FCaptionOffset write SetCaptionOffset default 8;
+    property CaptionParentFont: Boolean read FCaptionParentFont write SetCaptionParentFont default True;
+    property ShowAccelChar:Boolean read FAccelChar write SetAccelChar default True;
+  published
+    property CtlXP;
+    property CtlXPCaptionColor:Boolean read FCtlXPCaption write SetCtlXPCaption default true;
+    property ParentColor default true;
+  end;
+
+
+implementation

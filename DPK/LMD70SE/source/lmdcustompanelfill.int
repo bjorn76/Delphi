@@ -1,0 +1,59 @@
+
+uses
+  Windows,
+  Messages,  //TMessage
+  Classes,   //TComponent
+  Controls, //CM_...
+  Graphics,
+  LMDGraph,
+  LMDFillObject,
+  LMD3DCaption,
+  LMDFXCaption,
+  LMDCustomParentPanel;
+
+type
+  {--------------------- TLMDCustomPanelFill ----------------------------------------}
+  TLMDCustomPanelFill = class(TLMDCustomParentPanel)
+  private
+    FAlignment        : TLMDAlignment;
+    FFontFx           : TLMDFxCaption;
+    FFillObject       : TLMDFillObject;
+    FTransparentBorder: Boolean;
+
+    procedure SetAlignment(aValue: TLMDAlignment);
+    procedure SetCaptionFx(aValue: TLMDFxCaption);
+    procedure SetFillObject(aValue: TLMDFillObject);
+    procedure SetTransparentBorder(aValue: Boolean);
+    procedure CMEnabledChanged(var Message: TMessage);message CM_ENABLEDCHANGED;
+    procedure CMFontChanged(var Message: TMessage);message CM_FONTCHANGED;
+    procedure CMTextChanged(var Message: TMessage);message CM_TEXTCHANGED;
+  protected
+    procedure AdjustClientRect(var Rect: TRect);override;
+    procedure CreateBack(aValue: Boolean); override;
+    procedure DrawBack(Canvas: TCanvas; aRect:TRect);
+    procedure DrawCaption(aRect: TRect; aAlignment:TLMDAlignment); virtual;
+    procedure GetChange(Sender: TObject); override;
+    procedure GetIMLChange(Sender: TObject); override;
+    function  GetEmpty: Boolean; override;
+    function  GetPalette: HPalette;override;
+    procedure Loaded; override;
+    procedure Paint; override;
+    procedure Resize; override;
+
+    procedure MouseEnter; override;
+    procedure MouseExit; override;
+
+    function GetFillObject: TLMDFillObject; override;
+    function GetFont3D    : TLMD3DCaption; override;
+
+    property Alignment: TLMDAlignment read FAlignment write SetAlignment default agCenter;
+    property FontFX: TLMDFxCaption read FFontFx write SetCaptionFx;
+  public
+    constructor Create(AOwner:TComponent); override;
+    destructor Destroy; override;
+    property FillObject: TLMDFillObject read FFillObject write SetFillObject;
+    property TransparentBorder: Boolean read FTransparentBorder write SetTransparentBorder default false;
+  end;
+
+
+implementation

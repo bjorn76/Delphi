@@ -1,0 +1,96 @@
+
+uses
+  Windows,
+  Messages,
+  Classes,
+  Controls,
+  StdCtrls,
+  Graphics,
+  LMDCustomComboBox;
+
+type
+  {-------------------------- TLMDPrinterComboBox -----------------------------}
+
+  TLMDPrinterCBOption=(poDisplaySymbol,
+                       poActivatePrinter,
+                       poStartWithActive   //added Okt 2001, JH
+                      );
+  TLMDPrinterCBOptions = set of TLMDPrinterCBOption;
+
+
+  TLMDPrinterComboBox = class(TLMDCustomComboBox)
+  private
+    FBuffer:TBitmap;
+    FOptions:TLMDPrinterCBOptions;
+    procedure SetOptions(aValue : TLMDPrinterCBOptions);
+    procedure SetSelectedPrinter(const aValue:String);
+    function GetSelectedPrinter: String;
+    procedure CMFontChanged(var Message: TMessage); message CM_FONTCHANGED;
+    procedure CMFontChange(var Message: TMessage); message CM_FONTCHANGE;
+    procedure CNCommand(var Message: TWMCommand); message CN_COMMAND;
+  protected
+    procedure Change; override;
+    procedure CreateWnd; override;
+//    procedure CreatePrinterList;
+    procedure DrawItem(Index: Integer; Rect: TRect; State: TOwnerDrawState); override;
+    procedure InitHeight;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure Loaded; override;
+    procedure InitPrinterList;    
+    procedure Init;
+    property SelectedPrinter:String read GetSelectedPrinter write SetSelectedPrinter;
+    property Text;
+  published
+    property About;
+    property Color;
+    property Ctl3D;
+    property DragMode;
+    property DragCursor;
+    property DropDownCount;
+    property DropDownWidth;
+    property Enabled;
+    property Flat;
+    property FocusControl;
+    property Font;
+    property Options : TLMDPrinterCBOptions read FOptions write SetOptions default [poDisplaySymbol];
+    property ParentColor;
+    property ParentCtl3D;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    //property Search;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    property UseGlobalTimer;
+    property Visible;
+
+   {Events}
+   property OnSelect;
+   property OnChange;
+   property OnClick;
+   property OnDblClick;
+   property OnDragDrop;
+   property OnDragOver;
+   property OnDropDown;
+   property OnEndDrag;
+   property OnEnter;
+   property OnExit;
+   property OnKeyDown;
+   property OnKeyPress;
+   property OnKeyUp;
+   property OnStartDrag;
+
+    // V4 enhancements
+    property Anchors;
+    property Constraints;
+    property DragKind;
+    property BiDiMode;
+    property ParentBiDiMode;
+    property OnEndDock;
+    property OnStartDock;
+  end;
+
+implementation

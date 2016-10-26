@@ -1,0 +1,79 @@
+
+uses
+  Windows,
+  Classes,
+  Graphics,
+  Messages,
+  lmdgraph,
+  LMD3DCaption,
+  LMDCustomFormFill,
+  LMDWndProcComponent;
+
+type
+  {------------------------- TLMDFormStyler -----------------------------------}
+  TLMDFormStyleOption=(fsAdjustRect, fsUseDefaultFont, fsUseFontColor,
+                       fsInactiveGradient, fsDrawCaptionEvent, fsUseFormCaption,
+                       fsCheckSystemGradient);
+
+  TLMDFormStyleOptions=set of TLMDFormStyleOption;
+
+
+  TLMDFormStyler = class(TLMDWndProcComponent)
+  private
+    FHideGradient:Boolean;
+    FAlignment:TAlignment;
+    FColors:TLMDColorCount;
+    FCanvas:TCanvas;
+    FFont:TFont;
+    FFont3D:TLMD3DCaption;
+    FWNDActive:Boolean;
+    FPaintMode:TLMDPaintMode;
+    FOptions:TLMDFormStyleOptions;
+    FSmallCaption:Boolean;
+
+    FOnPaint,
+    FOnCaptionPaint:TLMDPaintEvent;
+
+    {Internal}
+    FCaption:String;
+    FIconBitmap:TBitmap;
+
+    Painting:Boolean;
+    procedure PaintTitleBar(CreateIcon:Boolean);
+    procedure SetAlignment(aValue:TAlignment);
+    procedure SetCaption(const aValue:String);
+    procedure SetColors(aValue:TLMDColorCount);
+    procedure SetFont(aValue:TFont);
+    procedure SetFont3D(aValue:TLMD3DCaption);
+    procedure SetOptions(aValue:TLMDFormStyleOptions);
+    procedure SetPaintMode(aValue:TLMDPaintMode);
+  protected
+    procedure Init;override;
+    procedure GetChange(Sender:TObject);override;
+    procedure RestoreState;override;
+    procedure WndProc(var Message: TMessage);override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure ForceNCPaint;
+    procedure NCPaint;
+    property Caption:String read FCaption write SetCaption;
+    property CaptionActive:Boolean read FWndActive;
+    property SmallCaption:Boolean read FSmallCaption;
+  published
+    property About;
+    property Alignment:TAlignment read FAlignment write SetAlignment default taLeftJustify;
+    property Colors:TLMDColorCount read FColors write SetColors default 32;
+    property Enabled;
+    property Font:TFont read FFont write SetFont;
+    property Font3D:TLMD3DCaption read FFont3D write SetFont3D;
+    property PaintMode:TLMDPaintMode read FPaintMode write SetPaintMode default pcControl;
+    property Options:TLMDFormStyleOptions read FOptions write SetOptions default
+                     [fsAdjustRect, fsUseDefaultFont, fsUseFormCaption, fsCheckSystemGradient];
+
+    property OnPaint:TLMDPaintEvent read FOnPaint write FOnPaint;
+    property OnCaptionPaint:TLMDPaintEvent read FOnCaptionPaint write FOnCaptionPaint;
+
+  end;
+
+implementation

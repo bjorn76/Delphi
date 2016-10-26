@@ -1,0 +1,19 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  LMDDynLIFOBuffer;
+
+type
+  TLMDStack = class(TLMDDynLIFOBuffer)
+  public
+    //inserts a new item as top item on the stack
+    procedure Push (item : Pointer);
+    //destroys the top item
+    procedure Pop;
+    //returns a pointer to the top item. Will be left on the stack
+    function Top : Pointer;
+    //keep in mind that the extracted item has to be destroyed manually!!
+    function ExtractTop : Pointer;
+  end;
+
+implementation

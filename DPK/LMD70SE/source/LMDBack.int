@@ -1,0 +1,21 @@
+
+uses
+  Windows,
+  LMDCustomFormFill;
+
+type
+  TLMDBack=class(TLMDCustomFormFill)
+  protected
+    function PaintClientArea(DC:HDC):Boolean;override;
+  published
+    property About;
+    property DefaultFill;
+    property Enabled;
+    property ImageIndex;
+    property ImageList;
+    property ListIndex;
+    property PaintMode;
+  end;
+
+
+implementation

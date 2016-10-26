@@ -1,0 +1,57 @@
+LMD-Tools V5.0 SE Demos Directory - © 2001 by LMD Innovative, Germany
+*********************************************************************
+
+Date: 04/28/01 
+
+
+a) Delphi demo projects (Demos\Delphi\)
+***************************************
+
+Note:
+Several projects do not support all features of the original demos. These demos
+represent an extract of examples of LMD-Tools release 4.0. For demonstration of
+new features check compiled Megademo in the \bin folder of your LMD-Tools SE
+installation.
+
+Directory Demos\Delphi
+----------------------
+\lmdanictrl - TLMDAniCtrl/TLMDLImage, ImageList controls
+\lmdapplication - Demonstrates features of TLMDApplication object
+\lmdassist - Demonstrates creating of Experts or Wizard-dialogs
+\lmdbtns - Demonstrates features of the LMD button classes
+\lmdclock - TLMDClock demo
+\lmdcolcbbox - TLMDColorComboBox demo
+\lmdcontainer - Demonstrates features of LMD container components
+\lmddialogs - Demonstration of LMD dialog components
+\lmddlgex - Demonstration of the new extended Dialog controls (NEW from version 4.01)
+\lmddrawedge - TLMDDrawEdge demo
+\lmdextfeatures - Demonstration of several extended features (e.g. TLMDNImage, TLMDFill, TLMDFillObject)
+\lmdfontcb - Demonstration of TLMDFontComboBox and TLMDFontSizeComboBox components
+\lmdformdemo - Demonstration of several LMD form components
+\lmdformdisplay - Demonstration of TLMDFormDisplay and TLMDFormTabControl
+\lmdgrlabel - Demonstration of the TLMDGraphicLabel component
+\lmdgroupboxes - Demonstration of the 'transparent' feature of TLMDGroupBox and other related components
+\lmdimlbox - Demo project for the TLMDImageListBox component
+\lmdinfo - Demonstration of the TLMDInformationLabel component
+\lmdIniCtrl - Demonstration of the various extended features of the TLMDIniCtrl component
+\lmdlabels - Demonstration of the TLMDSimpleLabel, TLMDLabel and TLMDLEDLabel components
+\lmdlblfill - Demonstration of the TLMDLabelFill component
+\lmdmemo - Demonstration of the exciting new TLMDMemo component (preliminary version, not included in Megademo)
+\lmdmousectrls - Demonstration of the LMD mouse controls
+\lmdmsgbox - Demonstration of the TLMDMessageBox component
+\lmdmsghint - Demonstrates the features of TLMDMessageHint against TLMDShapeHint
+\lmdprogress - Demonstration of the TLMDProgress / TLMDProgressFill components
+\lmdprogress2 - Demonstrates the OwnerDraw feature of TLMDProgress components
+\lmdscrolltext - Demonstration of the TLMDScrollText component
+\lmdshapes - Demonstration of the new designed TLMDShapeCtrl and TLMDRepeatedShape components
+\lmdshaphint - Demonstration of the TLMDShapeHint component
+\lmdsimplelabel - Demonstrates 'Jump' feature TLMDSimpleLabel + a small TLMDStarter demo
+\lmdstatusbar - Demonstration of the new designed TLMDStatusBar (not included in Megademo, it's a MDI project)
+\lmdstopwatch - Demonstration of TLMDStopWatch component (compares speed of components)
+\lmdsysinfo - Nice demonstration of new TLMDSysInfo features
+\lmdtechline - Demonstration of TLMDTechline component
+\lmdtextedit - Demonstration of many LMD-Tools components (e.g. TLMDMRUList, TLMDMemo etc. not included in Megademo, it's a MDI project)
+\lmdtimerpool - Demonstrates the use of shared timers with the TLMDTimerPool component
+\lmdtrackbar - Demonstration of the TLMDTrackBar component.
+\lmdtrayicon - Demonstration of TLMDTrayIcon (not included in Megademo)
+

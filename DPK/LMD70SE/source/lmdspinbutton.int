@@ -1,0 +1,109 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  LMDBase,
+  LMDClass,
+  LMDGraph,
+  LMDBaseControl,
+  LMDUtils,
+  LMDCustomControl,
+  LMDGraphicControl;
+
+const
+  def_SPINHOTCOLOR=clTeal;
+  
+type
+  TLMDSpinButtonState = (sbUpper, sbUpDown, sbDownDown, sbLeftDown, sbRightDown, sbDisabled);
+  TLMDExtSpinBtnStyle = (seSpinEdit, seSpinScrollBar);
+  TLMDSingleSpinButton = (sbUp, sbDown, sbLeft, sbRight);
+  TLMDButtonPartState = (bpsNormal, bpsHot, bpsPressed, bpsDisabled);
+  TLMDSpinButtons = set of TLMDSingleSpinButton;
+
+  {---------------------------- TLMDSpinButton --------------------------------}
+  TLMDSpinButton = class(TLMDGraphicControl)
+  private
+    FTimerId       : TLMDTimer;
+    FCache         : TBitmap;
+    FDown,
+    FLastDown      : TLMDSpinButtonState;
+    FExtStyle      : TLMDExtSpinBtnStyle;
+    FSkew,
+    FDragging      : Boolean;
+    FOnLeftClick,
+    FOnRightClick,
+    FOnTopClick,
+    FOnBottomClick : TNotifyEvent;
+    FSpinButtons   : TLMDSpinButtons;
+    FBtnMode       : Integer;
+    FBorderStyle   : TLMDBorderStyle;
+
+    FUpBtnState,
+    FDnBtnState,
+    FRBtnState,
+    FLBtnState    : TLMDButtonPartState;
+    FInterval:Word;
+    FCacheDim     : TPoint;
+    FUpRgn,
+    FDnRgn,
+    FRightRgn,
+    FLeftRgn       : HRGN;
+    FUseGlobalTimer: Boolean;
+    FHotColor: TColor;
+
+    procedure SetDown(Value: TLMDSpinButtonState);
+    procedure SetBtns(aValue: TLMDSpinButtons);
+    procedure CreateStates;
+    procedure DrawState(btn: TLMDSingleSpinButton; index:Integer);
+    function  SimpleMode:Boolean;
+    procedure TimerExpired(Sender: TObject);
+    procedure SetSkew(const Value: Boolean);
+    procedure CMEnabledChanged(var Msg:TMessage); message CM_EnabledChanged;
+    procedure WMWINDOWPOSCHANGED(var Msg:TMessage); message WM_WINDOWPOSCHANGED;
+  protected
+    procedure AddTimer;
+    function ControlSupportsXP: Boolean; override;
+    function checkRgn (aRgn: HRGN;var bsVar: TLMDButtonPartState; X,Y : Integer; Shift: TShiftState): boolean;
+    procedure DoThemeChanged;override;
+    procedure FreeRegions;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState;  X, Y: Integer); override;
+    procedure Paint; override;
+    procedure RemoveTimer;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+
+    procedure MouseLeave; //can be called from owning control for indicating
+                          //that the mouse was moved out of its borders
+                          //because this is sometimes not recognized by the
+                          //button :-(
+
+    property Down: TLMDSpinButtonState read FDown write SetDown default sbUpper;
+    property ExtStyle : TLMDExtSpinBtnStyle read FExtStyle write FExtStyle default seSpinEdit;
+    property Interval:Word read FInterval write FInterval;
+
+  //published
+    property CtlXP;
+    property Enabled;
+    //property ShowHint;
+    //property Transparent;
+    property SpinButtons : TLMDSpinButtons read FSpinButtons write SetBtns default [sbUp];
+    property OldStyle:Boolean read FSkew write SetSkew default true;
+    property Color default clBtnFace;
+    property HotColor:TColor read FHotColor write FHotColor default def_SPINHOTCOLOR;
+    //property Hint;
+    //property ParentShowHint;
+    property ParentColor default false;
+    property Visible;
+    // 7.0
+    property UseGlobalTimer:Boolean read FUseGlobalTimer write FUseGlobalTimer default false;
+    // ---
+    {events}
+    property OnBottomClick: TNotifyEvent read FOnBottomClick write FOnBottomClick;
+    property OnTopClick: TNotifyEvent read FOnTopClick write FOnTopClick;
+    property OnLeftClick: TNotifyEvent read FOnLeftClick write FOnLeftClick;
+    property OnRightClick: TNotifyEvent read FOnRightClick write FOnRightClick;
+  end;
+
+implementation

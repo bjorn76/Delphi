@@ -1,0 +1,29 @@
+
+uses
+  Classes,
+  Messages,
+  LMDBase, //TLMDFMDragDropEvent
+  LMDClass, //TLMDCharCase
+  LMDHookComponent;
+
+type
+  TLMDFMDrop=class(TLMDCustomHookComponent)
+  private
+    FOnDragDrop:TLMDFMDragDropEvent;
+    FCharCase:TLMDCharCase;
+  protected
+    procedure HandleMessage(var Message:TMessage);
+    procedure Init;override;
+    procedure RestoreState;override;
+    procedure WndProc(var Message: TMessage);override;
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property About;
+    property CharCase:TLMDCharCase read FCharCase write FCharCase default ccNormal;
+    property Control;
+    property Enabled;
+    property OnFMDragDrop:TLMDFMDragDropEvent read FOnDragDrop write FOnDragDrop;
+  end;
+
+implementation

@@ -1,0 +1,20 @@
+
+uses
+  LMDLEDCustomLabel;
+
+type
+  TLMDLEDLabel=class(TLMDLEDCustomLabel)
+  published
+    property About;
+    property Align;
+    property AutoSize;
+    property Bevel;
+    property Caption;
+    property Digits;
+    property LED;
+    property Style;
+    property Transparent;
+    property Value;
+  end;
+
+implementation

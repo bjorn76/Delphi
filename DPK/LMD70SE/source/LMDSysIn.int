@@ -1,0 +1,249 @@
+
+uses
+  Windows, SysUtils, {$IFDEF LMDCOMP6}Types, {$ENDIF}Classes,
+  {$IFDEF CLR} System.Management, System.Runtime.InteropServices,
+  System.Diagnostics, System.Collections, {$ENDIF} LMDClass, LMDConst;
+
+const
+  NC_ADJUSTRIGHT=1;
+  NC_ADJUSTLEFT=2;
+  NC_SMALLCAPTION=4;
+  NC_HASICON=8;
+  NC_ISICONIC=16;
+  NC_SINGLEBORDER=32;
+
+type
+  {$IFDEF CLR}
+  [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Ansi)]
+  TOSVERSIONINFOEX = record
+    dwOSVersionInfoSize: DWORD;
+    dwMajorVersion: DWORD;
+    dwMinorVersion: DWORD;
+    dwBuildNumber: DWORD;
+    dwPlatformId: DWORD;
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst=128)]
+    szCSDVersion: string;
+    wServicePackMajor: WORD;
+    wServicePackMinor: WORD;
+    wSuiteMask: WORD;
+    wProductType: BYTE;
+    wReserved: BYTE;
+  end;
+  {$ELSE}
+  TOSVERSIONINFOEX = packed record
+    dwOSVersionInfoSize: DWORD;
+    dwMajorVersion: DWORD;
+    dwMinorVersion: DWORD;
+    dwBuildNumber: DWORD;
+    dwPlatformId: DWORD;
+    szCSDVersion: Array [0..127 ] of Char;
+    wServicePackMajor: WORD;
+    wServicePackMinor: WORD;
+    wSuiteMask: WORD;
+    wProductType: BYTE;
+    wReserved: BYTE;
+  end;
+  POSVersionInfo=^TOSVersionInfo;
+  {$ENDIF}
+
+  { used by LMDInformationLabel }
+  TLMDInfoType =  (
+    itUser,
+    itWinDir,
+    itCurrentDir32,
+    itCurrentDiskFree32,
+    itCurrentDiskSize32,
+    itSystemDir,
+    itReg_Owner32,
+    itReg_Company32,
+    itVersion,
+    itColorDepth,
+    itScreenSaverDelay,
+    itMemSize,
+    itFreeSysRes,
+    itFreeGDIRes,
+    itFreeUserRes,
+    itComputerName32,
+    itMajorVerNr32,
+    itBuildNr32,
+    itMemLoaded32,
+    itMemFree32,
+    itMemPageFree32,
+    itMemPageTotal32,
+    itMemVirtFree32,
+    itMemVirtTotal32,
+    itPlatformID32,
+    itPlatform32,
+    itProcessorCont32,
+    itProcessor32,
+    itTempPath32,
+    itDOSVersion,
+    itNumLock,
+    itCapsLock,
+    itScroll,
+    itCurrentDateTime,
+    itProgCompany,
+    itProgName,
+    itProgVersion,
+    itFileVersion,
+    itFileVersionFull,
+    itFileVersionBuild,
+    itProgCopyright,
+    itProgTrademark,
+    itProgDescription,
+    itProgComments,
+    itCPUSpeed
+    );
+
+  TLMDVersionInfoType = (
+    viCompany,
+    viName,
+    viVersion,
+    viCopyright,
+    viTrademark,
+    viDescription,
+    viComments,
+    viFileVersion,
+    viFileVersionFull,
+    viFileVersionBuild
+    );
+
+
+{Nonclient-Area}
+{------------------------------------------------------------------------------}
+{Calculation}
+procedure LMDNCCalcDrawingArea(Handle:HWND; var dRecT:TRect; var rText:TRect;
+                               var sflag:WORD);
+{procedure LMDAddNCAreaToRect(var R: TRect);{Tobi: hinzugefügt}
+{procedure LMDSubNCAreaFromRect(var R: TRect);{Tobi: hinzugefügt}
+
+{Information}
+function LMDNCBITMAPHEIGHT:Integer;
+function LMDNCBITMAPWIDTH:Integer;
+
+function LMDNCCAPTIONHEIGHT:Integer;
+
+function LMDNCDLGBORDERWIDTH:Integer;   {Dialog Border}
+function LMDNCDLGBORDERHEIGHT:Integer;
+function LMDNCFIXBORDERWIDTH:Integer;   {Single-Line Border}
+function LMDNCFIXBORDERHEIGHT:Integer;
+function LMDNCSIZEBORDERWIDTH:Integer;  {Thick Border}
+function LMDNCSIZEBORDERHEIGHT:Integer;
+function LMDNCBORDERWIDTH:Integer;      {Tobi: hinzugefügt Thick Inner Border}
+function LMDNCBORDERHEIGHT:Integer;
+
+function LMDNCSMALLCAPTIONHEIGHT:Integer;{Tobi: verändert}
+function LMDNCSMALLBITMAPHEIGHT:Integer;
+function LMDNCSMALLBITMAPWIDTH:Integer;
+function LMDNCCAPTIONICONHEIGHT:Integer;
+function LMDNCCAPTIONICONWIDTH:Integer;
+
+
+{------------------------------------------------------------------------------}
+
+{General system information}
+{------------------------------------------------------------------------------}
+function LMDSIColorDepth:Byte;
+function LMDSIScreenSaverDelay:Integer;
+function LMDSIStretchBltPossible:Boolean;
+function LMDSIFontSmoothing:Boolean;
+
+function LMDSINumLock : Boolean;
+function LMDSICapsLock : Boolean;
+function LMDSIScrollLock : Boolean;
+
+function LMDSIFreeSysRes:Word;   {not NT!}
+function LMDSIFreeGDIRes:Word;
+function LMDSIFreeUserRes:Word;
+function LMDSIMajorVersionNr:Word;
+function LMDSIMinorVersionNr:Word;
+function LMDSIBuildNr:Word;
+function LMDSIVersionString:String;
+function LMDSIOLDWindowsNT:Boolean;
+{Memory}
+function LMDSIMemTotal:Int64;
+function LMDSIMemLoaded:Byte;
+function LMDSIMemFree:Int64;
+function LMDSIMemPageFree:Int64;
+function LMDSIMemPageTotal:Int64;
+function LMDSIMemVirtFree:Int64;
+function LMDSIMemVirtTotal:Int64;
+// only WinXP/Win2K and heigher
+function LMDSIMemVirtExtended:Int64;
+
+{other stuff}
+{procedure LMDSIModuleList(aList:TStringList);}
+function LMDSIPlatformID:DWORD;
+function LMDSIPlatformStr:String;
+function LMDSIProcessorCount:Byte;
+function LMDSIProcessorTypeStr:String;
+function LMDSIProductType:Word;
+function LMDSIVIPlatformID:Word;
+{Procedure LMDSIProcessList(aList:TStringList);}
+
+
+{Drives&Files}
+{------------------------------------------------------------------------------}
+type
+   TLMDDriveInfo=record
+     ditype:UINT;
+     diTotalSpace:Int64;
+     diFreeSpace:Int64;
+     diSectorsPerCluster:DWORD;
+     diBytesPerSector:DWORD;
+   end;
+
+  TMemoryStatusEx = record
+    dwLength,
+    dwMemoryLoad: DWORD;
+    ullTotalPhys,
+    ullAvailPhys,
+    ullTotalPageFile,
+    ullAvailPageFile,
+    ullTotalVirtual,
+    ullAvailVirtual,
+    ullAvailExtendedVirtual: ULARGE_INTEGER;
+  end;
+
+
+function  LMDSIDriveInfo(const aDrive:String):TLMDDriveInfo;
+Procedure LMDSIDriveList(aList:TStringList);
+function LMDSIDriveTypeStr(aType:UInt):String;
+function LMDSITempPath:String;
+
+{Misc}
+procedure LMDSIEnvironment(aList:TStringList);
+function LMDSITempFile:String;
+function LMDSIWindowsDirectory:String;
+function LMDSISystemDirectory:String;
+function LMDSIRegisteredOwner:String;
+function LMDSIRegisteredCompany:String;
+function LMDSIVersionStr:String;
+function LMDSIVersionNr:Extended;
+function LMDSIUserName:String;  {current user in the net}
+function LMDSIComputerName:String;
+function LMDSISystemDefaultLanguageID:Integer;
+function LMDSIGetTimeZone:String;
+function LMDSIGetTimeZoneBias:LongInt;
+function LMDSIIconHeight:Integer;
+function LMDSIIconWidth:Integer;
+function LMDSISmallIconHeight:Integer;
+function LMDSISmallIconWidth:Integer;
+function LMDSISystemIconListHandle(aLarge:Boolean):DWORD;
+
+{ used by LMDInformationLabel }
+function GetSystemInfoString (inf : TLMDInfoType; DevideBy : LongInt; DateTimeFormat : String) : String;
+function LMDSIVersionInfo(inf : TLMDVersionInfoType) : String;
+function LMDSIInfoToString(aValue:TLMDInfoType):String;
+
+function LMDGetLocalInfo (index : Integer) : String;
+function LMDSIGetCPUSpeed : Double;
+
+var
+  LMDSIWindows95, LMDSIWindows98, LMDSIWindowsNT, LMDSIWindows2000,
+  LMDSIWindows2000AdvancedServer, LMDSIWindowsME, LMDSIWindowsXP,
+  LMDSIWindowsXPHome, LMDSIWindowsXPProf, LMDSINETServer,
+  LMDSIWindowsExtension: Boolean;
+
+
+implementation

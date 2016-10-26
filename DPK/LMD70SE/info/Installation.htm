@@ -1,0 +1,264 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<meta http-equiv="Content-Language" content="en-us">
+<TITLE>LMD 2003 -Installation</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1252">
+</HEAD>
+<BODY>
+<STYLE>BODY {
+	FONT-SIZE: 70%; BACKGROUND: #ffffff; FONT-FAMILY: Verdana, Arial, Helvetica, MS Sans Serif
+}
+A:link {
+	COLOR: #0000ff; TEXT-DECORATION: none
+}
+A:visited {
+	COLOR: #0000ff; TEXT-DECORATION: none
+}
+A:hover {
+	COLOR: #ff0000; TEXT-DECORATION: underline
+}
+TABLE {
+	FONT-SIZE: 100%
+}
+HR {
+	WIDTH: 25%; COLOR: red; TEXT-ALIGN: left
+}
+</STYLE>
+<p>
+<FONT face=verdana size=+2><a name="Top"></a>LMD-Tools 2003 - Installation<br>
+</FONT>
+<FONT size=-2>
+
+(© by LMD Innovative, (<A href="http://www.lmd.de/">http://www.lmd.de</A>
+ or <A href="http://www.lmdtools.com/">http://www.lmdtools.com</A>)</font></p>
+<HR>
+
+<p>
+<FONT color=#000080 size="1"><a href="_readme.htm">[Main]</a></FONT><br>
+<font size="2" face="Verdana"><br>
+&nbsp;</font></p>
+<p><font face="Verdana" size="2"><a href="#Uninstalling">Uninstalling LMD-Tools</a><br>
+<a href="#BCB5">C++ Builder 5</a><br>
+<a href="#BCB6">C++ Builder 6</a><br>
+<a href="#D5">Delphi 5</a><br>
+<a href="#D6">Delphi 6</a><br>
+<a href="#D7">Delphi 7</a><a href="#Uninstall"><br>
+&nbsp;</a></font></p>
+<p><font face="Verdana" size="3"><b><br>
+</b><strong><a name="Uninstalling"></a>Uninstalling LMD-Tools</strong></font></p>
+<p><font face="Verdana" size="2">To remove LMD-Tools from your system completely 
+follow the directions below.</font></p>
+<p><font face="Verdana" size="2"><strong>C++ Builder 5 and 6</strong></font></p>
+<ul>
+  <li><font face="Verdana" size="2">Close all files and projects and and select 
+  &quot;Components|Install Packages...&quot;. </font></li>
+  <li><font face="Verdana" size="2">Select all LMD-Tools packages from the 
+  Packages list and click the &quot;Remove&quot; button.</font><font face="Verdana">
+  </font></li>
+  <li><font face="Verdana" size="2">After that remove all LMD-Tools paths from 
+  the global library search path (Library Page/Environment Options in the Tools 
+  Menu).</font><font face="Verdana"> </font></li>
+  <li><font face="Verdana" size="2">Start OpenHelp tool and remove any LMD-Tools 
+  helpfiles (Menu Help|Customize..., select Tab &quot;Link&quot; then).</font><font face="Verdana">
+  </font></li>
+</ul>
+<p><font face="Verdana" size="2"><strong>Delphi 5 to&nbsp; 7</strong></font></p>
+<ul>
+  <li><font face="Verdana" size="2">Close all files and projects and and select 
+  &quot;Components|Install Packages...&quot;.</font><font face="Verdana"> </font></li>
+  <li><font face="Verdana" size="2">Select all LMD-Tools packages from the 
+  Packages list and click the &quot;Remove&quot; button. </font></li>
+  <li><font face="Verdana" size="2">After that remove all LMD-Tools paths from 
+  the global library search path (Library Page/Environment Options in the Tools 
+  Menu).</font><font face="Verdana"> </font></li>
+  <li><font face="Verdana" size="2">Start OpenHelp tool and remove any LMD-Tools 
+  helpfiles (Menu Help|Customize..., select Tab &quot;Link&quot; then).</font><font face="Verdana">
+  </font></li>
+</ul>
+<p><font face="Verdana" size="2"><strong><br>
+Removing LMD-Tools files completely from your hard disk<br>
+</strong>After uninstalling the components from the CBuilder IDE/Delphi you may 
+remove the component files physically. </font></p>
+<ul>
+  <li><font face="Verdana" size="2">Open the Add/Remove Programs icon from the 
+  Control Panel and double click the &quot;LMD [..]&quot; entry.</font><font face="Verdana">
+  </font></li>
+  <li><font face="Verdana" size="2">All the DCUs/object and backup files have to 
+  be removed manually from the LMD-Tools' uninstallation directory. As a rule 
+  the installation directory won't be deleted during the unstallation because 
+  such files will be generated while you work on the Tools but - for safety's 
+  sake - won't be deleted automatically by the uninstaller.<span lang="de">
+  <font color="#000080">Alternative: Use the Custom Uninstall method in 
+  Uninstaller application and select always all options - this will remove 
+  complete paths including generated files.</font></span><font color="#000080">
+  <span lang="de">We recommend to use the second way.</span></font></font></li>
+  <li><font face="Verdana" size="2">Remove all dcllmd*.* and lmd*.* files from 
+  the \projects\bpl (and&nbsp; \projects\lib in CBuilder) folders and below your 
+  CBuilder/Delphi installation folder. If you had chosen to install runtime 
+  files into system directory, remove all lmd*.bpl packages from the System 
+  directory of your Windows installation. To be sure search harddisk for these 
+  files and remove them all. <font color="#000080">Do not remove license files 
+  or registration utility from the system directory.</font></font><font face="Verdana">
+  </font></li>
+  <li><font face="Verdana" size="2">Be sure that you did not compile LMD-Tools 
+  files into a custom package!</font><font face="Verdana"> </font></li>
+  <li><font face="Verdana" size="2">Possible registry keys can be found under:<br>
+  HKEY_LOCAL_MACHINE\SOFTWARE\LMD Innovative\LMD-Tools 2003<br>
+  Remove them if you don't want to use LMD-Tools any longer.</font></li>
+</ul>
+<p>
+<FONT color=#000080 size="1" face="Verdana"><a href="#Top">[Top]</a></FONT><font face="Verdana" size="1"><br>
+</font><font face="Verdana"><br>
+&nbsp;</font></p>
+
+<p><font face="Verdana"><strong><font size="3"><a name="BCB5"></a>C++
+Builder 5</font></strong></font></p>
+
+<p><strong style="font-weight: 400"><font face="Verdana" size="2">The Installer 
+supports automatic installation of packages. If you want to install package 
+manually, follow instructions below:<br>
+</font></strong><font size="2" face="Verdana"><strong><br>
+Manual Installation </strong></font><font face="Verdana"><br>
+</font><font size="2" face="Verdana">LMD-Tools SE releases support one design time package only 
+(unlike e.g. the LMD-Tools 7 full version). For installing
+the design time package manually, you have to install the
+LMD-Tools design-time package</font></p>
+
+<pre><font size="2" face="Verdana">LMD70SE_B5.BPL 		LMD-Tools Special Edition Components 
+
+in the &quot;Install packages...&quot;-dialog.</font></pre>
+
+<p><font color="#FF0000" size="2" face="Verdana"><strong>Important</strong></font><font
+size="2" face="Verdana">:<br>
+Furthermore you have to add the full path (e.g. $(BCB)\lib\lmd70) of LMD-Tools
+DCU/OBJ files to the CBuilder's
+library path (Library Page/Environment Options in the Tools
+Menu). <br>
+Alternatively the Path could be added to the system path settings. Please note
+that unlike in Delphi versions LMD-Tools CBuilder library directories are
+located below the \Lib directory of
+your CBuilder installation.<br>
+<br>
+<strong>How to add helpfile into
+the IDE </strong><br>
+By default the installer tries to install helpfile automatically. To install the LMD-Tools Helpfile manually use Openhelp (Menu Help|Customize).</font><font size="1" face="Verdana"><br>
+</font><a href="#Top"><font size="1" face="Verdana">[Top]</font></a></p>
+
+<p><font
+size="2" face="Verdana"><br>
+</font><font face="Verdana"><strong><font size="3"><a name="BCB6"></a>C++
+Builder 6</font></strong></font></p>
+
+<p><strong style="font-weight: 400"><font face="Verdana" size="2">The Installer 
+supports automatic installation of packages. If you want to install package 
+manually, follow instructions below:<br>
+</font></strong><font size="2" face="Verdana"><strong><br>
+Manual Installation </strong></font><font face="Verdana"><br>
+</font><font size="2" face="Verdana">LMD-Tools SE releases support one design time package only 
+(unlike e.g. the LMD-Tools 7 full version). For installing
+the design time package manually, you have to install the
+LMD-Tools design-time package</font></p>
+
+<pre><font size="2" face="Verdana">LMD70SE_B6.BPL 		LMD-Tools Special Edition Components 
+
+in the &quot;Install packages...&quot;-dialog.</font></pre>
+
+<p><font color="#FF0000" size="2" face="Verdana"><strong>Important</strong></font><font
+size="2" face="Verdana">:<br>
+Furthermore you have to add the full path (e.g. $(BCB)\lib\lmd70) of LMD-Tools
+DCU/OBJ files to the CBuilder's
+library path (Library Page/Environment Options in the Tools
+Menu). <br>
+Alternatively the Path could be added to the system path settings. Please note
+that unlike in Delphi versions LMD-Tools CBuilder library directories are
+located below the \Lib directory of
+your CBuilder installation.<br>
+<br>
+<strong>How to add helpfile into
+the IDE </strong><br>
+By default the installer tries to install helpfile automatically. To install the LMD-Tools Helpfile manually use Openhelp (Menu Help|Customize).</font><font size="1" face="Verdana"><br>
+</font><a href="#Top"><font size="1" face="Verdana">[Top]</font></a><font
+size="2" face="Verdana"><br>
+&nbsp;</font></p>
+
+<p><font size="3" face="Verdana"><strong><a name="D5"></a>Delphi 5</strong></font><font size="2" face="Verdana"><br>
+<br>
+<strong>How to add the components </strong><br>
+The current Delphi 5 version
+of LMD-Tools SE supports one design time package only. For installing
+the design time package manually, you have to install the
+LMD-Tools SE design-time package </font></p>
+
+<pre><font size="2" face="Verdana">LMD70SE_D5.BPL 		LMD-Tools Special Edition Components </font></pre>
+
+<pre><font size="2" face="Verdana">in the &quot;Install packages...&quot;-dialog.</font></pre>
+
+<p><font color="#FF0000" size="2" face="Verdana"><strong>Important:</strong></font><font
+size="2" face="Verdana"><br>
+Furthermore you have to add the full path (e.g. C:\LMD70SE\lib\d5)
+of LMD-Tools DCU files to the Delphi's library path (Library Page/Environment Options in the Tools Menu). Alternatively the
+Path could be added to the system path settings.<br>
+<br>
+<strong>How to add helpfile into
+the Delphi-IDE </strong><br>
+By default the installer tries to install helpfile automatically.
+To install the LMD-Tools Helpfile manually use Openhelp (Menu Help|Customize).</font><font size="1" face="Verdana"><br>
+</font><a href="#Top"><font size="1" face="Verdana">[Top]</font></a></p>
+
+<P>&nbsp;<P><font size="3" face="Verdana"><strong><a name="D6"></a>Delphi 6</strong></font><font size="2" face="Verdana"><br>
+<br>
+<strong>How to add the components </strong><br>
+The current Delphi 6 version
+of LMD-Tools SE supports one design time package only. For installing
+the design time package manually, you have to install the
+LMD-Tools SE design-time package </font>
+
+<pre><font size="2" face="Verdana">LMD70SE_D6.BPL 		LMD-Tools Special Edition Components </font></pre>
+
+<pre><font size="2" face="Verdana">in the &quot;Install packages...&quot;-dialog.</font></pre>
+
+<p><font color="#FF0000" size="2" face="Verdana"><strong>Important:</strong></font><font
+size="2" face="Verdana"><br>
+Furthermore you have to add the full path (e.g. C:\LMD70SE\lib\d6)
+of LMD-Tools DCU files to the Delphi's library path (Library Page/Environment Options in the Tools Menu). Alternatively the
+Path could be added to the system path settings.<br>
+<br>
+<strong>How to add helpfile into
+the Delphi-IDE </strong><br>
+By default the installer tries to install helpfile automatically.
+To install the LMD-Tools Helpfile manually use Openhelp (Menu Help|Customize).</font><font size="1" face="Verdana"><br>
+</font><a href="#Top"><font size="1" face="Verdana">[Top]</font></a></p>
+
+<p>&nbsp;</p>
+
+<p><font size="3" face="Verdana"><strong><a name="D7"></a>Delphi 7<br>
+</strong></font><font size="2" face="Verdana"><br>
+<strong>How to add the components </strong><br>
+The current Delphi 7 version
+of LMD-Tools SE supports one design time package only. For installing
+the design time package manually, you have to install the
+LMD-Tools SE design-time package </font></p>
+
+<pre><font size="2" face="Verdana">LMD70SE_D7.BPL 		LMD-Tools Special Edition Components </font></pre>
+
+<pre><font size="2" face="Verdana">in the &quot;Install packages...&quot;-dialog.</font></pre>
+
+<p><font color="#FF0000" size="2" face="Verdana"><strong>Important:</strong></font><font
+size="2" face="Verdana"><br>
+Furthermore you have to add the full path (e.g. C:\LMD70SE\lib\d7)
+of LMD-Tools DCU files to the Delphi's library path (Library Page/Environment Options in the Tools Menu). Alternatively the
+Path could be added to the system path settings.<br>
+<br>
+<strong>How to add helpfile into
+the Delphi-IDE </strong><br>
+By default the installer tries to install helpfile automatically.
+To install the LMD-Tools Helpfile manually use Openhelp (Menu Help|Customize).</font><font size="1" face="Verdana"><br>
+</font><a href="#Top"><font size="1" face="Verdana">[Top]</font></a></p>
+
+<P><font face="Verdana">&nbsp;&nbsp; </font>
+<P> 
+<HR>
+
+<P><FONT color=#000080>©&nbsp;  </FONT><FONT color=#0000FF>by</FONT><FONT color=#000080> <A 
+href="http://www.lmd.de/">LMD Innovative</A> Germany<BR>All other trademarks are 
+acknowledged.</FONT> </P></BODY></HTML>

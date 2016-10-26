@@ -1,0 +1,67 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  LMDBuffer;
+
+type
+  TLMDCompareItemEvent = procedure (Sender : TObject; item1, item2 : Integer; result : Integer) of object;
+
+  PLMDBiDynNode = ^TLMDBiDynNode;
+  TLMDBiDynNode = record
+    item : Pointer;
+    next,
+    prev : PLMDBiDynNode;
+  end;
+
+  TLMDList = class(TLMDBuffer)
+  private
+    FCurrent,
+    FLast,
+    FRoot : PLMDBiDynNode;
+
+    FOnCompareItem : TLMDCompareItemEvent;
+  protected
+
+    procedure FirstNode (var node : Pointer); override;
+    procedure NextNode (var node : Pointer); override;
+    function GetItem (node : Pointer) : Pointer; override;
+
+    function EOFBuffer(node : Pointer) : Boolean; override;
+
+
+    procedure SetItem (index : Integer; item : Pointer);
+  public
+
+    constructor Create; override;
+    destructor Destroy; override;
+
+    function Item : Pointer; //O(1)
+    procedure First; //O(1)
+    procedure Next; //O(1)
+    procedure Last; //O(1)
+    procedure Prev; // O(1)
+    function isLast : Boolean; //O(1);
+    procedure Seek (index : Integer); //O(n) ... n/2
+
+    function isEmpty : Boolean; override;
+    function isFull : Boolean; override;
+    procedure Put (item : Pointer); override; //O(1)
+    function Get : Pointer; override; //O(1)
+
+    function extract : Pointer;  //O(1)
+    function extractByNr (index : Integer) : Pointer; //O(n) ... n/2
+    function GetItemByNr (index : Integer) : Pointer; //O(n) ... n/2
+
+    procedure Delete;
+    procedure Insert (item : Pointer); //O(1)
+    procedure InsertAt (item : Pointer; index : Integer); //O(n) ... n/2
+
+    procedure Clear; override; //O(n)
+    procedure LoadFromStream (Stream : TStream); override;
+
+  public
+    property Items[Index: Integer]: Pointer read GetItemByNr write SetItem; default;
+    property OnCompareItem : TLMDCompareItemEvent read FOnCompareItem write FOnCompareItem;
+  end;
+
+implementation

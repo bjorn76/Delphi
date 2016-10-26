@@ -1,0 +1,44 @@
+
+uses
+  Classes,
+  Controls,
+  LMDBase,
+  LMDGraph,
+  LMDCustomSimpleLabel;
+
+type
+
+  {$IFNDEF LMDCOMP6}
+  TLabelPosition = (lpAbove, lpBelow, lpLeft, lpRight);
+  {$ENDIF}
+
+  TLMDBoundLabel = class (TLMDCustomSimpleLabel)
+  private
+    function GetTop: Integer;
+    function GetLeft: Integer;
+    function GetWidth: Integer;
+    function GetHeight: Integer;
+    procedure SetWidth(const Value: Integer);
+    procedure SetHeight(const Value: Integer);
+    function IsNotParent:Boolean;
+    function GetAnchors: TAnchors;
+    function GetConstraints: TSizeConstraints;
+  protected
+  public
+    procedure CorrectBounds; override;
+    constructor Create(AOwner: TComponent); override;
+    {$IFNDEF LMDCOMP6} function HasParent: Boolean;override;{$ENDIF}
+  published
+    property Alignment default agCenterLeft;
+    property Caption;
+    property FocusControl stored IsNotParent;
+    property Height: Integer read GetHeight write SetHeight;
+    property Left: Integer read GetLeft;
+    property Top: Integer read GetTop;
+    property Width: Integer read GetWidth write SetWidth;
+
+    property Anchors:TAnchors read GetAnchors;
+    property Constraints:TSizeConstraints read GetConstraints;
+  end;
+
+implementation

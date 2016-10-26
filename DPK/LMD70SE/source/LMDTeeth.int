@@ -1,0 +1,37 @@
+
+uses
+  Classes,
+  LMDGraph,
+  LMDObject;
+
+type
+  TLMDTeethCount=0..50;
+  
+  {----------------------TLMDTeeth-------------------------------------------}
+  TLMDTeeth = class(TLMDObject)
+    private
+      FCount: TLMDTeethCount;
+      FDirection: TLMDDirection;
+      FOffset,
+      FSetPerCount: Boolean;
+      FWidth,
+      FHeight: Integer;
+
+      procedure SetBoolean(Index: Integer; aValue: Boolean);
+      procedure SetCount(aValue: TLMDTeethCount);
+      procedure SetDirection(aValue: TLMDDirection);
+      procedure SetInteger(Index: Integer; aValue:Integer);
+    public
+      constructor Create;override;
+      procedure Assign(Source: TPersistent); override;
+    published
+      Property Count: TLMDTeethCount read FCount write SetCount default 10;
+      Property Direction: TLMDDirection read FDirection write SetDirection default tdRight;
+      Property Height: Integer Index 1 read FHeight write SetInteger default 0;
+      Property Offset: Boolean index 0 read FOffset write SetBoolean default True;
+      Property SetPerCount: Boolean index 1 read FSetPerCount write SetBoolean default True;
+      Property Width: Integer Index 0 read FWidth write SetInteger default 10;
+  end;
+
+
+implementation

@@ -1,0 +1,97 @@
+
+uses
+  {$IFDEF LMDCOMP6}RtlConsts,{$ENDIF} 
+  StdCtrls,
+  ExtCtrls,
+  Forms,
+  Windows,
+  Classes,
+  Graphics,
+  LMDBase,
+  LMDClass,
+  LMDButton,
+  LMDLED,
+
+  LMDWave,
+  LMDCustomContainer,
+  LMDCont,
+  LMDDateL,
+  LMDFormA, //TLMDFormStyler
+
+  LMDFormStyler,
+  LMDDateTime,
+  LMDCustom3DButton,
+  LMDFillObject,
+  LMDShape,
+  LMDTeeth,
+  LMDSimpleBevel,
+  LMDShapeFill,
+  LMDGradient,
+  LMDShadow,
+  LMDGlyphTextLayout,
+  LMDButtonLayout,
+  LMDTransparent,
+  LMDPointList,
+  LMDBevel,
+  LMD3DCaption,
+  LMDFXCaption,
+  LMDBitmapEffectObject,
+  LMDCaption,
+  {$IFNDEF LMDTOOLS_SPECIALEDITION}
+    LMDSplt,
+    LMDRegionMask,
+  {$ENDIF}
+  LMDSmallBar,
+  LMDGraph;
+
+  // 28-12-2001 -> see LMDCPGetStrings with Code-Editor support in LMDPE.PAS
+  function LMDCPGetStrings(aList:TStrings):Boolean; overload;
+  // ---
+  function LMDCPGetBevel(aBevel:TLMDBevel):Boolean;
+  function LMDCPGetDateTimeFormat (var format : String):Boolean;
+  function LMDCPGetDateTime(aDateTime:TLMDDateTime):Boolean;
+  function LMDCPGetBitmap(aBitmap:TBitmap):Boolean;
+  {$IFNDEF LMDTOOLS_SPECIALEDITION}
+  function LMDCPGetBitmapEffectObject(aBitmapObject:TLMDBitmapEffectObject):Boolean;
+  {$ENDIF}
+  function LMDCPGetBitmapStyle(aBitmapStyle:TLMDBitmapStyle):TLMDBitmapStyle;
+  function LMDCPGetBrush(aBrush:TBrush):Boolean;
+  procedure LMDCPGetButtonFace3D(aComponent: TLMDCustom3DButton);
+  function LMDCPGetButtonLayout(aLayout:TLMDButtonLayout):Boolean;
+  function LMDCPGetGlyphTextLayout(aLayout:TLMDGlyphTextLayout):Boolean;
+//  function LMDCPGetCaption(const aValue:String; aMaxLength:Integer):String;
+  {$IFNDEF LMDTOOLS_SPECIALEDITION}
+  function LMDCPGetHTMLString(var Value:TLMDHTMLString):Boolean;
+  function LMDCPGetShortCut(var Value:TShortCut):Boolean;
+  {$ENDIF}
+  function LMDCPGetColor(aColor:TColor;aStrings:TStrings=nil):TColor;
+  function LMDCPGetFillObject(aFillObject:TLMDFillObject):Boolean;
+  function LMDCPGetFont(aFont:TFont):Boolean;
+  function LMDCPGetFont3D(aFont3D:TLMD3DCaption):Boolean;
+  function LMDCPGetFontFx(aFontFx:TLMDFxCaption):Boolean;
+  function LMDCPGetGradient(aGradient:TLMDGradient):Boolean;
+  function LMDCPGetLED(aLed:TLMDLED):Boolean;
+  function LMDCPGetLMDCaption(aCaption:TLMDCaption; AllowMultiline:Boolean):Boolean;
+  function LMDCPGetShadow(aShadow:TLMDShadow):Boolean;
+  function LMDCPGetShape(aShape:TLMDShapeType):TLMDShapeType;
+  function LMDCPGetShapeFill(aShapeFill:TLMDShapeFill):Boolean;
+  function LMDCPGetSimpleBevel(aSimpleBevel:TLMDSimpleBevel):Boolean;
+  function LMDCPGetSmallBar(aSmBarOptions:TLMDSmallBar):Boolean;
+  function LMDCPGetTeeth(aTeeth:TLMDTeeth):Boolean;
+  function LMDCPGetTransparent(aTransparent:TLMDTransparent):Boolean;
+  function LMDCPGetPointList(aValue : TLMDPointList) : boolean;
+  function LMDCPGetDateList (aValue : TLMDDateList) : Boolean;
+  {$IFNDEF LMDTOOLS_SPECIALEDITION}
+    function LMDCPGetRegionMask (aValue : TLMDRegionMask; border : Boolean) : Boolean;
+  {$ENDIF}
+
+  function LMDCPGetFilter(aValue:TLMDListItemClassType):String;
+
+  // 7.0
+  {$IFNDEF LMDTOOLS_SPECIALEDITION}
+  function LMDCPGetLightColor(aLightColor:TLMDLightColor):TLMDLightColor;
+  // --> FaceController
+  function LMDCPGetSettingEditor(aObject:TPersistent):Boolean;
+  {$ENDIF}
+  
+implementation

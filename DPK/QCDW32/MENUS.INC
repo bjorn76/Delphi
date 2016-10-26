@@ -1,0 +1,202 @@
+{******************************************************************}
+{*                                                                *}
+{*     Copyright (C) QUINN-CURTIS, INC. Jan. 29, 1993             *}
+{*                                                                *}
+{******************************************************************}
+{*                                                                *}
+{*   Filename :   MENUS.INC                                       *}
+{*   Author   :   Mark Shmulevich                                 *}
+{*   Revision :   1.01                                            *}
+{*   Date     :   January 29, 1993                                *}
+{*                                                                *}
+{******************************************************************}
+
+CONST
+  IDM_FILEPOS =	0;
+  IDM_EDITPOS=	1;
+  IDM_GRAPHPOS=	2;
+  IDM_OPTIONSPOS= 3;
+  IDM_SELECTORS= 900;
+
+  IDOK	        = 1;
+  IDCANCEL	= 2;
+  IDABORT	= 3;
+  IDRETRY	= 4;
+  IDIGNORE	= 5;
+  IDYES	        = 6;
+  IDNO	        = 7;
+  IDM_START	=10;
+  IDM_NEW	=11;
+  IDM_OPEN	=12;
+  IDM_SAVE	=13;
+  IDM_SAVEAS	=14;
+  IDM_SAVEASMETA=15;
+  IDM_EXIT	=16;
+  IDM_CREATE	=17;
+  IDM_LOAD	=18;
+  IDM_UNDO	=20;
+  IDM_CUT	=21;
+  IDM_COPY	=22;
+  IDM_PASTE	=23;
+  IDM_CLEAR	=24;
+  IDM_FORMAT	=30;
+  IDM_HELP	=40;
+  IDM_ABOUT	=41;
+  IDM_COPYGRAPH	=50;
+  IDM_COPYPAGE	=51;
+  IDM_REPLACE	=52;
+  IDM_SHOWSEL	=60;
+  IDM_HIGHSEL	=61;
+  IDM_PARGRAPH	=70;
+  IDM_BLOWSEL	=71;
+  IDM_SELGRAPH	=72;
+  IDM_BLACK	=300;
+  IDM_BLUE	=301;
+  IDM_GREEN	=302;
+  IDM_CYAN	=303;
+  IDM_RED	=304;
+  IDM_MAGENTA	=305;
+  IDM_BROWN	=306;
+  IDM_LIGHTGRAY	=307;
+  IDM_GRAY	=308;
+  IDM_LIGHTBLUE	=309;
+  IDM_LIGHTGREEN=310;
+  IDM_LIGHTCYAN	=311;
+  IDM_LIGHTRED	=312;
+  IDM_LIGHTMAGENTA=313;
+  IDM_YELLOW	=314;
+  IDM_WHITE	=315;
+  IDM_MM_TEXT	=340;
+  IDM_MM_LOMETRIC=341;
+  IDM_MM_HIMETRIC=342;
+  IDM_MM_LOENGLISH=343;
+  IDM_MM_HIENGLISH=344;
+  IDM_MM_TWIPS	  =345;
+  IDM_MM_ISOTROPIC=346;
+  IDM_MM_ANISOTROPIC=347;
+  IDM_PRINT_PAGE =400;
+  IDM_PRINT_GRAPH=401;
+  IDM_PSET	 =402;
+  IDM_PRINT_PARAM=403;
+
+  ID_PRINT_BORDER=410;
+  ID_PRINT_GRAPHBACKGND	=412;
+  ID_PRINT_PLOTBACKGND	=413;
+  ID_PRINT_FULL    =414;
+  ID_PRINT_PROP    =415;
+  ID_PRINT_EXACT   =416;
+  ID_PRINT_X       =417;
+  ID_PRINT_Y       =418;
+  ID_PRINT_XYTEXT  =419;
+  ID_PRINT_ASPECT  =420;
+  ID_LINEPAR	   =500;
+  ID_FILENAME	=600;
+  ID_PRINTERBOX	=1020;
+  ID_SETUP	=1021;
+  ID_POS_BELOW	=1040;
+  ID_POS_ABOVE  =1041;
+  ID_POS_MIDDLE	=1042;
+  ID_POS_ABOVEPLOT =1043;
+  ID_POS_BELOWPLOT =1044;
+  ID_COLOR	   =1050;
+  ID_THICKNESS	=1051;
+  ID_COLORLAB   =1052;
+  ID_AXIS_AUTO	=1056;
+  ID_AXIS_FIXED	=1057;
+  ID_AXIS_GRIDS	=1058;
+  ID_AXIS_NSMTICKS=1059;
+  ID_AXIS_STEP	=1060;
+  ID_GRIDSMAJ	=1061;
+  ID_GRIDSMIN	=1062;
+  ID_AXIS_LOG	=1063;
+  ID_GRIDMAJDET	=1065;
+  ID_GRIDMINDET	=1066;
+  ID_AXIS_FROM	=1067;
+  ID_AXIS_TO	=1068;
+  ID_AXIS_INTERCEPT=1069;
+  ID_LINE_STYLE	  =1070;
+  ID_FILLAREA	  =1071;
+  ID_DATA	  =1072;
+  ID_SPLINE	  =1073;
+  ID_3D	          =1074;
+  ID_MARKER_SHAPE =1080;
+  ID_MARKER_STYLE =1081;
+  ID_WORD_TYPE	  =1082;
+  ID_MARKER_SIZE  =1083;
+  ID_LINE_TYPE	  =1084;
+  ID_MARKER_STYLE_FULL	=1085;
+  ID_MARKER_STYLE_EMPTY	=1086;
+  ID_MARKER_STYLE_DOT	=1087;
+  ID_MARKER_DROP	=1088;
+  ID_DEF_AREA	=1089;
+  ID_COLOR_AREA	=1090;
+  ID_TEXT_FONT	=1100;
+  ID_TEXT_SIZE	=1101;
+  ID_TEXT_EDIT	=1102;
+  ID_TEXT_PARAM	=1103;
+  ID_TEXT_BOLD	=1104;
+  ID_TEXT_ITALICS  =1105;
+  ID_TEXTLAB	   =1106;
+  ID_TEXT_UNDERLINE=1107;
+  ID_ARROW_WIDTH   =1151;
+  ID_ARROW_LENGTH  =1152;
+  ID_ARROW_START   =1154;
+  ID_ARROW_END	   =1155;
+  ID_LABEL_NUMERIC =1202;
+  ID_LABEL_STRING  =1203;
+  ID_LABEL_PREC	   =1205;
+  ID_LABEL_PRECON  =1206;
+  ID_LABEL_FORMDEC =1207;
+  ID_LABEL_FORMSCI =1208;
+  ID_LABEL_FORMENG =1209;
+  ID_LABEL_LASTON  =1210;
+  ID_LABEL_LASTOFF =1211;
+  ID_LABEL_LASTMAN =1212;
+  ID_LABEL_MANTEXT =1213;
+  ID_RED_SCROLL	   =1250;
+  ID_GREEN_SCROLL  =1251;
+  ID_BLUE_SCROLL   =1252;
+  ID_RED_TEXT	   =1253;
+  ID_GREEN_TEXT	   =1254;
+  ID_BLUE_TEXT	   =1255;
+  ID_HATCH	       =1260;
+  ID_BARWIDTH	   =1300;
+  ID_BARBORDER	   =1301;
+  ID_LEGWIDTH	   =1350;
+  ID_LEGHEIGHT	   =1351;
+  ID_LEGLEFT	   =1352;
+  ID_LEGTOP	       =1353;
+  ID_LEGTEXT	   =1354;
+  ID_LEGBORDER     =1355;
+
+  ID_PIEX          =1380;
+  ID_PIEY          =1381;
+  ID_PIEDIAM       =1382;
+  ID_PIESLICE      =1383;
+  ID_PIEDET        =1384;
+  ID_PIEVAL        =1385;
+  ID_PIELABEL      =1386;
+  ID_PIEEXPL       =1387;
+
+  ID_GRAPHBKGND	   =1500;
+  ID_GRAPHBORDER   =1501;
+  ID_GRAPHWIDTH	   =1502;
+  ID_GRAPHHEIGHT   =1503;
+  ID_GRAPHLEFT	   =1504;
+  ID_GRAPHTOP	   =1505;
+  ID_GRAPHCOLOR	   =1506;
+  ID_PLOTWIDTH	   =1510;
+  ID_PLOTHEIGHT	   =1511;
+  ID_PLOTLEFT	   =1512;
+  ID_PLOTTOP	   =1513;
+  ID_PLOTCOLOR	   =1515;
+  ID_FORMATWIDTH   =1550;
+  ID_FORMATPREC	   =1551;
+  ID_GRAPHPARAMS   =1600;
+  ID_DATASETS	   =1601;
+  ID_LOADDATASET   =1602;
+  ID_CREATEAXES	   =1603;
+  ID_CREATEVAXLEF  =1604;
+  ID_CREATENUM     =1606;
+
+  ID_USER	   = 2000;

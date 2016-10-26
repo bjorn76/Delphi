@@ -1,0 +1,22 @@
+
+uses
+  Classes;
+
+type
+  {----------------------TLMDObject--------------------------------------------}
+  TLMDObject = class(TPersistent)
+  private
+    FOnChange : TNotifyEvent;
+    FUpdate   : Byte;
+  protected
+    procedure GetChange(Sender:TObject);dynamic;
+    procedure Change;dynamic;
+    constructor Create;virtual;
+  public
+    function GetSetStr : String; dynamic;
+    procedure BeginUpdate;
+    procedure EndUpdate(aValue:Boolean=false);
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+  end;
+
+implementation

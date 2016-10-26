@@ -1,0 +1,35 @@
+
+uses
+  Windows,
+  Classes,
+  LMDGraph,
+  LMDBevel,
+  LMDGlyphTextLayout,
+  LMD3DCaption,
+  LMDBaseLabel;
+
+type
+  { ------------------------- class TLMDCustomGlyphLabel --------------------------- }
+  TLMDCustomGlyphLabel = class(TLMDBaseLabel)
+  private
+     FGlyphTextLayout : TLMDGlyphTextLayout;
+     FFont3D          : TLMD3DCaption;
+     FBevel           : TLMDBevel;
+     procedure SetGlyphText (aValue : TLMDGlyphTextLayout);
+     procedure SetFont3D (aValue : TLMD3DCaption);
+     procedure SetBevel (aValue : TLMDBevel);
+  protected
+    function GetPalette:HPalette; override;
+  public
+    constructor Create (aOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Paint; override;
+    procedure CorrectBounds; override;
+    
+    property Alignment: TLMDGlyphTextLayout read FGlyphTextLayout write SetGlyphText;
+    property Bevel : TLMDBevel read FBevel write SetBevel;
+    property Font3D : TLMD3DCaption read FFont3D write SetFont3D;
+
+  end;
+
+implementation

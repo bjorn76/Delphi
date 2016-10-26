@@ -1,0 +1,16 @@
+
+uses
+  Controls;
+
+type
+  {make some protected routines public}
+  {----------------------------------------------------------------------------}
+  TLMDResWinControl=class(TWinControl)
+  public
+    procedure CreateHandle;override;
+    procedure FreeResources;
+  end;
+
+  procedure LMDFreeResources(aControl:TWinControl);
+
+implementation

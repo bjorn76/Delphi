@@ -1,0 +1,89 @@
+
+uses
+  Windows,
+  Classes,
+  Graphics,
+  LMDGraph, //TLMDBorderStyle
+  LMDFillObject,
+  LMDBaseMeter;
+
+type
+
+  {-------------------------- TLMDProgressFill --------------------------------}
+  TLMDCustomProgressFill = class(TLMDBaseMeter)
+  private
+    FBar3D:TLMDBorderStyle;
+    FBack:TColor;
+    FFillObject:TLMDFillObject;
+    procedure SetBar3D(aValue:TLMDBorderStyle);
+    procedure SetBack(aValue:TColor);
+    procedure SetFillObject(aValue:TLMDFillObject);
+  protected
+    procedure DrawBar(aCanvas:TCanvas; dest, notDest, aRect:TRect);override;
+    procedure GetIMLChange(Sender:TObject); override;
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+  published
+    property About;
+    property Align;
+    property Alignment;
+    property Bar3D:TLMDBorderStyle read FBar3D write SetBar3D default lsNone;
+    property Bevel;
+    property BrushBackColor:TColor read FBack write SetBack default clBtnFace;
+    property Color;
+    property Caption;
+    property Direction;
+    property Delta;
+    property DragCursor;
+    property DragMode;
+    property Enabled;
+    property FillObject:TLMDFillObject read FFillObject write SetFillObject;
+    property Font;
+    property Font3D;
+    property ImageList;
+    property ImageIndex;
+    property ListIndex;
+    property MaxValue;
+    property MinValue;
+    property OptionsText;
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property UseFontColor;
+    property Visible;
+
+    {Events}
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnMouseDown;
+    {3.0}
+    property OnMouseEnter;
+    property OnMouseExit;
+    {---}
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDrag;
+
+    {4.0}
+    //properties
+    property Anchors;
+
+    property BiDiMode;
+
+    property DragKind;
+    property Constraints;
+
+    property ParentBiDiMode;
+    //events
+    property OnEndDock;
+    property OnStartDock;
+  end;
+
+
+implementation

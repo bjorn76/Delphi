@@ -1,0 +1,24 @@
+
+uses
+  Messages,
+  LMDCustomCheckGroup,
+  LMDCheckBox;
+
+type
+  TLMDCheckGroupButton = class(TLMDCheckBox)
+  private
+    procedure WMKeyDown (var Msg : TWMKEYDOWN); message WM_KEYDOWN;
+    procedure WMKey (var Msg : TWMKEY); message WM_CHAR;
+  protected
+    function CanModify:Boolean;override;
+    procedure ChangeScale(M, D: Integer); override;
+//    procedure KeyDown(var Key: Word; Shift: TShiftState); override;
+//    procedure KeyPress(var Key: Char); override;
+    procedure Toggle; override;
+  public
+    constructor CreateExt(Group: TLMDCustomCheckGroup);
+    destructor Destroy; override;
+    property Transparent default True;
+  end;
+
+implementation

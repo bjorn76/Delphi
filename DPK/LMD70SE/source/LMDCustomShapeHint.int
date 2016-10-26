@@ -1,0 +1,39 @@
+
+uses
+  Classes,
+  Graphics,
+  Controls,
+  LMDShadow,
+  LMDCustomHint;
+
+type
+  TLMDHintStyle=(hsRect, hsRoundRect, hsEllipse, hsNoseRect, hsNoseRoundRect, hsNoseEllipse);
+
+  TLMDCustomShapeHint = class(TLMDCustomHint)
+  private
+    FBorderColor:TColor;
+    FPosition:TLMDHintPosition;
+    FStyle:TLMDHintStyle;
+    FShadow:TLMDShadow;
+    FOnClose:TNotifyEvent;
+    procedure SetShadow(aValue:TLMDShadow);
+  public
+    FControl:TControl;
+    Constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+  published
+    property About;
+    property BorderColor: TColor read FBorderColor write FBorderColor default clBlack;
+    property Color;
+    property Font;
+    property Font3D;
+    Property MaxWidth;
+    property Position:TLMDHintPosition read FPosition write FPosition default hpAboveRight;
+
+    property Shadow: TLMDShadow read FShadow write SetShadow;
+    property Style:TLMDHintStyle read FStyle write FStyle default hsNoseRoundRect;
+    property OnCloseHintWindow:TNotifyEvent read FOnClose write FOnClose;
+  end;
+
+
+implementation

@@ -1,0 +1,47 @@
+
+uses
+  Windows,
+  Graphics,
+  Classes,
+  LMDGradient,
+  lmdgraph,
+  LMDObject;
+
+type
+  {----------------------TLMDShapeFill---------------------------------------}
+  TLMDShapeFill = class(TLMDObject)
+  private
+    FBitmap : TBitmap;
+    FGradient: TLMDGradient;
+    FFillStyle: TLMDFillStyle;
+    FTileMode: TLMDTileMode;
+    procedure SetBitmap(aValue: TBitmap);
+    procedure SetListBitmap(aValue:TBitmap);
+    procedure SetGradient(aValue: TLMDGradient);
+    procedure SetFillStyle(aValue: TLMDFillStyle);
+    procedure SetTileMode(aValue: TLMDTileMode);
+    function GetBitmap:TBitmap;
+    function GetEmpty:Boolean;
+    function GetMustRedraw:Boolean;
+    function GetPalette:HPalette;
+  protected
+    FListBitmap: TBitmap;
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+    procedure Assign(Source:TPersistent);override;
+    function GetSetStr : String; override;
+    property Empty:Boolean read GetEmpty;
+    property Palette:HPalette read GetPalette;
+    property SizeDependent:Boolean read GetMustRedraw;
+    property ListBitmap:TBitmap read FListBitmap write SetListBitmap;
+    property CurrentBitmap:TBitmap read GetBitmap;
+  published
+    property Bitmap:TBitmap read FBitmap write SetBitmap;
+    property Style:TLMDFillStyle read FFillStyle write SetFillStyle default sfBrush;
+    property Gradient:TLMDGradient read FGradient write SetGradient;
+    property TileMode:TLMDTileMode read FTileMode write SetTileMode default tmTile;
+  end;
+
+
+implementation

@@ -1,0 +1,279 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<meta http-equiv="Content-Language" content="en-us">
+<TITLE>LMD 2003 -Troubleshooting</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1252">
+</HEAD>
+<BODY>
+<STYLE>BODY {
+	FONT-SIZE: 70%; BACKGROUND: #ffffff; FONT-FAMILY: Verdana, Arial, Helvetica, MS Sans Serif
+}
+A:link {
+	COLOR: #0000ff; TEXT-DECORATION: none
+}
+A:visited {
+	COLOR: #0000ff; TEXT-DECORATION: none
+}
+A:hover {
+	COLOR: #ff0000; TEXT-DECORATION: underline
+}
+TABLE {
+	FONT-SIZE: 100%
+}
+HR {
+	WIDTH: 25%; COLOR: red; TEXT-ALIGN: left
+}
+</STYLE>
+<p>
+<FONT face=verdana size=+2><a name="Top"></a>LMD-Tools 2003 - TroubleShooting<br>
+</FONT>
+<FONT size=-2>
+
+(© by LMD Innovative, (<A href="http://www.lmd.de/">http://www.lmd.de</A>
+ or <A href="http://www.lmdtools.com/">http://www.lmdtools.com</A>)</font></p>
+<HR>
+
+<p>
+<FONT color=#000080 size="1"><a href="_readme.htm">[Main]</a></FONT><br>
+<font size="2" face="Verdana"><br>
+</font><strong><font size="5" face="Arial"><br>
+Contents<br>
+<br>
+</font></strong><font size="2" face="Verdana"><b><a href="#General">General</a></b><br>
+<span lang="de">&nbsp; Debugger problem<br>
+&nbsp; LMD-Tools Trial or SE does not work with Delphi Trial</span><br>
+<br>
+<b><a href="#Delphi">Delphi</a></b><br>
+&nbsp; </font><font color="#FF0000" face="Verdana" size="2">[Fatal Error]: Unit
+XXXX was compiled with a different version of XXXXX<br>
+<span lang="de">&nbsp; </span>
+</font><span lang="de"><font face="Verdana" size="2">I use SE or registered 
+package, but still trial messages appear.</font></span><font color="#FF0000" face="Verdana" size="2"><br>
+&nbsp;
+</font><font size="2" face="Verdana">Compatibility
+Components are not installed by default!<b><br>
+<span lang="de">&nbsp; </span><br>
+&nbsp; </b>Help Index files disappear after installation of LMD-Tools helpfiles<br>
+&nbsp;
+</font><font face="Arial"><a href="#Toolbar97"><font size="2" face="Verdana">ToolBar97
+components</font></a></font></p>
+
+<p><font face="Verdana"><font size="2"><b><a href="#CBuilder">CBuilder<br>
+</a></b><span lang="de">&nbsp; CodeGuard Issues</span></font><br>
+<font size="2"><a href="#CBuilder" style="text-decoration: none">&nbsp; </a>
+</font> <font size="2">LMD ShellPack
+Notes<br>
+</font><a href="#CBuilder" style="text-decoration: none"><font size="2">&nbsp;
+</font> </a><font size="2">LMD ShellPack
+Notes<br>
+&nbsp; LMD TextPack Notes<br>
+&nbsp; LMD WebPack Notes<br>
+&nbsp; </font><font color="#000000" size="2">TLMDHideNonVC Notes<br>
+</font></font><font color="#000000" size="2" face="Verdana">&nbsp; TLMDFormDisplay
+Notes<br>
+</font><font face="Verdana" size="2"><b>&nbsp;&nbsp;</b></font></p>
+
+<p><font face="Verdana"><b>
+<font size="2"><a name="General"></a>
+</font>
+<font size="3">General</font><font size="2"><br>
+</font>
+</b><font size="2"><br>
+<b>I want to run my application in IDE, but debugger window 
+appears (breakpoint just before ntdll.DbgUserBreakPoint) and I have to hit F9 
+several times to start project.<br>
+</b>1.) The problem happens only within IDE (does not affect the executable). 
+<br>
+2.) Get the projects #15804 and #16098 from
+<a href="http://codecentral.borland.com">Borland Codecentral</a> and install in 
+the IDE. Follow information in text files and problem will go away.</font></font><font size="2" face="Verdana"><br>
+</font><FONT color=#000080 size="1"><a href="#Top">[Top]</a></FONT></p>
+
+<p><br>
+<font size="2" face="Verdana">
+<b>I want to <span lang="de">use a LMD-Tools Trial (or SE version) within a 
+Delphi/CBuilder Trial. Everything installs ok, but if I want to execute a 
+project I receive error &quot;LMD[..].pas not found&quot;.</span><br>
+</b><span lang="de">To make it short: </span></font><font face="Verdana">
+<font size="2">&nbsp;You need a full version of <span lang="de">CBuilder/</span>Delphi 
+to run any precompiled version<span lang="de"> (Trial ot SE). </span>The VCL 
+files<span lang="de"> in Borland </span>Trials use a different DCU format than 
+full version<span lang="de">s</span>. So many or<span lang="de"> </span>almost 
+all precompiled packages will fail to work on a <span lang="de">CBuilder/Delphi
+</span>Trial<span lang="de">version</span>.</font><br>
+</font><FONT color=#000080 size="1"><a href="#Top">[Top]</a></FONT></p>
+
+<p>&nbsp;</p>
+
+<p><strong><font size="2" face="Verdana"><a name="Delphi"></a></font>
+<font size="3" face="Verdana">Delphi Notes</font></strong></p>
+
+<p><font face="Verdana"><b><font size="2">The support request Nr. 1 for LMD-Tools
+5:&nbsp;<br>
+</font>
+</b>
+<font color="#FF0000" size="2">[Fatal Error] UMain.pas(8): Unit lmdsysin was compiled with a different version of lmdconst.IDS_CPUSPEED<br>
+</font> </font>
+
+<font face="Arial"><font face="Verdana" size="2">Reason: You did not uninstall a previous
+version (e.g. Release 5.X) completely.&nbsp;<br>
+Solution: Make sure that no path reference to an older LMD-Tools exist (check
+Environment Options|Library Path). The most secure way would be to uninstall any
+files of any previous version from your harddisk. Please rebuild your project
+completely to reflect new units. For detailed instruction read
+<a href="../install.htm#Uninstall">Uninstall LMD-Tools</a>.<br>
+</font>
+
+</font>
+
+<FONT color=#000080 size="1"><a href="#Top">[Top]</a></FONT><font size="2" face="Verdana">
+</font>
+
+</p>
+
+<p><span lang="de"><b><font face="Verdana" size="2">I use SE or registered 
+package, but still trial messages appear in my application outside IDE.<br>
+</font></b><font face="Verdana" size="2">Reason and solution is simple: A full 
+version or SE edition does not contain any trialcode, so a previously installed 
+trialversion was not completely removed. To solve this problem in any case 
+uninstall all LMD-Tools files from your harddisk (check installation.htm) and 
+reinstall full version. Make sure that you REBUILD your project, so that new 
+units are used.</font></span><font color="#FF0000" face="Verdana" size="2"><br>
+&nbsp;</font></p>
+
+<p><font face="Verdana"><strong><font size="2">Compatibility
+Components are not installed by default!
+</font><font color="#FF0000" size="2"><br>
+</font>
+</strong>
+</font><font face="Arial">
+<font size="2" face="Verdana">User who you used the older
+components of version 1 in their projects (e.g. the ones from the LMD Free tab)
+must explicitly mark the corresponding check box in the installation options to
+install the LMD-Tools compatibility components. Please note: No components were
+left out, they're all still available (and will be available in the future).
+However we want to avoid that new user use these controls because they will not
+be improved in the future (because they're replaced by improved controls).<br>
+</font></font><FONT color=#000080 size="1"><a href="#Top">[Top]</a></FONT></p>
+
+<p><font face="Verdana" size="2"><b>Help Index files disappear after installation 
+of LMD-Tools helpfile (you checked automatic installation in installer). </b>
+<br>
+You are running a Win9X/ME machine (on Windows NT/2K/XP this problem should not 
+happen). The capability of index items in Windows Help system is limited on 
+these operating systems (and LMD-Tools Index files are very large). There are 
+two possible workarounds: </font></p>
+
+<ul>
+  <li><font face="Verdana" size="2">To reset the original help index use the 
+  OpenHelp tool from the Help menu and remove LMD-Tools index files </font></li>
+  <li><font face="Verdana" size="2">Use the Open Help tool from the Help menu to 
+  remove other unnecessary help index files (until Delphi/CBuilder helpfiles 
+  including LMD-Tools helpfile work again). </font></li>
+</ul>
+
+<p><FONT color=#000080 size="1"><a href="#Top">[Top]</a></FONT></p>
+
+<p><font face="Verdana"><a name="Toolbar97"><font size="2"></font></a><strong><font size="2">ToolBar97
+components</font></strong><font size="2"><br>
+The <strong>registered</strong>
+versions of LMD-Tools include a license for the Toolbar97 components. Please note that no precompiled packages are installed during
+installation, simply install the DPK if you want to use the ToolBar97 components.
+The ToolBar97 units can be found in the \</font></font><font size="2" face="Verdana">lib\toolb97 folder. Documentation can be found in HTML format in the \help folder.<br>
+</font><FONT color=#000080 size="1"><a href="#Top">[Top]</a></FONT></p>
+
+<p>&nbsp;</p>
+
+<p><strong><font face="Verdana" size="2"><a name="CBuilder"></a></font>
+<font face="Verdana" size="3">CBuilder Notes</font></strong></p>
+
+<p><font size="2" face="Verdana"><span lang="de"><b>CodeGuard Issues<br>
+</b>Using CodeGuard you might encounter at designtime &quot;Bitmap invalid&quot; or 
+similar strange errors (e.g. using TLMDSpeedButton controls). If switching 
+CodeGuard off is no option,&nbsp; <br>
+</span>
+</font>
+<font SIZE="2"><span lang="de">please</span> disable tracking of the &quot;memory 
+block&quot; resource, on the Resource Options Tab of CodeGu<span lang="de">a</span>rd<span lang="de">.<br>
+</span></font>
+<FONT color=#000080 size="1"><a href="#Top">[Top]</a></FONT></p>
+
+<p><font size="2" face="Verdana"><b><br>
+LMD RichPack <br>
+</b>After recompiling LMD RichPack packages, you might receive errors regarding CHARFORMAT2A types 
+if you want to start an application using TLMDRichEdit components.<i> Workaround:</i>
+Simply enter in the header files Richedit:: 
+before CHARFORMAT2A types 
+(where compiler requires this). Example: <br>
+Change line...<br>
+void __fastcall GetAttributes(CHARFORMAT2A 
+&amp;Format);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+..to...<br>
+void __fastcall GetAttributes(<font color="#800080">Richedit::</font>CHARFORMAT2A 
+&amp;Format);<br>
+<br>
+</font>
+<FONT color=#000080 size="1"><a href="#Top">[Top]</a></FONT></p>
+
+<p><font size="2" face="Verdana"><br>
+</font><font face="Verdana"><b><font size="2">LMD ShellPack </font></b><font size="2"><br>
+<b><font color="#FF0000">Important:</font></b> <br>
+ </font></font><font size="2" face="Verdana">If your application uses ShellPack components, 
+the following line must be added in one of the units which contain ShellPack 
+components (e.g. main unit of your application):<br>
+<br>
+#include &lt;LMDShellBCBSupport.hpp&gt;</font></p>
+
+<p><font face="Verdana" size="2">If this header file is not included, an E2076 
+linker error will be generated.<br>
+ </font><FONT color=#000080 size="1"><a href="#Top">[Top]</a></FONT></p>
+
+<p><font face="Verdana"><b><font size="2">LMD TextPack <br>
+</font></b><font size="2">
+<b><font color="#FF0000">Important:</font></b> <br>
+ </font></font><font size="2" face="Verdana">Borland CBuilder does not add the 
+path to ParsePack lib automatically. Please either add ParsePack (e.g. [..]\Lib\LMDParse20\B5) 
+path to the project options or move ParsePack files.<br>
+</font><FONT color=#000080 size="1"><a href="#Top">[Top]</a></FONT></p>
+<p><font face="Verdana"><b><font size="2">LMD WebPack
+</font></b><font size="2"><br>
+<b><font color="#FF0000">Important:</font></b> <br>
+[1]
+To make an application compileable using TLMDWebUpdate&nbsp; component, the #define
+NO_WIN32_LEAN_AND_MEAN switch <u>must</u> be
+inserted before the #include &lt;vcl.h&gt;
+line in the header file of the main unit. Check example project for
+demonstration.<br>
+[2] If you use WinInet version of WebPack and you receive &quot;Unresolved External&quot; 
+compiler errors, add <b>wininet.lib</b> from
+</font></font><font face="Verdana" size="2">CBuilderDir\Lib 
+directory to project files (wininet.lib will be statically linked then).<br>
+[3] Borland CBuilder does not add the path to 
+ParsePack lib automatically. Please either add ParsePack (e.g. [..]\Lib\LMDParse20\B5) 
+path to the project options or move ParsePack files to a common directory. <br>
+ </font><FONT color=#000080 size="1"><a href="#Top">[Top]</a></FONT></p>
+<p><font face="Verdana"><b><font color="#000000" size="2">TLMDHideNonVC
+</font></b><font color="#000000" size="2"><br>
+The
+        TLMDHideNonVC component has no functionality in LMD-Tools
+        for CBuilder 5 and is included for the sake of
+        compatability only. In the version for C++ Builder 6 this component is 
+no longer included.<br>
+</font></font><FONT color=#000080 size="1"><a href="#Top">[Top]</a></FONT></p>
+
+<p><font face="Arial"><font color="#000000" size="2" face="Verdana">
+<br>
+<b>TLMDFormDisplay</b><br>
+</font><font size="2" face="Verdana">The AddForm method on TLMDFormDisplay was
+      renamed to AddFormExt due to naming conflicts with CBuilder routines.<br>
+</font></font><FONT color=#000080 size="1"><a href="#Top">[Top]</a></FONT></p>
+
+<p>
+&nbsp;</p>
+<P>&nbsp;
+<P> 
+<HR>
+
+<P><FONT color=#000080>©&nbsp;  </FONT><FONT color=#0000FF>by</FONT><FONT color=#000080> <A 
+href="http://www.lmd.de/">LMD Innovative</A> Germany<BR>All other trademarks are 
+acknowledged.</FONT> </P></BODY></HTML>

@@ -1,0 +1,15 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  LMDGraph,  
+  LMDShadow;
+
+type
+  TLMDRgnShadow = class(TLMDShadow)
+  public
+    constructor Create; override;
+  published
+    property Style default hssNone;
+  end;
+
+implementation

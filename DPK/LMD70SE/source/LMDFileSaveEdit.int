@@ -1,0 +1,49 @@
+
+uses
+  Classes,
+  Dialogs,
+  LMDCustomFileEdit;
+
+type
+  { ----------------------- TLMDFileSaveEdit --------------------------------- }
+  TLMDFileSaveEdit = class(TLMDCustomFileEdit)
+  private
+    FOptions     : TOpenOptions;
+    FPath,
+    FTitle,
+    FInitialDir,
+    FFilter,
+    FDefaultExt  : String;
+    //FIntModified,
+    FFilenameOnly: Boolean;
+
+  protected
+    procedure DoBrowse; override;
+    procedure GetCommandKey (var KeyCode : Word; Shift : TShiftState); override;
+    procedure SetFile (fileWithPath: String);
+  public
+    constructor Create (aOwner : TComponent); override;
+    function GetFilePath: String;
+    property FilenameOnly: Boolean read FFilenameOnly write FFilenameOnly default false;
+  published
+    property Options : TOpenOptions read FOptions write FOptions default [ofHideReadOnly];
+    property Title : String read FTitle write FTitle;
+    property InitialDir : String read FInitialDir write FInitialDir;
+    property Filter : String read FFilter write FFilter;
+    property Filename;
+    property DefaultExt : String read FDefaultExt write FDefaultExt;
+    property ReadOnly;
+    property MinimizeName;
+  end;
+
+  TLMDLabeledFileSaveEdit = class(TLMDFileSaveEdit)
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property LabelPosition;
+    property LabelSpacing;
+    property LabelSync;
+    property EditLabel;
+  end;
+
+implementation

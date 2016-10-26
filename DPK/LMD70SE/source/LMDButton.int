@@ -1,0 +1,14 @@
+
+uses
+  LMDCustomButton;
+
+type
+  TLMDButton=class(TLMDCustomButton)
+  published
+    property DropDownMenu;
+    property DropDownIndent;
+    property DropDownRight;
+    property OnDropDown;
+  end;
+
+implementation

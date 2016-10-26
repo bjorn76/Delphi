@@ -1,0 +1,41 @@
+
+uses
+  Classes,
+  LMDCont,
+  LMDBaseController,
+  LMDCustomImageList,
+  LMDCustomComponent;
+
+type
+  {TComponent-descendants}
+  {a base class which can hold a linked bitmap}
+  {------------------------ Class TLMDContainerComponent  ---------------------}
+  TLMDContainerComponent=class(TLMDCustomComponent)
+  private
+    FImageList:TLMDCustomImageList;
+    FIndex,
+    FListIndex:Integer;
+    FChangeLink:TLMDChangeLink;
+    procedure SetImageList(aValue:TLMDCustomImageList);
+    procedure SetIndex(index, aValue:Integer);
+    {saving}
+    {----}
+    procedure ReadIdent(Reader:TReader);
+    procedure WriteIdent(Writer:TWriter);
+    function  CheckCont:Boolean;
+    function HasControl:Boolean;
+    {----  }
+  protected
+    procedure DefineProperties(Filer:TFiler);override;
+    procedure GetIMLChange(Sender:TObject);virtual;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override ;
+    {properties}
+    property ImageList:TLMDCustomImageList read FImageList write SetImageList stored HasControl;
+    property ImageIndex:Integer index 0 read FIndex write SetIndex default 0;
+    property ListIndex:Integer index 1 read FListIndex write SetIndex default 0;
+  public
+    constructor Create(aOwner:TComponent);override;
+    destructor Destroy;override;
+  end;
+
+implementation

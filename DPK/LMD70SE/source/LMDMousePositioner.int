@@ -1,0 +1,26 @@
+
+uses
+  Windows,
+  Messages,
+  Classes,
+  LMDMouseBaseCtrl,
+  LMDGraph;
+
+type
+  {------------------------- TLMDMousePositioner ------------------------------}
+  TLMDMousePositioner = class(TLMDMouseBaseCtrl)
+  private
+    FPosition:TLMDAlignment;
+    function GetAutoPosition(aRect:TRect):TPoint;
+    procedure SetPosition(aValue:TLMDAlignment);
+  protected
+    procedure WndProc(var Message: TMessage);override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    function Execute:Boolean;
+    function ExecuteEnh(X,Y:Integer):Boolean;
+  published
+    property Position:TLMDAlignment read FPosition write SetPosition default agCenter;
+  end;
+
+implementation

@@ -1,0 +1,70 @@
+
+uses
+  Windows,
+  Graphics,
+  Classes,
+  Forms,
+  LMDBaseDialog;
+
+type
+  TLMDAboutStyle=(bsStandard, bsLMD);
+  TLMDAboutIconStyle=(isNone, isStandard, isExtended);
+  TLMDAboutVersionStyle=(vsProg, vsFileShort, vsFileFull, vsFileBuild);
+
+  TLMDAboutDlg = class(TLMDBaseDialog)
+  private
+    FAppname,
+    FCopyright,
+    FJump,
+    FEmail,
+    FDescription: String;
+    FDefault:Boolean;
+    FIcon:TIcon;
+    FIconStyle:TLMDAboutIconStyle;
+    FSize:Integer;
+    FStyle:TLMDAboutStyle;
+    FVersion:String;
+    FUseResInfo:Boolean;
+    FUseResVersionInfo:TLMDAboutVersionStyle;
+    procedure SetIcon(aIcon:TIcon);
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+    function Execute:Boolean;override;
+    function ExecuteEnh(aForm:TForm):Boolean;
+    {used internally}
+    property Icon:TIcon read FIcon write SetIcon;
+  published
+    property About;
+    property Appname:String read FAppname write FAppname;
+    property AppNameSize:Integer read FSize write FSize default 22;
+    property CaptionFill;
+    property CaptionTitle;
+    property Copyright: String read FCopyright write FCopyright;
+    property CtlXP;
+    property Colors;
+    property CustomButton;
+    property Description: String read FDescription write FDescription;
+    property Effect;
+    property EMail : String read FEmail write FEmail;
+    property Hints;
+    property ImageList;
+    property ImageIndex;
+    property ListIndex;
+    property IconStyle:TLMDAboutIconStyle read FIconStyle write FIconStyle default isExtended;
+    property Jump:String read FJump write FJump;
+    property Position;
+    property RelatePos;
+    property ShowHints;
+    property Style: TLMDAboutstyle read FStyle write FStyle default bsLMD;
+    property UseDefault:Boolean read FDefault write FDefault default false;
+    property UseResInfo:Boolean read FUseResInfo write FUseResInfo default false;
+    property UseResVersionInfoStyle:TLMDAboutVersionStyle read FUseResVersionInfo write FUseResVersionInfo default vsProg;
+    property Version:String read FVersion write FVersion;
+
+    {Events}
+    property OnCustomize;
+    property OnCustomClick;
+  end;
+
+implementation

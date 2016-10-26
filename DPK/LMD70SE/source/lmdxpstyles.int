@@ -1,0 +1,787 @@
+
+uses
+  windows, commctrl, controls;
+
+const
+  WM_THEMECHANGED = $31A;
+  
+type
+  HTheme = type LongWord;
+
+  TLMDThemeSize = (tsMin, tsTrue, tsDraw);
+  XPSIZE = packed record
+    cx, cy: LongInt;
+  end;
+  PSIZE = ^XPSIZE;
+
+  {$IFDEF LMDCOMP5}
+  PBoolean=^Boolean;
+  {$ENDIF}
+
+const
+
+      LMDBASE_PART = 1;
+      LMDBASE_STATE = 1;
+
+      ETDT_DISABLE       = $00000001;
+      ETDT_ENABLE        = $00000002;
+      ETDT_USETABTEXTURE = $00000004;
+      ETDT_ENABLETAB     = (ETDT_ENABLE or ETDT_USETABTEXTURE);
+  //Control
+  //  Part
+  //    States
+  //BUTTON {values from tmschema.h}
+      BP_PUSHBUTTON = LMDBASE_PART + 0;
+        PBS_NORMAL = LMDBASE_STATE + 0;
+        PBS_HOT = LMDBASE_STATE + 1;
+        PBS_PRESSED = LMDBASE_STATE + 2;
+        PBS_DISABLED = LMDBASE_STATE + 3;
+        PBS_DEFAULTED = LMDBASE_STATE + 4;
+      BP_RADIOBUTTON = LMDBASE_PART + 1; 
+        RBS_UNCHECKEDNORMAL = LMDBASE_STATE + 0;
+        RBS_UNCHECKEDHOT = LMDBASE_STATE + 1;
+        RBS_UNCHECKEDPRESSED = LMDBASE_STATE + 2;
+        RBS_UNCHECKEDDISABLED = LMDBASE_STATE + 3;
+        RBS_CHECKEDNORMAL = LMDBASE_STATE + 4;
+        RBS_CHECKEDHOT = LMDBASE_STATE + 5;
+        RBS_CHECKEDPRESSED = LMDBASE_STATE + 6;
+        RBS_CHECKEDDISABLED = LMDBASE_STATE + 7;
+      BP_CHECKBOX = LMDBASE_PART + 2;
+        CBS_UNCHECKEDNORMAL = LMDBASE_STATE + 0;
+        CBS_UNCHECKEDHOT = LMDBASE_STATE + 1;
+        CBS_UNCHECKEDPRESSED = LMDBASE_STATE + 2;
+        CBS_UNCHECKEDDISABLED = LMDBASE_STATE + 3;
+        CBS_CHECKEDNORMAL = LMDBASE_STATE + 4;
+        CBS_CHECKEDHOT = LMDBASE_STATE + 5;
+        CBS_CHECKEDPRESSED = LMDBASE_STATE + 6;
+        CBS_CHECKEDDISABLED = LMDBASE_STATE + 7;
+        CBS_MIXEDNORMAL = LMDBASE_STATE + 8;
+        CBS_MIXEDHOT = LMDBASE_STATE + 9;
+        CBS_MIXEDPRESSED = LMDBASE_STATE + 10;
+        CBS_MIXEDDISABLED = LMDBASE_STATE + 11;
+      BP_GROUPBOX = LMDBASE_PART + 3;
+        GBS_NORMAL = LMDBASE_STATE + 0;
+        GBS_DISABLED = LMDBASE_STATE + 1;
+      BP_USERBUTTON = LMDBASE_PART + 4;
+  //CLOCK {values from tmschema.h}
+      CLP_TIME = LMDBASE_PART + 0;
+        CLS_NORMAL = LMDBASE_STATE + 0;
+  //COMBOBOX {values from tmschema.h}
+      CP_DROPDOWNBUTTON = LMDBASE_PART + 0;
+        CBXS_NORMAL = LMDBASE_STATE + 0;
+        CBXS_HOT = LMDBASE_STATE + 1;
+        CBXS_PRESSED = LMDBASE_STATE + 2;
+        CBXS_DISABLED = LMDBASE_STATE + 3;
+  //EDIT {values from tmschema.h}
+      EP_EDITTEXT = LMDBASE_PART + 0;
+        ETS_NORMAL = LMDBASE_STATE + 0;
+        ETS_HOT = LMDBASE_STATE + 1;
+        ETS_SELECTED = LMDBASE_STATE + 2;
+        ETS_DISABLED = LMDBASE_STATE + 3;
+        ETS_FOCUSED = LMDBASE_STATE + 4;
+        ETS_READONLY = LMDBASE_STATE + 5;
+        ETS_ASSIST = LMDBASE_STATE + 6;
+      EP_CARET = LMDBASE_PART + 1;
+  //EXPLORERBAR {values from tmschema.h}
+      EBP_HEADERBACKGROUND = LMDBASE_PART + 0;
+      EBP_HEADERCLOSE = LMDBASE_PART + 1;
+        EBHC_NORMAL = LMDBASE_STATE + 0;
+        EBHC_HOT = LMDBASE_STATE + 1;
+        EBHC_PRESSED = LMDBASE_STATE + 2;
+      EBP_HEADERPIN = LMDBASE_PART + 2;
+        EBHP_NORMAL = LMDBASE_STATE + 0;
+        EBHP_HOT = LMDBASE_STATE + 1;
+        EBHP_PRESSED = LMDBASE_STATE + 2;
+        EBHP_SELECTEDNORMAL = LMDBASE_STATE + 3;
+        EBHP_SELECTEDHOT = LMDBASE_STATE + 4;
+        EBHP_SELECTEDPRESSED = LMDBASE_STATE + 5;
+      EBP_IEBARMENU = LMDBASE_PART + 3;
+        EBM_NORMAL = LMDBASE_STATE + 0;
+        EBM_HOT = LMDBASE_STATE + 1;
+        EBM_PRESSED = LMDBASE_STATE + 2;
+      EBP_NORMALGROUPBACKGROUND = LMDBASE_PART + 4;
+      EBP_NORMALGROUPCOLLAPSE = LMDBASE_PART + 5;
+        EBNGC_NORMAL = LMDBASE_STATE + 0;
+        EBNGC_HOT = LMDBASE_STATE + 1;
+        EBNGC_PRESSED = LMDBASE_STATE + 2;
+      EBP_NORMALGROUPEXPAND = LMDBASE_PART + 6;
+        EBNGE_NORMAL = LMDBASE_STATE + 0;
+        EBNGE_HOT = LMDBASE_STATE + 1;
+        EBNGE_PRESSED = LMDBASE_STATE + 2;
+      EBP_NORMALGROUPHEAD = LMDBASE_PART + 7;
+      EBP_SPECIALGROUPBACKGROUND = LMDBASE_PART + 8;
+      EBP_SPECIALGROUPCOLLAPSE = LMDBASE_PART + 9;
+        EBSGC_NORMAL = LMDBASE_STATE + 0;
+        EBSGC_HOT = LMDBASE_STATE + 1;
+        EBSGC_PRESSED = LMDBASE_STATE + 2;
+      EBP_SPECIALGROUPEXPAND = LMDBASE_PART + 10;
+        EBSGE_NORMAL = LMDBASE_STATE + 0;
+        EBSGE_HOT = LMDBASE_STATE + 1;
+        EBSGE_PRESSED = LMDBASE_STATE + 2;
+      EBP_SPECIALGROUPHEAD = LMDBASE_PART + 11;
+  //GLOBALS
+      GP_BORDER = LMDBASE_PART + 0;
+        BSS_FLAT = LMDBASE_STATE + 0;
+        BSS_RAISED = LMDBASE_STATE + 1;
+        BSS_SUNKEN = LMDBASE_STATE + 2;
+      GP_LINEHORZ = LMDBASE_PART + 1;
+        LHS_FLAT = LMDBASE_STATE + 0;
+        LHS_RAISED = LMDBASE_STATE + 1;
+        LHS_SUNKEN = LMDBASE_STATE + 2;
+      GP_LINEVERT = LMDBASE_PART + 2;
+        LVS_FLAT = LMDBASE_STATE + 0;
+        LVS_RAISED = LMDBASE_STATE + 1;
+        LVS_SUNKEN = LMDBASE_STATE + 2;
+  //HEADER
+      HP_HEADERITEM = LMDBASE_PART + 0;
+        HIS_HOT = LMDBASE_STATE + 0;
+        HIS_NORMAL = LMDBASE_STATE + 1;
+        HIS_PRESSED = LMDBASE_STATE + 2;
+      HP_HEADERITEMLEFT = LMDBASE_PART + 1;
+        HILS_HOT = LMDBASE_STATE + 0;
+        HILS_NORMAL = LMDBASE_STATE + 1;
+        HILS_PRESSED = LMDBASE_STATE + 2;
+      HP_HEADERITEMRIGHT = LMDBASE_PART + 2;
+        HIRS_HOT = LMDBASE_STATE + 0;
+        HIRS_NORMAL = LMDBASE_STATE + 1;
+        HIRS_PRESSED = LMDBASE_STATE + 2;
+      HP_HEADERSORTARROW = LMDBASE_PART + 3;
+        HSAS_SORTEDDOWN = LMDBASE_STATE + 0;
+        HSAS_SORTEDUP = LMDBASE_STATE + 1;
+  //LISTVIEW
+      LVP_EMPTYTEXT = LMDBASE_PART + 0;
+      LVP_LISTDETAIL = LMDBASE_PART + 1;
+      LVP_LISTGROUP = LMDBASE_PART + 2;
+      LVP_LISTITEM = LMDBASE_PART + 3;
+        LIS_DISABLED = LMDBASE_STATE + 0;
+        LIS_HOT = LMDBASE_STATE + 1;
+        LIS_NORMAL = LMDBASE_STATE + 2;
+        LIS_SELECTED = LMDBASE_STATE + 3;
+        LIS_SELECTEDNOTFOCUS = LMDBASE_STATE + 4;
+      LVP_LISTSORTEDDETAIL = LMDBASE_PART + 4;
+  //MENU
+      MP_MENUBARDROPDOWN = LMDBASE_PART + 0;
+        MS_DEMOTED = LMDBASE_STATE + 0;
+        MS_NORMAL = LMDBASE_STATE + 1;
+        MS_SELECTED = LMDBASE_STATE + 2;
+      MP_MENUBARITEM = LMDBASE_PART + 1;
+{        MS_DEMOTED = LMDBASE_STATE + 0;
+        MS_NORMAL = LMDBASE_STATE + 1;
+        MS_SELECTED = LMDBASE_STATE + 2;}
+      MP_CHEVRON = LMDBASE_PART + 2;
+{        MS_DEMOTED = LMDBASE_STATE + 0;
+        MS_NORMAL = LMDBASE_STATE + 1;
+        MS_SELECTED = LMDBASE_STATE + 2;}
+      MP_MENUDROPDOWN = LMDBASE_PART + 3;
+{        MS_DEMOTED = LMDBASE_STATE + 0;
+        MS_NORMAL = LMDBASE_STATE + 1;
+        MS_SELECTED = LMDBASE_STATE + 2;}
+      MP_MENUITEM = LMDBASE_PART + 4;
+{        MS_DEMOTED = LMDBASE_STATE + 0;
+        MS_NORMAL = LMDBASE_STATE + 1;
+        MS_SELECTED = LMDBASE_STATE + 2;}
+      MP_SEPARATOR = LMDBASE_PART + 5;
+{        MS_DEMOTED = LMDBASE_STATE + 0;
+        MS_NORMAL = LMDBASE_STATE + 1;
+        MS_SELECTED = LMDBASE_STATE + 2;}
+  //MENUBAND {values from tmschema.h}
+      MDP_NEWAPPBUTTON = LMDBASE_PART + 0;
+        MDS_NORMAL = LMDBASE_STATE + 0;
+        MDS_HOT = LMDBASE_STATE + 1;
+        MDS_PRESSED = LMDBASE_STATE + 2;
+        MDS_DISABLED = LMDBASE_STATE + 3;
+        MDS_CHECKED = LMDBASE_STATE + 4;
+        MDS_HOTCHECKED = LMDBASE_STATE + 5;
+      MDP_SEPARATOR = LMDBASE_PART + 1;
+  //PAGE {values from tmschema.h}
+      PGRP_UP = LMDBASE_PART + 0;
+      PGRP_DOWN = LMDBASE_PART + 1;
+      PGRP_UPHORZ = LMDBASE_PART + 2;
+      PGRP_DOWNHORZ = LMDBASE_PART + 3;
+      //sates -> see spin
+  //PROGRESS {values from tmschema.h}
+      PP_BAR = LMDBASE_PART + 0;
+      PP_BARVERT = LMDBASE_PART + 1;
+      PP_CHUNK = LMDBASE_PART + 2;
+      PP_CHUNKVERT = LMDBASE_PART + 3;
+  //REBAR {values from tmschema.h}
+      RP_GRIPPER = LMDBASE_PART + 0;
+      RP_GRIPPERVERT = LMDBASE_PART + 1;
+      RP_BAND = LMDBASE_PART + 2;
+      RP_CHEVRON = LMDBASE_PART + 3;
+        CHEVS_NORMAL = LMDBASE_STATE + 0;
+        CHEVS_HOT = LMDBASE_STATE + 1;
+        CHEVS_PRESSED = LMDBASE_STATE + 2;
+      RP_CHEVRONVERT = LMDBASE_PART + 4;
+  //SCROLLBAR {values from tmschema.h}
+      SBP_ARROWBTN = LMDBASE_PART + 0;
+        ABS_UPNORMAL = LMDBASE_STATE + 0;
+        ABS_UPHOT = LMDBASE_STATE + 1;
+        ABS_UPPRESSED = LMDBASE_STATE + 2;
+        ABS_UPDISABLED = LMDBASE_STATE + 3;
+
+        ABS_DOWNNORMAL = LMDBASE_STATE + 4;
+        ABS_DOWNHOT = LMDBASE_STATE + 5;
+        ABS_DOWNPRESSED = LMDBASE_STATE + 6;
+        ABS_DOWNDISABLED = LMDBASE_STATE + 7;
+
+        ABS_LEFTNORMAL = LMDBASE_STATE + 8;
+        ABS_LEFTHOT = LMDBASE_STATE + 9;
+        ABS_LEFTPRESSED = LMDBASE_STATE + 10;
+        ABS_LEFTDISABLED = LMDBASE_STATE + 11;
+
+        ABS_RIGHTNORMAL = LMDBASE_STATE + 12;
+        ABS_RIGHTHOT = LMDBASE_STATE + 13;
+        ABS_RIGHTPRESSED = LMDBASE_STATE + 14;
+        ABS_RIGHTDISABLED = LMDBASE_STATE + 15;
+      SBP_THUMBBTNHORZ = LMDBASE_PART + 1;
+        SCRBS_NORMAL = LMDBASE_STATE + 0;
+        SCRBS_HOT = LMDBASE_STATE + 1;
+        SCRBS_PRESSED = LMDBASE_STATE + 2;
+        SCRBS_DISABLED = LMDBASE_STATE + 3;
+      SBP_THUMBBTNVERT = LMDBASE_PART + 2;
+        //states see SBP_THUMBBTNHORZ
+      SBP_LOWERTRACKHORZ = LMDBASE_PART + 3;
+        //states see SBP_THUMBBTNHORZ
+      SBP_UPPERTRACKHORZ = LMDBASE_PART + 4;
+        //states see SBP_THUMBBTNHORZ
+      SBP_LOWERTRACKVERT = LMDBASE_PART + 5;
+        //states see SBP_THUMBBTNHORZ
+      SBP_UPPERTRACKVERT = LMDBASE_PART + 6;
+        //states see SBP_THUMBBTNHORZ
+      SBP_GRIPPERHORZ = LMDBASE_PART + 7;
+      SBP_GRIPPERVERT = LMDBASE_PART + 8;
+      SBP_SIZEBOX = LMDBASE_PART + 9;
+        SZB_RIGHTALIGN = LMDBASE_STATE + 0;
+        SZB_LEFTALIGN = LMDBASE_STATE + 1;
+  //SPIN {values from tmschema.h}
+      SPNP_UP = LMDBASE_PART + 0;
+        UPS_NORMAL = LMDBASE_STATE + 0;
+        UPS_HOT = LMDBASE_STATE + 1;
+        UPS_PRESSED = LMDBASE_STATE + 2;
+        UPS_DISABLED = LMDBASE_STATE + 3;
+      SPNP_DOWN = LMDBASE_PART + 1;
+        DNS_NORMAL = LMDBASE_STATE + 0;
+        DNS_HOT = LMDBASE_STATE + 1;
+        DNS_PRESSED = LMDBASE_STATE + 2;
+        DNS_DISABLED = LMDBASE_STATE + 3;
+      SPNP_UPHORZ = LMDBASE_PART + 2;
+        UPHZS_NORMAL = LMDBASE_STATE + 0;
+        UPHZS_HOT = LMDBASE_STATE + 1;
+        UPHZS_PRESSED = LMDBASE_STATE + 2;
+        UPHZS_DISABLED = LMDBASE_STATE + 3;
+      SPNP_DOWNHORZ = LMDBASE_PART + 3;
+        DNHZS_NORMAL = LMDBASE_STATE + 0;
+        DNHZS_HOT = LMDBASE_STATE + 1;
+        DNHZS_PRESSED = LMDBASE_STATE + 2;
+        DNHZS_DISABLED = LMDBASE_STATE + 3;
+  //STARTPANEL
+     SPP_LOGOFF = LMDBASE_PART + 0;
+     SPP_LOGOFFBUTTONS = LMDBASE_PART + 1;
+       SPLS_NORMAL = LMDBASE_STATE + 1;
+       SPLS_HOT = LMDBASE_STATE + 0;
+       SPLS_PRESSED = LMDBASE_STATE + 2;
+     SPP_MOREPROGRAMS = LMDBASE_PART + 2;
+     SPP_MOREPROGRAMSARROW = LMDBASE_PART + 3;
+       SPS_NORMAL = LMDBASE_STATE + 1;
+       SPS_HOT = LMDBASE_STATE + 0;
+       SPS_PRESSED = LMDBASE_STATE + 2;
+     SPP_PLACESLIST = LMDBASE_PART + 0;
+     SPP_PLACESLISTSEPARATOR = LMDBASE_PART + 4;
+     SPP_PREVIEW = LMDBASE_PART + 5;
+     SPP_PROGLIST = LMDBASE_PART + 6;
+     SPP_PROGLISTSEPARATOR = LMDBASE_PART + 7;
+     SPP_USERPANE = LMDBASE_PART + 8;
+     SPP_USERPICTURE = LMDBASE_PART + 9;
+  //STATUS {values from tmschema.h}
+     SP_PANE = LMDBASE_PART + 0;
+     SP_GRIPPERPANE = LMDBASE_PART + 1;
+     SP_GRIPPER = LMDBASE_PART + 2;
+  //TAB
+     TABP_BODY = LMDBASE_PART + 0;
+     TABP_PANE = LMDBASE_PART + 1;
+     TABP_TABITEM = LMDBASE_PART + 2;
+       TIS_DISABLED = LMDBASE_STATE + 0;
+       TIS_FOCUSED = LMDBASE_STATE + 1;
+       TIS_NORMAL = LMDBASE_STATE + 3;
+       TIS_HOT = LMDBASE_STATE + 2;
+       TIS_SELECTED = LMDBASE_STATE + 4;
+     TABP_TABITEMBOTHEDGE  = LMDBASE_PART + 3;
+       TIBES_DISABLED = LMDBASE_STATE + 0;
+       TIBES_FOCUSED = LMDBASE_STATE + 1;
+       TIBES_NORMAL = LMDBASE_STATE + 3;
+       TIBES_HOT = LMDBASE_STATE + 2;
+       TIBES_SELECTED = LMDBASE_STATE + 4;
+     TABP_TABITEMLEFTEDGE = LMDBASE_PART + 4;
+       TILES_DISABLED = LMDBASE_STATE + 0;
+       TILES_FOCUSED = LMDBASE_STATE + 1;
+       TILES_HOT = LMDBASE_STATE + 2;
+       TILES_NORMAL = LMDBASE_STATE + 3;
+       TILES_SELECTED = LMDBASE_STATE + 4;
+     TABP_TABITEMRIGHTEDGE = LMDBASE_PART + 5;
+       TIRES_DISABLED = LMDBASE_STATE + 0;
+       TIRES_FOCUSED = LMDBASE_STATE + 1;
+       TIRES_HOT = LMDBASE_STATE + 2;
+       TIRES_NORMAL = LMDBASE_STATE + 3;
+       TIRES_SELECTED = LMDBASE_STATE + 4;
+     TABP_TOPTABITEM = LMDBASE_PART + 6;
+       TTIS_DISABLED = LMDBASE_STATE + 0;
+       TTIS_FOCUSED = LMDBASE_STATE + 1;
+       TTIS_HOT = LMDBASE_STATE + 2;
+       TTIS_NORMAL = LMDBASE_STATE + 3;
+       TTIS_SELECTED = LMDBASE_STATE + 4;
+     TABP_TOPTABITEMBOTHEDGE = LMDBASE_PART + 7;
+       TTIBES_DISABLED = LMDBASE_STATE + 0;
+       TTIBES_FOCUSED = LMDBASE_STATE + 1;
+       TTIBES_HOT = LMDBASE_STATE + 2;
+       TTIBES_NORMAL = LMDBASE_STATE + 3;
+       TTIBES_SELECTED = LMDBASE_STATE + 4;
+     TABP_TOPTABITEMLEFTEDGE = LMDBASE_PART + 8;
+       TTILES_DISABLED = LMDBASE_STATE + 0;
+       TTILES_FOCUSED = LMDBASE_STATE + 1;
+       TTILES_HOT = LMDBASE_STATE + 2;
+       TTILES_NORMAL = LMDBASE_STATE + 3;
+       TTILES_SELECTED = LMDBASE_STATE + 4;
+     TABP_TOPTABITEMRIGHTEDGE = LMDBASE_PART + 9;
+       TTIRES_DISABLED = LMDBASE_STATE + 0;
+       TTIRES_FOCUSED = LMDBASE_STATE + 1;
+       TTIRES_HOT = LMDBASE_STATE + 2;
+       TTIRES_NORMAL = LMDBASE_STATE + 3;
+       TTIRES_SELECTED = LMDBASE_STATE + 4;
+  //TASKBAND {values from tmschema.h}
+     TDP_GROUPCOUNT = LMDBASE_PART + 0;
+     TDP_FLASHBUTTON = LMDBASE_PART + 1;
+     TDP_FLASHBUTTONGROUPMENU = LMDBASE_PART + 2;
+  //TASKBAR {values from tmschema.h}
+     TBP_BACKGROUNDBOTTOM = LMDBASE_PART + 0;
+     TBP_BACKGROUNDRIGHT = LMDBASE_PART + 1;
+     TBP_BACKGROUNDTOP = LMDBASE_PART + 2;
+     TBP_BACKGROUNDLEFT = LMDBASE_PART + 3;
+     TBP_SIZINGBARBOTTOM = LMDBASE_PART + 4;
+     TBP_SIZINGBARRIGHT = LMDBASE_PART + 5;
+     TBP_SIZINGBARTOP = LMDBASE_PART + 6;
+//     TBP_SIZINGBARBOTTOMLEFT = LMDBASE_PART + 7;
+  //TOOLBAR {values from tmschema.h}
+     TP_BUTTON = LMDBASE_PART + 0;
+       TS_NORMAL = LMDBASE_STATE + 0;
+       TS_HOT = LMDBASE_STATE + 1;
+       TS_PRESSED = LMDBASE_STATE + 2;
+       TS_DISABLED = LMDBASE_STATE + 3;
+       TS_CHECKED = LMDBASE_STATE + 4;
+       TS_HOTCHECKED = LMDBASE_STATE + 5;
+     TP_DROPDOWNBUTTON = LMDBASE_PART + 1;
+{       TS_CHECKED = LMDBASE_STATE + 0;
+       TS_DISABLED = LMDBASE_STATE + 1;
+       TS_HOT = LMDBASE_STATE + 2;
+       TS_HOTCHECKED = LMDBASE_STATE + 3;
+       TS_NORMAL = LMDBASE_STATE + 4;
+       TS_PRESSED = LMDBASE_STATE + 5;}
+     TP_SPLITBUTTON = LMDBASE_PART + 2;
+{       TS_CHECKED = LMDBASE_STATE + 0;
+       TS_DISABLED = LMDBASE_STATE + 1;
+       TS_HOT = LMDBASE_STATE + 2;
+       TS_HOTCHECKED = LMDBASE_STATE + 3;
+       TS_NORMAL = LMDBASE_STATE + 4;
+       TS_PRESSED = LMDBASE_STATE + 5;}
+     TP_SPLITBUTTONDROPDOWN = LMDBASE_PART + 3;
+{       TS_CHECKED = LMDBASE_STATE + 0;
+       TS_DISABLED = LMDBASE_STATE + 1;
+       TS_HOT = LMDBASE_STATE + 2;
+       TS_HOTCHECKED = LMDBASE_STATE + 3;
+       TS_NORMAL = LMDBASE_STATE + 4;
+       TS_PRESSED = LMDBASE_STATE + 5;}
+     TP_SEPARATOR = LMDBASE_PART + 4;
+{       TS_CHECKED = LMDBASE_STATE + 0;
+       TS_DISABLED = LMDBASE_STATE + 1;
+       TS_HOT = LMDBASE_STATE + 2;
+       TS_HOTCHECKED = LMDBASE_STATE + 3;
+       TS_NORMAL = LMDBASE_STATE + 4;
+       TS_PRESSED = LMDBASE_STATE + 5;}
+     TP_SEPARATORVERT = LMDBASE_PART + 5;
+{       TS_CHECKED = LMDBASE_STATE + 0;
+       TS_DISABLED = LMDBASE_STATE + 1;
+       TS_HOT = LMDBASE_STATE + 2;
+       TS_HOTCHECKED = LMDBASE_STATE + 3;
+       TS_NORMAL = LMDBASE_STATE + 4;
+       TS_PRESSED = LMDBASE_STATE + 5;}
+  //TOOLTIP {values from tmschema.h}
+     TTP_STANDARD = LMDBASE_PART + 0;
+       TTSS_NORMAL = LMDBASE_STATE + 0;
+       TTSS_LINK = LMDBASE_STATE + 1;
+     TTP_STANDARDTITLE = LMDBASE_PART + 1;
+     TTP_BALLOON = LMDBASE_PART + 2;
+       TTBS_NORMAL = LMDBASE_STATE + 0;
+       TTBS_LINK = LMDBASE_STATE + 1;
+     TTP_BALLOONTITLE = LMDBASE_PART + 3;
+     TTP_CLOSE = LMDBASE_PART + 4;
+       TTCS_NORMAL = LMDBASE_STATE + 0;
+       TTCS_HOT = LMDBASE_STATE + 1;
+       TTCS_PRESSED = LMDBASE_STATE + 2;
+  //TRACKBAR {values from tmschema.h}
+     TKP_TRACK = LMDBASE_PART + 0;
+       TRS_NORMAL = LMDBASE_STATE + 0;
+     TKP_TRACKVERT = LMDBASE_PART + 1;
+       TRVS_NORMAL = LMDBASE_STATE + 0;
+     TKP_THUMB = LMDBASE_PART + 2;
+       TUS_NORMAL = LMDBASE_STATE + 0;
+       TUS_HOT = LMDBASE_STATE + 1;
+       TUS_PRESSED = LMDBASE_STATE + 2;
+       TUS_FOCUSED = LMDBASE_STATE + 3;
+       TUS_DISABLED = LMDBASE_STATE + 4;
+     TKP_THUMBBOTTOM = LMDBASE_PART + 3;
+       TUBS_NORMAL = LMDBASE_STATE + 0;
+       TUBS_HOT = LMDBASE_STATE + 1;
+       TUBS_PRESSED = LMDBASE_STATE + 2;
+       TUBS_FOCUSED = LMDBASE_STATE + 3;
+       TUBS_DISABLED = LMDBASE_STATE + 4;
+     TKP_THUMBTOP = LMDBASE_PART + 4;
+       TUTS_NORMAL = LMDBASE_STATE + 0;
+       TUTS_HOT = LMDBASE_STATE + 1;
+       TUTS_PRESSED = LMDBASE_STATE + 2;
+       TUTS_FOCUSED = LMDBASE_STATE + 3;
+       TUTS_DISABLED = LMDBASE_STATE + 4;
+     TKP_THUMBVERT = LMDBASE_PART + 5;
+       TUVS_NORMAL = LMDBASE_STATE + 0;
+       TUVS_HOT = LMDBASE_STATE + 1;
+       TUVS_PRESSED = LMDBASE_STATE + 2;
+       TUVS_FOCUSED = LMDBASE_STATE + 3;
+       TUVS_DISABLED = LMDBASE_STATE + 4;
+     TKP_THUMBLEFT = LMDBASE_PART + 6;
+       TUVLS_NORMAL = LMDBASE_STATE + 0;
+       TUVLS_HOT = LMDBASE_STATE + 1;
+       TUVLS_PRESSED = LMDBASE_STATE + 2;
+       TUVLS_FOCUSED = LMDBASE_STATE + 3;
+       TUVLS_DISABLED = LMDBASE_STATE + 4;
+     TKP_THUMBRIGHT = LMDBASE_PART + 7;
+       TUVRS_NORMAL = LMDBASE_STATE + 0;
+       TUVRS_HOT = LMDBASE_STATE + 1;
+       TUVRS_PRESSED = LMDBASE_STATE + 2;
+       TUVRS_FOCUSED = LMDBASE_STATE + 3;
+       TUVRS_DISABLED = LMDBASE_STATE + 4;
+     TKP_TICS = LMDBASE_PART + 8;
+       TSS_NORMAL = LMDBASE_STATE + 0;
+     TKP_TICSVERT = LMDBASE_PART + 9;
+       TSVS_NORMAL = LMDBASE_STATE + 0;
+  //TRAYNOTIFY {values from tmschema.h}
+     TNP_BACKGROUND = LMDBASE_PART + 0;
+     TNP_ANIMBACKGROUND = LMDBASE_PART + 1;
+  //TREEVIEW {values from tmschema.h}
+     TVP_TREEITEM = LMDBASE_PART + 0;
+       TREIS_NORMAL = LMDBASE_STATE + 0;
+       TREIS_HOT = LMDBASE_STATE + 1;
+       TREIS_SELECTED = LMDBASE_STATE + 2;
+       TREIS_DISABLED = LMDBASE_STATE + 3;
+       TREIS_SELECTEDNOTFOCUS = LMDBASE_STATE + 4;
+     TVP_GLYPH = LMDBASE_PART + 1;
+       GLPS_CLOSED = LMDBASE_STATE + 0;
+       GLPS_OPENED = LMDBASE_STATE + 1;
+     TVP_BRANCH = LMDBASE_PART + 2;
+  //WINDOW {values from tmschema.h}
+    WP_CAPTION = LMDBASE_PART + 0; {ok}
+      CS_ACTIVE = LMDBASE_STATE + 0;
+      CS_INACTIVE = LMDBASE_STATE + 1;
+      CS_DISABLED = LMDBASE_STATE + 2;
+
+    WP_SMALLCAPTION = LMDBASE_PART + 1;
+{      CS_ACTIVE = LMDBASE_STATE + 0;
+      CS_DISABLED = LMDBASE_STATE + 1;
+      CS_INACTIVE = LMDBASE_STATE + 2;}
+    WP_MINCAPTION = LMDBASE_PART + 2;
+      MNCS_ACTIVE = LMDBASE_STATE + 0;
+      MNCS_INACTIVE = LMDBASE_STATE + 1;
+      MNCS_DISABLED = LMDBASE_STATE + 2;
+    WP_SMALLMINCAPTION = LMDBASE_PART + 3;
+{      MNCS_ACTIVE = LMDBASE_STATE + 0;
+      MNCS_DISABLED = LMDBASE_STATE + 1;
+      MNCS_INACTIVE = LMDBASE_STATE + 2;}
+    WP_MAXCAPTION = LMDBASE_PART + 4;
+      MXCS_ACTIVE = LMDBASE_STATE + 0;
+      MXCS_INACTIVE = LMDBASE_STATE + 1;
+      MXCS_DISABLED = LMDBASE_STATE + 2;
+    WP_SMALLMAXCAPTION = LMDBASE_PART + 5;
+{      MXCS_ACTIVE = LMDBASE_STATE + 0;
+      MXCS_DISABLED = LMDBASE_STATE + 1;
+      MXCS_INACTIVE = LMDBASE_STATE + 2;}
+    WP_FRAMELEFT = LMDBASE_PART + 6;
+{      FS_ACTIVE = LMDBASE_STATE + 0;
+      FS_INACTIVE = LMDBASE_STATE + 1;}
+    WP_FRAMERIGHT = LMDBASE_PART + 7;
+{      FS_ACTIVE = LMDBASE_STATE + 0;
+      FS_INACTIVE = LMDBASE_STATE + 1;}
+    WP_FRAMEBOTTOM = LMDBASE_PART + 8;
+      FS_ACTIVE = LMDBASE_STATE + 0;
+      FS_INACTIVE = LMDBASE_STATE + 1;
+    WP_SMALLFRAMELEFT = LMDBASE_PART + 9;
+{      FS_ACTIVE = LMDBASE_STATE + 0;
+      FS_INACTIVE = LMDBASE_STATE + 1;}
+    WP_SMALLFRAMERIGHT = LMDBASE_PART + 10;
+{      FS_ACTIVE = LMDBASE_STATE + 0;
+      FS_INACTIVE = LMDBASE_STATE + 1;}
+    WP_SMALLFRAMEBOTTOM = LMDBASE_PART + 11;
+{      FS_ACTIVE = LMDBASE_STATE + 0;
+      FS_INACTIVE = LMDBASE_STATE + 1;}
+
+    //*** window frame buttons ***
+    WP_SYSBUTTON = LMDBASE_PART + 12;
+{     SBS_DISABLED = LMDBASE_STATE + 0;
+      SBS_HOT = LMDBASE_STATE + 1;
+      SBS_NORMAL = LMDBASE_STATE + 2;
+      SBS_PUSHED = LMDBASE_STATE + 3;}
+    WP_MDISYSBUTTON = LMDBASE_PART + 13;
+      SBS_NORMAL = LMDBASE_STATE + 0;
+      SBS_HOT = LMDBASE_STATE + 1;
+      SBS_PUSHED = LMDBASE_STATE + 2;
+      SBS_DISABLED = LMDBASE_STATE + 3;
+    WP_MINBUTTON = LMDBASE_PART + 14;{ok}
+{      MINBS_DISABLED = LMDBASE_STATE + 0;
+      MINBS_HOT = LMDBASE_STATE + 1;
+      MINBS_NORMAL = LMDBASE_STATE + 2;
+      MINBS_PUSHED = LMDBASE_STATE + 3;}
+    WP_MDIMINBUTTON = LMDBASE_PART + 15; {ok}
+      MINBS_NORMAL = LMDBASE_STATE + 0;
+      MINBS_HOT = LMDBASE_STATE + 1;
+      MINBS_PUSHED = LMDBASE_STATE + 2;
+      MINBS_DISABLED = LMDBASE_STATE + 3;
+    WP_MAX_BUTTON = LMDBASE_PART + 16; {ok}
+      MAXBS_NORMAL = LMDBASE_STATE + 0;
+      MAXBS_HOT = LMDBASE_STATE + 1;
+      MAXBS_PUSHED = LMDBASE_STATE + 2;
+      MAXBS_DISABLED = LMDBASE_STATE + 3;
+    WP_CLOSEBUTTON = LMDBASE_PART + 17; {ok}
+      CBS_NORMAL = LMDBASE_STATE + 0;
+      CBS_HOT = LMDBASE_STATE + 1;
+      CBS_PUSHED = LMDBASE_STATE + 2;
+      CBS_DISABLED = LMDBASE_STATE + 3;
+    WP_SMALLCLOSEBUTTON = LMDBASE_PART + 18; {ok}
+{      CBS_DISABLED = LMDBASE_STATE + 0;
+      CBS_HOT = LMDBASE_STATE + 1;
+      CBS_NORMAL = LMDBASE_STATE + 2;
+      CBS_PUSHED= LMDBASE_STATE + 3;}
+    WP_MDICLOSEBUTTON = LMDBASE_PART + 19; {ok}
+{      CBS_DISABLED = LMDBASE_STATE + 0;
+      CBS_HOT = LMDBASE_STATE + 1;
+      CBS_NORMAL = LMDBASE_STATE + 2;
+      CBS_PUSHED = LMDBASE_STATE + 3;}
+    WP_RESTOREBUTTON = LMDBASE_PART + 20; {ok}
+{      RBS_DISABLED = LMDBASE_STATE + 0;
+      RBS_HOT = LMDBASE_STATE + 1;
+      RBS_NORMAL = LMDBASE_STATE + 2;
+      RBS_PUSHED = LMDBASE_STATE + 3;}
+    WP_MDIRESTOREBUTTON = LMDBASE_PART + 21; {ok}
+      RBS_NORMAL = LMDBASE_STATE + 0;
+      RBS_HOT = LMDBASE_STATE + 1;
+      RBS_PUSHED = LMDBASE_STATE + 2;
+      RBS_DISABLED = LMDBASE_STATE + 3;
+    WP_HELPBUTTON = LMDBASE_PART + 22; {ok}
+      HBS_NORMAL = LMDBASE_STATE + 0;
+      HBS_HOT = LMDBASE_STATE + 1;
+      HBS_PUSHED = LMDBASE_STATE + 2;
+      HBS_DISABLED = LMDBASE_STATE + 3;
+    WP_MDIHELPBUTTON = LMDBASE_PART + 23;
+{      HBS_DISABLED = LMDBASE_STATE + 0;
+      HBS_HOT = LMDBASE_STATE + 1;
+      HBS_NORMAL = LMDBASE_STATE + 2;
+      HBS_PUSHED = LMDBASE_STATE + 3;}
+
+    //*** scrollbars ***
+    WP_HORZSCROLL = LMDBASE_PART + 24;
+      HSS_NORMAL = LMDBASE_STATE + 0;
+      HSS_HOT = LMDBASE_STATE + 1;
+      HSS_PUSHED = LMDBASE_STATE + 2;
+      HSS_DISABLED = LMDBASE_STATE + 3;
+    WP_HORZTHUMB = LMDBASE_PART + 25;
+      HTS_NORMAL = LMDBASE_STATE + 0;
+      HTS_HOT = LMDBASE_STATE + 1;
+      HTS_PUSHED = LMDBASE_STATE + 2;
+      HTS_DISABLED = LMDBASE_STATE + 3;
+    WP_VERTSCROLL = LMDBASE_PART + 26;
+      VSS_NORMAL = LMDBASE_STATE + 0;
+      VSS_HOT = LMDBASE_STATE + 1;
+      VSS_PUSHED = LMDBASE_STATE + 2;
+      VSS_DISABLED = LMDBASE_STATE + 3;
+    WP_VERTTHUMB = LMDBASE_PART + 27;
+      VTS_NORMAL = LMDBASE_STATE + 0;
+      VTS_HOT = LMDBASE_STATE + 1;
+      VTS_PUSHED = LMDBASE_STATE + 2;
+      VTS_DISABLED = LMDBASE_STATE + 3;
+
+    //*** dialog ***
+    WP_DIALOG = LMDBASE_PART + 28;
+
+    //*** hit-test templates ***
+
+    WP_CAPTIONSIZINGTEMPLATE = LMDBASE_PART + 29;
+    WP_SMALLCAPTIONSIZINGTEMPLATE = LMDBASE_PART + 30;
+    WP_FRAMELEFTSIZINGTEMPLATE = LMDBASE_PART + 31;
+    WP_SMALLFRAMELEFTSIZINGTEMPLATE = LMDBASE_PART + 32;
+    WP_FRAMERIGHTSIZINGTEMPLATE = LMDBASE_PART + 33;
+    WP_SMALLFRAMERIGHTSIZINGTEMPLATE = LMDBASE_PART + 34;
+    WP_FRAMEBOTTOMSIZINGTEMPLATE = LMDBASE_PART + 35;
+    WP_SMALLFRAMEBOTTOMSIZINGTEMPLATE = LMDBASE_PART + 36;
+
+    STAP_ALLOW_NONCLIENT = (1 shl 0);
+    STAP_ALLOW_CONTROLS = (1 shl 1);
+    STAP_ALLOW_WEBCONTENT = (1 shl 2);
+
+(*  Existing according to MSDN, but not defined in the .h file ...
+    WP_SMALLHELPBUTTON = LMDBASE_PART + 32;
+{      HBS_DISABLED = LMDBASE_STATE + 0;
+      HBS_HOT = LMDBASE_STATE + 1;
+      HBS_NORMAL = LMDBASE_STATE + 2;
+      HBS_PUSHED = LMDBASE_STATE + 3;}
+    WP_SMALLMAXBUTTON = LMDBASE_PART + 33;
+{      MAXBS_DISABLED = LMDBASE_STATE + 0;
+      MAXBS_HOT = LMDBASE_STATE + 1;
+      MAXBS_NORMAL = LMDBASE_STATE + 2;
+      MAXBS_PUSHED = LMDBASE_STATE + 3;}
+    WP_SMALLMINBUTTON = LMDBASE_PART + 35;
+{      MINBS_DISABLED = LMDBASE_STATE + 0;
+      MINBS_HOT = LMDBASE_STATE + 1;
+      MINBS_NORMAL = LMDBASE_STATE + 2;
+      MINBS_PUSHED = LMDBASE_STATE + 3;}
+
+    WP_SMALLRESTOREBUTTON = LMDBASE_PART + 37;
+{     RBS_DISABLED = LMDBASE_STATE + 0;
+      RBS_HOT = LMDBASE_STATE + 1;
+      RBS_NORMAL = LMDBASE_STATE + 2;
+      RBS_PUSHED = LMDBASE_STATE + 3;}
+    WP_SMALLSYSBUTTON = LMDBASE_PART + 38;
+{     SBS_DISABLED = LMDBASE_STATE + 0;
+      SBS_HOT = LMDBASE_STATE + 1;
+      SBS_NORMAL = LMDBASE_STATE + 2;
+      SBS_PUSHED = LMDBASE_STATE + 3;}*)
+
+
+{.$EXTERNALSYM DrawThemeEdge}
+type
+  TLMDDrawThemeEdge = function {DrawThemeEdge}(handleTheme: HTHEME; handleDC: HDC;
+                       iPartId, iStateId: Integer;
+                       const aDestRect: PRect;
+                       uEdge, uFlags: Cardinal;
+                       aContentRect: PRect): HRESULT; stdcall;
+
+{.$EXTERNALSYM DrawThemeBackground}
+  TLMDDrawThemeBackground = function {DrawThemeBackground}(handleTheme: HTHEME; handleDC: HDC;
+                             iPartId, iStateId: Integer;
+                             const aRect, clipRect: PRect): HRESULT; stdcall;
+
+{.$EXTERNALSYM DrawThemeParentBackground}
+  TLMDDrawThemeParentBackground = function {DrawThemeParentBackground}(controlHandle: HWND; handleDC: HDC;
+                                   aRect: PRect): HRESULT; stdcall;
+
+{.$EXTERNALSYM DrawThemeText}
+  TLMDDrawThemeText = function {DrawThemeText}(handleTheme: HTHEME; handleDC: HDC;
+                       iPartId, iStateId: Integer;
+                       LPCWSTR: PWideChar;
+                       iCharCount: Integer;
+                       dwTextFlags, dwTextFlags2: DWORD;
+                       const aRect: PRect): HRESULT; stdcall;
+
+{.$EXTERNALSYM DrawThemeIcon}
+  TLMDDrawThemeIcon = function {DrawThemeIcon}(handleTheme: HTHEME; handleDC: HDC;
+                       iPartId, iStateId: Integer;
+                       const aRect: PRect;
+                       himl: HIMAGELIST;
+                       iImageIndex: Integer): HRESULT; stdcall;
+
+{.$EXTERNALSYM OpenThemeData}
+  TLMDOpenThemeData = function {OpenThemeData}(handle: HWND; pszClassList: PWideChar): HTHEME; stdcall;
+
+{.$EXTERNALSYM CloseThemeData}
+  TLMDCloseThemeData = function {CloseThemeData}(handleTheme: HTHEME): HRESULT; stdcall;
+
+  TLMDIsThemeBackgroundPartiallyTransparent = function (handleTheme: HTHEME; iPartId, iStateId: Integer): Boolean; stdcall;
+
+  TLMDGetThemeBackgroundContentRect = procedure (handleTheme: HTHEME; handleDC: HDC; iPartId, iStateId: Integer; const boundingRect: PRect; contentRect: PRect); stdcall;
+
+  //exlcudes a control from drawing with xp themes
+  TLMDSetWindowTheme = function (handle: HWND; SubAppName, SubIdList: PWideChar): HRESULT; stdcall;
+
+  TLMDSetThemeAppProperties = procedure (flags: DWORD); stdcall;
+
+  TLMDGetThemeBackgroundExtend = procedure (handleTheme: HTHEME; handleDC: HDC; iPartId, iStateId: Integer; const contentRect: PRect; out extendRect: PRect); stdcall;
+
+  TLMDGetThemePartSize = function(handleTheme: HTHEME; handleDC: HDC; iPartId, iStateId: Integer; prc: PRect; eSize: TLMDThemeSize; var psz: TSize):HRESULT; stdcall;
+
+//TLMDGetThemeTextExtend
+//GetThemeTextMetrics
+//GetThemeBackgroundRegion
+//HitTestThemeBackground
+  TLMDIsThemePartDefined = function (handleTheme: HTHEME; iPartId, iStateId: Integer): Boolean; stdcall;
+  PColorRef = ^ColorRef;
+  TLMDGetThemeColor = function (handleTheme: HTHEME; iPartId, iStateId, iPropId: Integer; var Color : COLORREF): HRESULT; stdcall;
+  TLMDGetThemeMetric = function (handleTheme: HTHEME; handleDC: HDC; iPartId, iStateId, iPropId: Integer; piVal: PInteger): HRESULT; stdcall;
+  TLMDGetThemeString = function (handleTheme: HTHEME; iPartId, iStateId, iPropId: Integer; pszBuff: PWideChar; cchMaxBuffChars: Integer): HRESULT; stdcall;
+  TLMDGetThemeBool = function (handleTheme: HTHEME; iPartId, iStateId, iPropId: Integer; pfVal: PBoolean): HRESULT; stdcall;
+  TLMDGetThemeInt = function (handleTheme: HTHEME; iPartId, iStateId, iPropId: Integer; pfVal: PInteger): HRESULT; stdcall;
+  TLMDGetThemeEnumValue = function (handleTheme: HTHEME; iPartId, iStateId, iPropId: Integer; piVal: PInteger): HRESULT; stdcall;
+  TLMDGetThemePosition = function (handleTheme: HTHEME; iPartId, iStateId, iPropId: Integer; pPoint: PPoint): HRESULT; stdcall;
+  TLMDGetThemeFont = function (handleTheme: HTHEME; handleDC: HDC; iPartId, iStateId, iPropId: Integer; pFont: PLogFont): HRESULT; stdcall;
+  TLMDGetThemeRect = function (handleTheme: HTHEME; iPartId, iStateId, iPropId: Integer; pRect: PRect): HRESULT; stdcall;
+//GetThemeMargins
+//GetThemeIntList
+//GetThemePropertyOrigin
+  TLMDGetThemeFilename = function (handleTheme: HTHEME; iPartId, iStateId, iPropId: Integer; pszThemeFilename: PWideChar; cchMaxBuffChars: Integer): HRESULT; stdcall;
+  TLMDGetThemeSysColor = function (handleTheme: HTHEME; iColorID: Integer): COLORREF; stdcall;
+  TLMDGetThemeSysColorBrush = function (handleTheme: HTHEME; iColorID: Integer): HBRUSH; stdcall;
+  TLMDGetThemeSysBool = function (handleTheme: HTHEME; iBoolID: Integer): Boolean; stdcall;
+//GetThemeSysSize
+//GetThemeSysFont
+  TLMDGetThemeSysString = function (handleTheme: HTHEME; iStringID: Integer; pszStringBuff: PWideChar; cchMaxBuffChars: Integer): HRESULT; stdcall;
+  TLMDGetThemeSysInt = function (handleTheme: HTHEME; iIntID: Integer; pValue: PInteger): HRESULT; stdcall;
+  TLMDIsThemeActive = function (): Boolean; stdcall;
+  TLMDIsAppThemed = function (): Boolean; stdcall;
+  TLMDGetWindowTheme = function (handle: HWND): HTHEME; stdcall;
+  TLMDEnableThemeDialogTexture = function (handle: HWND; dwFlgs: DWORD): HRESULT; stdcall;
+  TLMDIsThemeDialogTextureEnabled = function (): Boolean; stdcall;
+//GetThemeAppProperties
+//GetCurrentThemeName
+//GetThemeDocumentationProperty
+  TLMDEnableTheming = procedure (fEnable: Boolean); stdcall;
+
+
+
+var
+  GetCurrentThemeName: function(pszThemeFileName: LPWSTR;
+    cchMaxNameChars: Integer; pszColorBuff: LPWSTR; cchMaxColorChars: Integer;
+    pszSizeBuff: LPWSTR; cchMaxSizeChars: Integer): HRESULT; stdcall;
+
+  DrawThemeEdge: TLMDDrawThemeEdge;
+  DrawThemeBackground: TLMDDrawThemeBackground;
+  DrawThemeParentBackground: TLMDDrawThemeParentBackground;
+  DrawThemeText: TLMDDrawThemeText;
+  DrawThemeIcon: TLMDDrawThemeIcon;
+  OpenThemeData: TLMDOpenThemeData;
+  CloseThemeData: TLMDCloseThemeData;
+  IsThemeBackgroundPartiallyTransparent: TLMDIsThemeBackgroundPartiallyTransparent;
+  GetThemeBackgroundContentRect: TLMDGetThemeBackgroundContentRect;
+  SetWindowTheme: TLMDSetWindowTheme;
+  SetThemeAppProperties: TLMDSetThemeAppProperties;
+  GetThemeBackgroundExtend: TLMDGetThemeBackgroundExtend;
+  IsThemePartDefined: TLMDIsThemePartDefined;
+  GetThemeColor: TLMDGetThemeColor;
+  GetThemeMetric: TLMDGetThemeMetric;
+  GetThemeString: TLMDGetThemeString;
+  GetThemeBool: TLMDGetThemeBool;
+  GetThemeInt: TLMDGetThemeInt;
+  GetThemeEnumValue: TLMDGetThemeEnumValue;
+  GetThemePosition: TLMDGetThemePosition;
+  GetThemeFont: TLMDGetThemeFont;
+  GetThemeRect: TLMDGetThemeRect;
+
+  GetThemeFilename: TLMDGetThemeFilename;
+  GetThemeSysColor: TLMDGetThemeSysColor;
+  GetThemeSysColorBrush: TLMDGetThemeSysColorBrush;
+  GetThemeSysBool: TLMDGetThemeSysBool;
+  GetThemePartSize:TLMDGetThemePartSize;
+  IsThemeActive: TLMDIsThemeActive;
+  IsAppThemed: TLMDIsAppThemed;
+  GetWindowTheme: TLMDGetWindowTheme;
+  EnableThemeDialogTexture: TLMDEnableThemeDialogTexture;
+  IsThemeDialogTextureEnabled: TLMDIsThemeDialogTextureEnabled;
+
+  EnableTheming: TLMDEnableTheming;
+
+  XPThemesAvailable: Boolean;
+
+implementation

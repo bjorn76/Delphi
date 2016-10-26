@@ -1,0 +1,78 @@
+
+uses
+  windows, classes, graphics,
+  lmdcont, lmdgraph, lmdutils,
+  LMDButtonBase,
+  LMD3DCaption,
+  LMDGlyphTextLayout,
+  LMDImageList;
+
+type
+  TLMDNumGlyphs=0..5;
+  
+  TLMDGlyphList=class(TLMDImageListItem)
+  private
+    FCount:Integer;
+    FUsed:TBits;
+    function AllocateIndex: Integer;
+  public
+    constructor CreateSize(aWidth, aHeight: Integer);
+    destructor Destroy; override;
+    function Add(Image, Mask: TBitmap): Integer;
+    function AddMasked(Image: TBitmap; MaskColor: TColor): Integer;
+    procedure Delete(Index: Integer);
+    property Count: Integer read FCount;
+  end;
+
+  TLMDGlyphCache = class
+  private
+    FList:TList;
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    function GetList(aWidth, aHeight: Integer): TLMDGlyphList;
+    procedure FreeList(aList:TLMDGlyphList);
+    function Empty:Boolean;
+  end;
+
+  TLMDGlyphStyle=(gsStandard, gsExplorer);
+
+  {-------------------- internal object for 16 color glyphs -------------------}
+  TLMDGlyph=class
+  private
+    FBitmap: TBitmap;
+    FIndexs: array[TLMDButtonState] of Integer;
+    FGlyphList: TLMDGlyphList;
+    FNumGlyphs: TLMDNumGlyphs;
+    FOnChange: TNotifyEvent;
+    FStyle: TLMDGlyphStyle;
+    FTransparentColor: TColor;
+    procedure SetGlyph(aValue:TBitmap);
+    procedure SetNumGlyphs(aValue:TLMDNumGlyphs);
+    procedure SetStyle(aValue:TLMDGlyphStyle);
+    procedure GetGlyphChange(Sender: TObject);
+    procedure Init;
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    procedure DrawButtonGlyphAndText(
+              aCanvas: TCanvas; const aString:String;
+              Effects:TLMD3DCaption; aDest: TRect; State:TLMDButtonState;
+              aLayout: TLMDGlyphTextLayout; ExtFlags:TLMDDrawTextStyles;
+              MultiLine:Boolean; flags:LongInt);
+    function GetButtonGlyph(State:TLMDButtonState):Integer;
+    procedure GetStateBitmap(State : TLMDButtonState; bmp : TBitmap);
+
+    property Glyph: TBitmap read FBitmap write SetGlyph;
+    property NumGlyphs: TLMDNumGlyphs read FNumGlyphs write SetNumGlyphs;
+    property Style:TLMDGlyphStyle read FStyle write SetStyle;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+  end;
+
+{global cachelist}
+var
+  LMDGlyphCache:TLMDGlyphCache;
+
+implementation

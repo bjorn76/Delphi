@@ -1,0 +1,185 @@
+
+uses
+  Windows,
+  Classes,
+  Controls,
+  Dialogs,
+  Graphics,
+  Messages,
+  lmdgraph,
+  LMDBevel,
+  LMD3DCaption,
+  LMDCustomStatusBar,
+  LMDCustomPanel;
+
+type
+  {------------------ TLMDStatusCustomPanel -----------------------------------}
+  TLMDStatusPanelStyle = (spText, spOwnerDraw, spPanel);
+
+  TLMDStatusBar = class;
+
+  TLMDStatusCustomPanel=class(TLMDCustomPanel)
+  private
+    FId : Integer;
+    procedure ReadIdent (Reader : TReader);
+    procedure WriteIdent (Writer : TWriter);
+  protected
+    procedure ReadState (Reader : TReader); override;
+    procedure DefineProperties (Filer : TFiler); override;
+  public
+    property BarPanelId : Integer read FId write FId;
+  published
+    property Color;
+    property ParentColor;
+  end;
+
+  TLMDStatusPanel = class (TCollectionItem)
+  private
+    FAlignment : TLMDAlignment;
+    FBevel     : TLMDBevel;
+    FStyle     : TLMDStatusPanelStyle;
+    FText      : String;
+    FBarPanelId,
+    FLeft,
+    FSize      : Integer;
+    FFont      : TFont;
+    FFont3D    : TLMD3DCaption;
+    FControl   : TLMDStatusCustomPanel;
+    procedure SetBevel (aValue : TLMDBevel);
+    procedure SetFont (aValue : TFont);
+    procedure SetFont3D (aValue : TLMD3DCaption);
+    procedure SetText (aValue : String);
+    procedure SetInteger (index : Integer;aValue : Integer);
+    procedure SetAlignment (aValue : TLMDAlignment);
+    procedure SetStyle (aValue : TLMDStatusPanelStyle);
+    procedure ReadIdent (Reader : TReader);
+    procedure WriteIdent (Writer : TWriter);
+  public
+    constructor Create(Collection: TCollection); override;
+    destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure DefineProperties (Filer : TFiler); override;
+    property Control : TLMDStatusCustomPanel read FControl write FControl;
+    property BarPanelId : Integer read FBarPanelId write FBarPanelId stored true default -1;
+  published
+    property Alignment : TLMDAlignment read FAlignment write SetAlignment default agTopLeft;
+    property Bevel : TLMDBevel read FBevel write SetBevel;
+    property Style : TLMDStatusPanelStyle read FStyle write SetStyle;
+    property Text : String read FText write SetText;
+    property Size : Integer index 0 read FSize write SetInteger default 50;
+    property Left : Integer index 1 read FLeft write SetInteger default 3;
+    property Font : TFont read FFont write SetFont;
+    property Font3D : TLMD3DCaption read FFont3D write SetFont3D;
+    property Index;
+    property DisplayName;
+  end;
+
+  TLMDStatusPanels = class (TCollection)
+  private
+    FStatusBar: TLMDStatusBar;
+    function GetItem(Index: Integer): TLMDStatusPanel;
+    procedure SetItem(Index: Integer; Value: TLMDStatusPanel);
+  protected
+    function GetOwner: TPersistent; override;
+    procedure Update(Item: TCollectionItem); override;
+  public
+    constructor Create(StatusBar: TLMDStatusBar);
+    destructor Destroy ; override;
+    function Add: TLMDStatusPanel;
+    property Items[Index: Integer]: TLMDStatusPanel read GetItem write SetItem; default;
+  end;
+
+  TLMDOwnerDrawPanel = procedure (Sender : TObject;Nr : Integer;aRect : TRect;Canvas : TCanvas) of object;
+  TLMDOnPanelClick = procedure (Sender : TObject;Nr : Integer) of object;
+
+  { ----------------------------- TLMDStatusBar ------------------------------ }
+  TLMDStatusBar = class(TLMDCustomStatusBar)
+  private
+    FAlignment  : TLMDAlignment;
+    FSimpleText : String;
+    FAutoSizeLastPanel,
+    FOldStyle,
+    FSimplePanel,
+    FSizeGrip   : Boolean;
+    FFont3D     : TLMD3DCaption;
+    FPanels     : TLMDStatusPanels;
+    FGap        : Integer;
+    FOnOwnerDrawPanel : TLMDOwnerDrawPanel;
+    FOnPanelClick : TLMDOnPanelClick;
+    procedure SetAlignment (aValue : TLMDAlignment);
+    procedure SetFont3D (aValue : TLMD3DCaption);
+    procedure SetSimpleText (aValue : String);
+    procedure SetBoolean (index : Integer; aValue : Boolean);
+    procedure SetGap(aValue:Integer);
+    procedure SetPanels (aValue : TLMDStatusPanels);
+    procedure WMLButtonDown (var Msg : TWMLBUTTONDOWN); message WM_LBUTTONDOWN;
+    procedure WMSize (var Msg : TWMSIZE); message WM_SIZE;
+  protected
+    InnerRect : TRect;
+    procedure UpdatePanel (Nr : Integer);
+    procedure AlignControls(AControl: TControl; var Rect: TRect); override;
+    procedure CreateParams(var Params: TCreateParams); override;
+    procedure Resize; override;
+    procedure Paint; override;
+    procedure Loaded; override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+  public
+    constructor Create(aOwner : TComponent); override;
+    destructor Destroy; override;
+    function GetControlGap:Integer; override;
+  published
+    property Alignment  : TLMDAlignment read FAlignment write SetAlignment default agTopLeft;
+    property Font3D     : TLMD3DCaption read FFont3D write SetFont3D;
+    property SimpleText : String read FSimpleText write SetSimpleText;
+    property SimplePanel: Boolean index 0 read FSimplePanel write SetBoolean default false;
+    property SizeGrip   : Boolean index 1 read FSizeGrip write SetBoolean default true;
+    property OldStyle   : Boolean index 2 read FOldStyle write SetBoolean default true;
+    property AutoSizeLastPanel : Boolean index 3 read FAutoSizeLastPanel write SetBoolean default true;
+    property ControlGap : Integer read FGap write SetGap default 0;
+    property Panels     : TLMDStatusPanels read FPanels write SetPanels;
+    property About;
+    property Bevel;
+
+    property Align;
+    property Color;
+    property Cursor;
+    property DragMode;
+    property DragCursor;
+    property Font;
+    property Height;
+    property HelpContext;
+    property Hint;
+    property Left;
+    property ParentColor;
+    property ParentFont;
+    property PopupMenu;
+    property ShowHint;
+    property Top;
+    property Visible;
+    property Width;
+
+    property OnOwnerDrawPanel : TLMDOwnerDrawPanel read FOnOwnerDrawPanel write FOnOwnerDrawPanel;
+    property OnPanelClick : TLMDOnPanelClick read FOnPanelClick write FOnPanelClick;
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnResize;
+    property OnStartDrag;
+
+    // V4 enhancements
+    property Anchors;
+    property Constraints;
+    property DragKind;
+    property BiDiMode;
+    property ParentBiDiMode;
+    property OnEndDock;
+    property OnStartDock;
+  end;
+
+
+implementation

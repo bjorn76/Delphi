@@ -1,0 +1,27 @@
+
+uses
+  Windows,
+  Classes;
+  
+type
+  {----------------------TLMDPointList-----------------------------------------}
+  TLMDPointList=class(TList)
+    private
+      FOnChange : TNotifyEvent;
+      FUpdateCount : Integer;
+      function GetPoint(Index: integer):TPoint;
+    protected
+      procedure GetChange (Sender : TObject);
+    public
+      procedure BeginUpdate;
+      procedure EndUpdate (change : boolean);
+      procedure PutPoint(Index: integer; aValue: TPoint);
+      procedure AddPoint(aValue: TPoint);
+      procedure DeletePoint (Index: Integer);
+      procedure Clone (aValue : TLMDPointList);
+      Property Points[Index: integer]:TPoint read GetPoint write PutPoint;
+      property OnChange : TNotifyEvent read FOnChange write FOnChange;
+  end;
+
+
+implementation

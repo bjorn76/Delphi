@@ -1,0 +1,396 @@
+
+uses
+  Windows,
+  Controls,
+  Classes,
+  Forms,
+  Messages,
+  Graphics,
+  StdCtrls,
+  ExtCtrls,
+  intfLMDBackground,
+  intfLMDThemes,
+  LMDBoundLabel,
+  LMDClass,
+  LMDCont,
+  LMDGraph,
+  LMD3DCaption,
+  LMDBase,
+  LMDXPStyles;
+
+type
+  TLMDListBoxEditOptions=set of (lboAllowDelete, lboAllowEdit, lboAllowInsert, lboNo3DFrame, lboSelectText);
+  TLMDListBoxLargeTextOptions=(lbltNone, lbltEndEllipsis, lbltPathEllipsis, lbltHorzScrollBar,
+                               lbltShowHint);
+
+const
+  def_ListBoxEditOptions=[];
+
+type
+
+  TLMDListBoxEditShowEvent   = procedure(Sender: TObject; Index: Integer;
+                                         var Cancel: Boolean) of object;
+  TLMDListBoxEditMeasureEvent= procedure(Sender: TObject; Index: Integer;
+                                         var Height: Integer) of object;
+  TLMDListBoxEditChangeEvent = procedure(Sender: TObject; Index: Integer)
+                                         of object;
+
+  TLMDCustomListBoxEdit=class(TMemo);
+
+  {$IFNDEF LMDCOMP6}
+  TCustomListControl=class(TCustomListBox);
+  {$ENDIF}
+
+  {--------------------- TLMDCustomListBox -------------------------------------}
+  TLMDCustomListBox=class(TCustomListBox, ILMDBackground, ILMDThemes)
+  private
+    FAbout:TLMDAboutVar;
+
+    //4.0
+    FMultiLine:Boolean;
+
+    FFont3D:TLMD3DCaption;
+    FLast:Integer;
+    FTransparent:Boolean;
+    FOnSelect : TNotifyEvent;
+
+    // 6.1 - Edit Support
+    FEditOptions:TLMDListBoxEditOptions;
+    FEditIndex:Integer;
+    FOnEditShow:TLMDListBoxEditShowEvent;
+    FOnEditMeasure:TLMDListBoxEditMeasureEvent;
+    FOnEditChange:TLMDListBoxEditChangeEvent;
+    FOnEditHide:TNotifyEvent;
+
+    // LMD-Tools 6.0
+    FVertical,
+    FMouseOver,
+    FFlat,
+    FHideFocus,
+    FHorzGridline:Boolean;
+    FDisabledColor,
+    FSelectedColor,
+    FSelectedFontColor,
+    FHorzGridColor:TColor;
+    FHorzGridStyle:TPenStyle;
+    FHorzWidth:Integer;
+
+    // 6.1
+    FHideSelection,
+    FCtlXP:Boolean;
+    FEdit:TLMDCustomListBoxEdit;
+    FLargeTextOptions:TLMDListBoxLargeTextOptions;
+    FMargin:Byte;
+    FSelectedFontStyle:TFontStyles;
+    FHintWindow:THintWindow;
+    {$IFDEF LMDCOMP6}FVirtual:Boolean;{$ENDIF}
+    FAutoHeight:Boolean;
+
+    // 7.0
+    FBeveledFocus:Boolean;
+    FBevelFocusLightColor,
+    FBevelFocusDarkColor:TColor;
+
+    //support of bound labels, JH April 02
+    // ------------------------------------------
+    FEditLabel    : TLMDBoundLabel;
+    FHasBoundLabel: Boolean;
+    FLabelPosition: TLabelPosition;
+    FLabelSync:Boolean;
+    FLabelSpacing : Integer;
+    FMeasureItem: Boolean;
+    procedure SetLabelPosition(const Value: TLabelPosition);
+    procedure SetLabelSpacing(const Value: Integer);
+    procedure SetHasLabel(aValue: Boolean);
+    procedure SetLabelSync(const Value: Boolean);
+    // 7.0
+    procedure ReadEditLabel(Stream: TStream);
+    {$IFNDEF LMDCOMP6}
+    procedure WriteEditLabel(Stream: TStream);
+    {$ENDIF}
+    // ------------------------------------------
+
+    function GetHintWindow:THintWindow;
+    procedure CancelHint;
+    procedure FreeHintWindow;
+    procedure SetListBoxEditOptions(const aValue:TLMDListBoxEditOptions);
+    procedure SetListBoxLargeTextOptions(const aValue:TLMDListBoxLargeTextOptions);
+    procedure SetMargin(const aValue:Byte);
+    procedure SetMultiline(aValue:Boolean);
+    //4.0
+    procedure SetAutoHeight(aValue:Boolean);
+    //--
+
+    //6.0
+    procedure SetHideSelection(const aValue:Boolean);
+    procedure SetCtlXP(aValue:Boolean);
+    procedure SetFlat(const aValue:Boolean);
+    procedure SetVerticalScrollBar(const aValue:Boolean);
+    {$IFDEF LMDCOMP6}
+    procedure SetVirtualMode(const aValue:Boolean);
+    {$ENDIF}
+    procedure SetHorzGridline(const aValue:Boolean);
+    procedure SetHorzGridColor(const aValue:TColor);
+    procedure SetSelectedFontColor(const aValue:TColor);
+    procedure SetSelectedColor(const aValue:TColor);
+    procedure SetDisabledColor(const aValue:TColor);
+    procedure SetHideFocus(const aValue:Boolean);
+    procedure SetHorzGridStyle(const aValue:TPenStyle);
+    procedure SetSelectedFontStyle(const aValue:TFontStyles);
+    //--
+    procedure SetTransparent(aValue:Boolean);
+    procedure SetFont3D(aValue:TLMD3DCaption);
+
+    // LMD-Tools 6.0
+    procedure DrawBorder;
+    procedure SetHorzExtent;
+    Procedure MeasureListBoxItems;
+    //---
+
+    // LMD-Tools 6.01, internal edut control
+    procedure DoOnEditExit (Sender : TObject);
+    procedure DoOnEditKeyDown (Sender: TObject; var Key: Word; Shift: TShiftState);
+
+    // ---
+    procedure SetBeveledFocus(const Value: Boolean);
+    procedure SetBevelFocusDarkColor(const Value: TColor);
+    procedure SetBevelFocusLightColor(const Value: TColor);
+
+    // 6.1
+    procedure CMLMDThemeChanged(var Message: TMessage); message CM_LMDTHEMECHANGED;
+    procedure WMThemeChanged(var Msg:TMessage); message WM_THEMECHANGED;
+    // --
+
+    //7.0
+    procedure SetMeasureItem(const Value: Boolean);
+    procedure SetListBoxStyle;
+    //---
+
+    // 7.0
+    procedure CMLMDBOUNDLABELCHANGE(var Message: TMessage); message CM_LMDBOUNDLABELCHANGE;
+    procedure CMVisibleChanged(var Message: TMessage); message CM_VISIBLECHANGED;
+    procedure CMEnabledChanged(var Message: TMessage); message CM_ENABLEDCHANGED;
+    procedure CMBiDiModeChanged(var Message: TMessage); message CM_BIDIMODECHANGED;
+    // --
+
+    procedure CMLMDSCROLLBOXSCROLLEVENT (var Message : TMessage); message CM_LMDSCROLLBOXSCROLLEVENT;
+    procedure CMMouseEnter(var Message:TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Message:TMessage); message CM_MOUSELEAVE;
+    procedure CNDrawItem(var Message:TWMDrawItem); message CN_DRAWITEM;
+    procedure LBGetTopIndex(var Message:TMessage); message LB_GETTOPINDEX;
+    procedure WMKillFocus(var Message:TMessage); message WM_KILLFOCUS;
+    procedure WMNCCalcSize(var Message: TWMNCCalcSize); message WM_NCCALCSIZE;
+    procedure WMNCPaint(var Message: TMessage); message WM_NCPAINT;
+    procedure WMPaint(var Message:TWMPaint); message WM_PAINT;
+    procedure WMSize(var Message:TWMSize); message WM_SIZE;
+    procedure WMSetFocus(var Message:TMessage); message WM_SETFOCUS;
+    procedure WMSetCursor(var Message:TWMSetCursor); message WM_SETCURSOR;
+    procedure WMMove(var Message:TMessage); message WM_MOVE;
+    procedure WMNCHitTest(var Message:TMessage); message WM_NCHITTEST;
+    procedure WMEraseBkgnd(var Message:TWMEraseBkgnd); message WM_ERASEBKGND;
+    procedure CNCommand(var Message: TWMCommand); message CN_COMMAND;
+    function GetCtlXP: Boolean;
+
+  protected
+    // Transparency Support
+    function CheckOptimized:Boolean;
+    procedure RestoreBack(const tmp:TRect);
+
+     // LMD-Tools 6.0 - functions for specifying width and height of an item
+    procedure GetChange(Sender:TObject);virtual;
+    procedure InitHorzExtent;
+    function GetHorzExtent(index:Integer):Integer; virtual;
+    function ItemVisible(index:Integer):Boolean;
+    function IsHintWindowActive:Boolean;
+
+    // overwrite if any settings do not allow edit mode;
+    function CanEdit:Boolean;virtual;
+    // overwrite for special items in descendant classes
+    function GetEditRect(index:Integer):TRect;virtual;
+    // returns real string to be drawn
+    function GetStringValue(index:Integer):String;virtual;
+
+    // XP Support
+    function UseXP:Boolean;
+    //handle theme changes
+    procedure DoThemeChanged; virtual;
+
+    procedure CreateParams(var Params: TCreateParams);  override;
+    procedure CreateWnd;override;
+    procedure DrawItem(Index: Integer; Rect: TRect; State: TOwnerDrawState); override;
+    procedure DoSelect; virtual;
+
+    function GetFieldValue:Integer;virtual;
+    procedure KeyDown(var Key:Word;Shift:TShiftState);override;
+    procedure Loaded; override;
+    procedure MeasureItem(Index: Integer; var Height: Integer); override;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override ;
+    procedure WndProc(var Message: TMessage);override;
+
+    procedure EnterEditMode(const NewItem:Boolean=false; Index:Integer=-1);virtual;
+    procedure CancelEditMode;virtual;
+
+    procedure SetupEditLabel;
+    //
+
+    // 7.0 -----------------------------------------------
+    //support of bound label, April 02
+    procedure SetName(const Value: TComponentName); override;
+    procedure SetParent(AParent: TWinControl); override;
+
+    //procedure GetChildren(Proc: TGetChildProc; Root: TComponent);override;
+    procedure DefineProperties(Filer:TFiler);override;
+    // ---
+    property EditLabel: TLMDBoundLabel read FEditLabel;
+    property LabelSpacing: Integer read FLabelSpacing write SetLabelSpacing default 3;
+    property HasBoundLabel: Boolean read FHasBoundLabel write SetHasLabel;
+    //----------------------------------------------------
+
+    {$IFDEF LMDCOMP6}
+    property Count;
+    property VirtualMode:Boolean read FVirtual write SetVirtualMode default false;
+    {$ENDIF}
+
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+
+    procedure MoveHorz(flag:Word);
+
+    // Edit operations
+    procedure DeleteSelected;{$IFDEF LMDCOMP6}override;{$ENDIF}
+    {$IFNDEF LMDCOMP6}
+    procedure CopySelection(Destination:TCustomListControl); // keep compatibility with ListBox in Delphi/CBuilder 6
+    procedure SelectAll;
+    procedure ClearSelection;
+    {$ENDIF}
+
+    // 7.0
+    function BackBitmap: TBitmap; virtual;
+    function BackBitmapCheck: Boolean; virtual;
+    function BackDrawArea (Canvas: TCanvas; const dest: TRect; const src: TPoint;
+                           flags: Word=0): Boolean; virtual;
+    function isTransparentSet: Boolean;
+    function BackMapPoint (const aValue: TPoint): TPoint; virtual;
+    function BackBitmapPalette: HPalette; virtual;
+    procedure BackUpdate;
+    function BackControl (index: Integer): TControl; virtual;
+    function BackControlCount: Integer; virtual;
+    // ----
+    function ControlSupportsXP: Boolean;
+    //support of bound label, JH April 02
+    procedure SetBounds(ALeft: Integer; ATop: Integer; AWidth: Integer; AHeight: Integer); override;
+    //---
+    procedure AddItemByEditor;
+    procedure DisplayEditor(const Index:Integer);
+    procedure HideEditor;
+
+    property ScrollWidth:Integer read FHorzWidth; // in Delphi 6: Overwrite ScrollWidth
+    property StringValue[Index:Integer]:String read GetStringValue;
+
+    property ItemAutoHeight:Boolean read FAutoHeight write SetAutoHeight default false;
+    property EditOptions:TLMDListBoxEditOptions read FEditOptions write SetListBoxEditOptions default def_ListBoxEditOptions;
+    property LargeTextOptions:TLMDListBoxLargeTextOptions read FLargeTextOptions write SetListBoxLargeTextOptions default lbltNone;
+    property MultiLine:Boolean read FMultiline write SetMultiline default false;
+
+      // Event for internal edit control
+    property EditControl:TLMDCustomListBoxEdit read FEdit;
+    property OnEditShow: TLMDListBoxEditShowEvent read FOnEditShow write FOnEditShow;
+    property OnEditMeasure:TLMDListBoxEditMeasureEvent read FOnEditMeasure write FOnEditMeasure;
+    property OnEditChange:TLMDListBoxEditChangeEvent read FOnEditChange write FOnEditChange;
+    property OnEditHide:TNotifyEvent read FOnEditHide write FOnEditHide;
+
+    property Canvas;
+    property Text;
+
+    //bounded label support, April 02, JH
+    property LabelPosition: TLabelPosition read FLabelPosition write SetLabelPosition default lpAbove;
+    property LabelSync:Boolean read FLabelSync write SetLabelSync default false;
+  published
+    property MultiSelect;
+
+    // 7.0
+    property BeveledFocus:Boolean read FBeveledFocus write SetBeveledFocus default false;
+    property BevelFocusShadowColor:TColor read FBevelFocusDarkColor write SetBevelFocusDarkColor default clGray;
+    property BevelFocusLightColor:TColor read FBevelFocusLightColor write SetBevelFocusLightColor default clWhite;
+    property MeasureItemEvent:Boolean read FMeasureItem write SetMeasureItem default false;
+    // ---
+
+    property About:TLMDAboutVar read FAbout write FAbout;
+    property Font3D:TLMD3DCaption read FFont3D write SetFont3D;
+    property Transparent:Boolean read FTransparent write SetTransparent default false;
+
+    // 6.1
+    property CtlXP:Boolean read GetCtlXP write SetCtlXP default True;
+    property HideSelection:Boolean read FHideSelection write SetHideSelection default false;
+    property Margin:Byte read FMargin write SetMargin default 1;
+    property HorzGridColor:TColor read FHorzGridColor write SetHorzGridColor default clSilver;
+    property HorzGridStyle:TPenStyle read FHorzGridStyle write SetHorzGridStyle default psSolid;
+    property HorzGridLine:Boolean read FHorzGridline write SetHorzGridline default false;
+    property VerticalScrollBar:Boolean read FVertical write SetVerticalScrollBar default true;
+    // 6.0
+    property Flat:Boolean read FFlat write SetFlat default false;
+    property SelectedColor:TColor read FSelectedColor write SetSelectedColor default clHighlight;
+    property DisabledColor:TColor read FDisabledColor write SetDisabledColor default clWindow;
+    property SelectedFontColor:TColor read FSelectedFontColor write SetSelectedFontColor default clHighlightText;
+    property SelectedFontStyle:TFontStyles read FSelectedFontStyle write SetSelectedFontStyle default [];
+    property HideFocus:Boolean read FHideFocus write SetHideFocus default false;
+    // 4.0
+    // ---
+    property Align;
+    property BorderStyle;
+    property Ctl3D;
+    property Color;
+    property DragCursor;
+    property DragMode;
+    property Enabled;
+    property ExtendedSelect;
+    property Font;
+    property ImeMode;
+    property ImeName;
+    property IntegralHeight;
+    property ItemHeight;
+    property ParentColor;
+    property ParentCtl3D;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property Sorted;
+    property TabOrder;
+    property TabStop;
+    //property TabWidth;              
+    property Visible;
+
+    {Events}
+    property OnSelect : TNotifyEvent read FOnSelect write FOnSelect;
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnDrawItem;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnMeasureItem;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDrag;
+    property OnContextPopup;
+
+    // V4 enhancements
+    property Anchors;
+    property Constraints;
+    property DragKind;
+    property BiDiMode;
+    property ParentBiDiMode;
+    property OnEndDock;
+    property OnStartDock;
+  end;
+
+implementation

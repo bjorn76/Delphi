@@ -1,0 +1,43 @@
+
+uses
+  Classes,
+  Dialogs,
+  LMDCustomFileEdit;
+
+type
+  { ----------------------- TLMDFileOpenEdit --------------------------------- }
+  TLMDFileOpenEdit = class(TLMDCustomFileEdit)
+  private
+    FOptions     : TOpenOptions;
+
+    FTitle,
+    FInitialDir,
+    FFilter,
+    FDefaultExt  : String;
+  protected
+    procedure DoBrowse; override;
+  public
+    constructor Create (aOwner : TComponent); override;
+  published
+    property Options : TOpenOptions read FOptions write FOptions default [ofHideReadOnly];
+    property Title : String read FTitle write FTitle;
+    property InitialDir : String read FInitialDir write FInitialDir;
+    property Filter : String read FFilter write FFilter;
+    property Filename;
+    property DefaultExt : String read FDefaultExt write FDefaultExt;
+    property MinimizeName;
+    property FilenameOnly;
+    property ReadOnly;
+  end;
+
+  TLMDLabeledFileOpenEdit = class(TLMDFileOpenEdit)
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property LabelPosition;
+    property LabelSpacing;
+    property LabelSync;
+    property EditLabel;
+  end;
+
+implementation

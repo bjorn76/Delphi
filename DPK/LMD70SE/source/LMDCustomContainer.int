@@ -1,0 +1,135 @@
+
+uses
+  Windows,
+  SysUtils,
+  Classes,
+  Graphics,
+  Consts,
+  Controls,
+  LMDClass,
+  LMDProcs,
+  LMDCustomComponent,
+  LMDBaseController;
+
+type
+
+  {possible values for Container}
+  TLMDListItemClassType=(icImageList, icBitmap, icWave, icStringList, icGeneric, icRTF, icInvalid);
+
+  {--------------------- TLMDListItem -----------------------------------------}
+  TLMDListItem = class(TLMDCustomComponent)
+  private
+    function GetIndex:Integer;
+  protected
+    FDescription : String;
+    FIdent       : Word;
+    FCompressed  : Boolean;
+    procedure AssignStd(Source:TPersistent);
+    procedure Change; override;
+    procedure FreeData; virtual;
+    function  GetEmpty: Boolean; virtual;
+    procedure ReadData(Stream:TStream);virtual;
+    function ReadStd(Stream:TStream):Byte;
+    procedure ReadState(Reader: TReader);override;
+    procedure WriteData(Stream:TStream);virtual;
+    function  WriteFlag:Byte; virtual;
+    procedure WriteStd(Stream:TStream);
+  public
+    procedure LoadFromStream(Stream:TStream);
+    procedure SaveToStream(Stream:TStream);
+
+    property ListIndex:Integer read GetIndex;
+    property Owner;
+    property Empty:Boolean read GetEmpty;
+    property Compressed:Boolean read FCompressed write FCompressed default false;
+    property Description:String read FDescription write FDescription;
+    property Ident:Word read FIdent write FIdent;
+  end;
+
+  {****************************************************************************}
+  {----------------------TLMDCustomContainer-----------------------------------}
+  TLMDListItemClass = class of TLMDListItem;
+  TLMDContainerSource=(sdComponent, sdFile, sdAppResource, sdLibResource, sdPath);
+
+  TLMDCustomContainer=class(TLMDBaseController)
+  private
+    procedure SetSource(aValue:TLMDContainerSource);
+    procedure SetPrefix(aValue:TLMDPathPrefix);
+    function GetItemByName(index:String):TLMDListItem;
+  protected
+    FDefault:Boolean;
+    FPrefix:TLMDPathPrefix;
+    FSource:TLMDContainerSource;
+    FFileName:TFileName;
+    FList:TList;
+    FListClass:TLMDListItemClass;
+    FListType:TLMDListItemClassType;
+    procedure GetChildren(Proc: TGetChildProc; Root: TComponent); override;
+    function GetChildOwner: TComponent; override;
+
+    function GetCount:Integer;virtual;
+    function GetEmpty:Boolean;virtual;
+    function GetItem(index:Integer):TLMDListItem;virtual;
+    procedure ReadData(Stream:TStream; flag:Boolean);virtual;
+    procedure WriteData(Stream:TStream; flag:Boolean);virtual;
+    procedure Update(Sender:TObject);
+  public
+    constructor Create(aOwner:TComponent);override;
+    destructor Destroy;override;
+    procedure Assign(Source:TPersistent);override;
+    {admin functions}
+    function Add(aValue:TLMDListItem=nil):Integer;
+    procedure AddList(aValue:TLMDCustomContainer);
+    procedure Clear;
+    procedure Delete(Index: Integer);
+    function  IndexOf(aValue:TLMDListItem):Integer;
+    procedure Insert(Index:Integer; aValue:TLMDListItem=nil);
+    procedure Move(OldIndex, NewIndex:Integer);
+
+    {i/o}
+    procedure LoadFromFile(const Filename: string);
+    procedure LoadFromStream(Stream:TStream);
+    procedure SaveToStream(Stream:TStream);
+    procedure SaveToFile(const Filename: string);
+
+    {properties, read only}
+    property Count:Integer read GetCount;
+    property Empty:Boolean read GetEmpty;
+    property Contents[Index:Integer]:TLMDListItem read GetItem;
+    property ContentsByName[Index:String]:TLMDListItem read GetItemByName;
+
+    {ResSource -> datei, LMDList, RessDLL/Exe, ResApp
+    TLMDContainerSource=(sdComponent, sdFile, sdAppResource, sdDLLResource, sdPath);}
+    property DefaultCompressed:Boolean read FDefault write FDefault default False;
+    property Source:TLMDContainerSource read FSource write SetSource default sdComponent;
+    property FileName:TFileName read FFileName write FFileName;
+    property FilePrefix:TLMDPathPrefix read FPrefix write SetPrefix default ppProgram;
+  published
+    property About;
+  end;
+
+{file Access routines}
+function LMDListGetFileType(const FileName:String; var aCount:LongInt; aList:TList):TLMDListItemClassType;
+function LMDListGetItemFromStream(Stream:TStream; aList:TList; Index:Integer; aItem:TLMDListItem):Boolean;
+function LMDListGetItemFromFile(const FileName:String; aType:TLMDListItemClassType; aList:TList; Index:Integer;
+                                aItem:TLMDListItem):Boolean;
+
+{helper for Extensions}
+function LMDICGetSuffix(aValue:TLMDListItemClassType; AddPoint:Boolean):String;
+function LMDICGetItemSuffix(aValue:TLMDListItemClassType; AddPoint:Boolean):String;
+
+const {standard extensions for LMD-Tools Container Files}
+   LMDICEXTENSION:array[TLMDListItemClassType] of string[3]=('iml', 'bml', 'wvl', 'sll',
+                                                             'gll','rtl', '');
+   LMD_ICInfo:array[TLMDListItemClassType] of string[8]=('LMDIML30', 'LMDBML30',
+                                                         'LMDWVL30', 'LMDSLL30', 'LMDGLL50',
+                                                         'LMDRTL50', '');
+  ITF_COMPRESSED=$1;
+  ITF_DESCRIPTION=$2;
+  ITF_IDENT=$4;
+  ITF_DATA=$8;
+
+var
+  LMD_ICRegistered:array[TLMDListItemClassType] of Boolean;
+
+implementation

@@ -1,0 +1,10 @@
+
+uses
+  LMDGraph;
+
+type
+  TLMDShapeButtonMode=(sbmShapeFast, sbmShapeFill);
+
+  function LMDTileMode2DSF(tm: TLMDTileMode): Word;
+
+implementation

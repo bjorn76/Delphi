@@ -1,0 +1,46 @@
+
+uses
+  Windows,
+  Classes,
+  Controls,
+  Messages,
+  Graphics,
+  LMD3DCaption,
+  dialogs,
+  LMDCustomHint,
+  LMDShapeHint,
+  LMDCustomShapeHint;
+
+type
+  TLMDShapeHintWindow = class(THintWindow)
+  private
+    FCaller:TLMDCustomShapeHint;
+    FCustom:Boolean;
+    procedure WMEraseBkgnd(var Message: TWMEraseBkgnd); message WM_ERASEBKGND;
+  protected
+    procedure CalculateDimensions(var aRect:TRect);virtual;
+    procedure CreateParams(var Params: TCreateParams); override;
+    procedure Paint; override;
+    procedure Draw(ABitmap: TBitmap; AHintPosition: TLMDHintPosition;
+              var TxRect:TRect);virtual;
+    procedure SetPosition(Origin:TPoint; var pos:TLMDHintPosition;
+                          var aRect:TRect);
+    procedure WndProc(var Message: TMessage);override;
+    procedure GetTextSize (Caption : String; Font3D : TLMD3DCaption;
+                           var aRect : TRect; Font : TFont; b1, b2 : boolean;
+                           v1, flags : Integer); virtual;
+    procedure DrawText (Canvas : TCanvas; Caption : String;
+                        Font3D : TLMD3DCaption; TextRect : TRect); virtual;
+    function GetShapeHintControl : TLMDCustomShapeHint; virtual; //fetch the shape hint control
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy;override;
+    procedure ActivateHint(aRect: TRect; const AHint: string); override;
+    procedure ActivateHintExt(aRect:TRect; const aHint:String; Caller:TLMDCustomShapeHint);
+  end;
+
+var
+  ShapeHintControl:TLMDShapeHint;
+
+
+implementation

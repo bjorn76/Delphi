@@ -1,0 +1,63 @@
+
+uses
+  Windows,
+  Classes,
+  LMDBaseImage;
+
+type
+  {--------------------------- TLMDCustomLImage -------------------------------}
+  TLMDCustomLImage = class(TLMDBaseImage)
+  private
+    FSilentMove:Boolean;
+    procedure SetBool(index:Integer; aValue:Boolean);
+  protected
+    FForceTransparent:Boolean;
+    function CheckOptimized:Boolean;override;
+    function CorrectBounds:Boolean;override;
+    function GetEmpty:Boolean;override;
+    function GetPalette:HPalette;override;
+    property ForceTransparent:Boolean index 0 read FForceTransparent write SetBool default false;
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+    function isTransparentSet: Boolean;override;
+
+    property ImageList;
+    property ImageIndex;
+    property ListIndex;
+    {3.10}
+    property SilentMove:Boolean index 1 read FSilentMove write SetBool default false;
+    property Transparent;
+  published
+    property Align;
+    property Bevel;
+    property Color;
+    property DragCursor;
+    property DragMode;
+    property ParentColor;
+    property ParentShowHint;
+    property PopupMenu;
+    property QuickDraw;
+    property ShowHint;
+    property Visible;
+
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDrag;
+
+    // V4 enhancements
+    property Anchors;
+    property Constraints;
+    property DragKind;
+    property OnEndDock;
+    property OnStartDock;
+  end;
+
+
+implementation

@@ -1,0 +1,124 @@
+
+{
+  ##############################################################################
+  # Author:             LMD Innovative (RM)
+  # Created:            December 2000
+  # Description:        Simple TPopup descendant which adds various properties
+  #                     to add 'bar' effects know from Windows StartMenu. Useful
+  #                     e.g. for TrayIcon applications
+  # State:
+  # Comments:           RM: Please check 20.03.2001!!!!!
+  # ToDo:               In later release:
+  #                     Add more effects for menu background, Menu font etc.
+  #                     Note: ImageList, ListIndex, ImageIndex or rather Bitmap
+  #                     property specify LogoBitmap in Bar. if ImageList<>nil
+  #                     ImageList is used, otherwise Bitmap property
+  #---------------------------------- CHANGES ----------------------------------
+  # Author:              RM / AJB
+  # Date:                06-10-2002
+  # Description:         [-] FFillObject.Free in Destructor
+  # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  # Author:              RM / KJS
+  # Date:                01-07-2002
+  # Description:         [+] OnBeforePopUp event
+  # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  # Author:
+  # Date:
+  # Description:
+  ##############################################################################
+}
+
+uses
+  Windows, SysUtils, Classes, Graphics, Menus, Forms,
+  ImgList,
+  lmdbase,
+  LMDCont,
+  lmdgraph,
+  LMDCustomImageList,
+  LMDFillObject,
+  LMDFXCaption,
+  LMDBevel,
+  LMDGlyphTextLayout,
+  LMDStrings;
+
+type
+  TLMDPopUpOptions=set of (poDisplayBar, poUseAppTitle);
+  TLMDOnPopUpEvent = procedure (Sender:TObject; X,Y:Integer; var Cancel:Boolean) of Object;
+
+const
+  def_PopUpOptions=[poDisplayBar, poUseAppTitle];
+
+type
+  TLMDPopupMenu = class(TPopupMenu)
+  private
+    FAbout         : TLMDAboutVar;
+    FBevel         : TLMDBevel;
+    //FChangeLink    : TLMDChangeLink;
+    FImageList     : TLMDCustomImageList;
+    FIndex,
+    FListIndex     : Integer;
+    FFont          : TFont;
+    FFillObject    : TLMDFillObject;
+    FFontFx        : TLMDFxCaption;
+    FGlyphTextLayout : TLMDGlyphTextLayout;
+    FHeight,
+    FGap,
+    FWidth         : Word;
+    FOptions       : TLMDPopupOptions;
+    FCaption       : String;
+    FDummy,
+    FDrawing       :Boolean;
+    FBitmap,
+    FBack          :TBitmap;
+    FOnBeforePopUp :TLMDOnPopUpEvent;
+    procedure SetBitmap(aValue:TBitmap);
+    procedure SetDummy(aValue:Boolean);
+    procedure SetFont(aValue:TFont);
+    procedure SetBevel(aValue:TLMDBevel);
+    procedure SetFontFx(aValue:TLMDFxCaption);
+    procedure SetFillObject(aValue:TLMDFillObject);
+    procedure SetGlyphText (aValue:TLMDGlyphTextLayout);
+    procedure SetOptions(aValue:TLMDPopupOptions);
+    // ImageList Support
+    procedure SetImageList(aValue:TLMDCustomImageList);
+    procedure SetIndex(index, aValue:Integer);
+    {saving}
+    {----}
+    procedure ReadIdent(Reader:TReader);
+    procedure WriteIdent(Writer:TWriter);
+    function  CheckCont:Boolean;
+    function  HasControl:Boolean;
+    {----  }
+  protected
+    procedure DefineProperties(Filer:TFiler);override;
+    function IMLEmpty:Boolean;
+    // these two routines perform custom drawing features
+    procedure LMDMeasureItem(Sender:TObject;aCanvas:TCanvas; var Width, Height: Integer);
+    procedure LMDDrawItem(Sender:TObject;aCanvas: TCanvas; aRect: TRect;State:TOwnerDrawState);
+    procedure Notification(AComponent:TComponent; Operation: TOperation); override ;
+
+    //--> Hide
+    property OwnerDraw:Boolean read FDummy write SetDummy stored false;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure Popup(X, Y: Integer); override;
+  published
+    property About:TLMDAboutVar read FAbout write FAbout;
+    property Bitmap:TBitmap read FBitmap write SetBitmap;
+    property Layout:TLMDGlyphTextLayout read FGlyphTextLayout write SetGlyphText;
+    property BarWidth:Word read FWidth write FWidth default 26;
+    property BarGap:Word read FGap write FGap default 1; // Gap between Bar and Drawing of default menu items
+    property Bevel:TLMDBevel read FBevel write SetBevel;
+    property Caption:String read FCaption write FCaption;
+    property FillObject:TLMDFillObject read FFillObject write SetFillObject;
+    property Font: TFont read FFont write SetFont;
+    property FontFX:TLMDFxCaption read FFontFx write SetFontFx;
+    property ImageList:TLMDCustomImageList read FImageList write SetImageList stored HasControl;
+    property ImageIndex:Integer index 0 read FIndex write SetIndex default 0;
+    property ListIndex:Integer index 1 read FListIndex write SetIndex default 0;
+    property Options:TLMDPopUpOptions read FOptions write SetOptions default def_PopUpOptions;
+    property OnBeforePopUp:TLMDOnPopUpEvent read FOnBeforePopUp write FOnBeforePopUp;
+  end;
+
+implementation

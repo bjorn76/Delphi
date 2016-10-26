@@ -1,0 +1,95 @@
+
+uses
+  controls,     //TGraphicControl
+  classes,      //TNotifyEvent
+  messages,     //TMessage
+  windows,      //TPoint, Rect, ...
+  graphics,     //clBlack, ...
+  intfLMDBackground,
+  intfLMDThemes,
+  LMDXPStyles,
+  lmdbase;      //TLMDAboutVar
+
+
+type
+
+  TLMDOnBoundsChangeEvent=procedure(Sender:TObject; State:TLMDBoundsChangeStates) of object;
+
+  TLMDControl=class(TGraphicControl, ILMDBackground, ILMDThemes)
+  private
+    FAbout         : TLMDAboutVar;
+    FOnMouseEnter,
+    FOnMouseExit   : TNotifyEvent;
+    FOnBoundsChange: TLMDOnBoundsChangeEvent;
+    FUpdateCount   : Integer;
+    procedure SetCtlXP (aValue: Boolean);
+    procedure CMMouseEnter(var Message: TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Message: TMessage); message CM_MOUSELEAVE;
+    procedure CMLMDThemeChanged(var Message: TMessage); message CM_LMDTHEMECHANGED;
+    function GetCtlXP: Boolean;
+  protected
+    FXP            : Boolean;
+    // XP Support - changed in 6.1
+    // ---------------------------
+    //handle theme changes
+    procedure DoThemeChanged; virtual;
+
+    //UseXP will return true,
+    //if the system supports xp, xp theme support is switched on, the components
+    //local variable supportXp is active or global (and global settings are active)
+    //and if ControlSupportsXp returns true ...
+    function UseXP: Boolean;
+
+    //this method must be overwritten by controls supporting a special WinXP
+    //look for being able to use the Bevel bmWindows mode correctly under all
+    //circumstances
+    function ControlSupportsXP: Boolean; virtual;
+    // ----------------------------
+
+    procedure BoundsChange(State:TLMDBoundsChangeStates);virtual;
+    procedure DrawDashedFrame;
+    procedure FillControl;
+    procedure MouseEnter;virtual;
+    procedure MouseExit;virtual;
+    procedure GetChange(Sender:TObject);virtual;
+    function GetEmpty:Boolean;virtual;
+
+    // Properties
+    property About:TLMDAboutVar read FAbout write FAbout;
+    property OnBoundsChange:TLMDOnBoundsChangeEvent read FOnBoundsChange write FOnBoundsChange;
+    property OnMouseEnter: TNotifyEvent read FOnMouseEnter write FOnMouseEnter;
+    property OnMouseExit: TNotifyEvent read FOnMouseExit write FOnMouseExit;
+
+    {6.1}
+    property CtlXP:Boolean read GetCtlXP write SetCtlXP default false;
+    // -----
+
+  public
+    constructor Create(aOwner:TComponent);override;
+
+    destructor Destroy;override;
+    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);override;
+    //usually property setters call GetChange if a property has been changed
+    //this behaviour can be stopped by using the BeginUpdate procedure
+    //EndUpdate will reanble the GetChange procedure, and if repaint is true
+    //will call GetChange for doing any necessary visual updates
+    procedure BeginUpdate;
+    function IsUpdating:Boolean;
+    procedure EndUpdate(repaint: Boolean);
+
+    //new V7
+    function BackBitmap: TBitmap; virtual;
+    function BackBitmapCheck: Boolean; virtual;
+    function BackDrawArea (Canvas: TCanvas; const dest: TRect; const src: TPoint;
+                           flags: Word=0): Boolean; virtual;
+    function isTransparentSet: Boolean; virtual;
+    function BackMapPoint (const aValue: TPoint): TPoint; virtual;
+    function BackBitmapPalette: HPalette; virtual;
+    procedure BackUpdate; virtual;
+    function BackControl (index: Integer): TControl; virtual;
+    function BackControlCount: Integer; virtual;
+    // ---
+  end;
+
+
+implementation

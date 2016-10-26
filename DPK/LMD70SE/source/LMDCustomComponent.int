@@ -1,0 +1,29 @@
+
+uses
+  classes,
+  LMDBase;
+
+type
+  TLMDCustomComponent = class(TComponent)
+  private
+    FAbout    : TLMDAboutVar;
+    FOnChange : TNotifyEvent;
+    FCtlXP    : Boolean;
+    procedure SetCtlXP(const aValue:Boolean);
+  protected
+    FUpdate   : Byte;
+    procedure GetChange(Sender:TObject);dynamic;
+    procedure Change; dynamic;
+    procedure DoThemeChange;virtual;
+    function UseXP: Boolean;
+    property About:TLMDAboutVar read FAbout write FAbout;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    property CtlXP:Boolean read FCtlXP write SetCtlXP default True;
+  public
+    constructor Create (AOwner: TComponent); override;
+    procedure BeginUpdate;
+    procedure EndUpdate(aValue:Boolean=True);
+  end;
+
+
+implementation

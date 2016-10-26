@@ -1,0 +1,349 @@
+
+uses
+  Windows,
+  Messages,
+  StdCtrls,
+  ExtCtrls,
+  Controls,
+  ComCtrls,
+  Classes,
+  Graphics,
+
+  LMDBase,
+  LMDBaseLabel,
+  LMDClass,
+  LMDIniCtrl,
+  LMDExtListBox,
+  LMDCustomScrollBox;
+
+const
+  IDS_LISTBOXSAVE='ListBoxData';  // do not localize!
+
+type
+  TLMDListBox = class;
+
+  // ListBox Creacker
+  TLMDMyListBox=class(TLMDExtListBox)
+  protected
+    procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
+  end;
+
+  TLMDHeaderControl = class(THeaderControl)
+  private
+    function GetSectionWidth(Index:Integer):Integer;
+    procedure SetSectionWidth(Index:Integer; aValue:Integer);
+  public
+    property SectionWidth[Index:Integer]:Integer read GetSectionWidth write SetSectionWidth;
+  end;
+
+  TLMDLBGridLines = (glNone, glHorizontal, glVertical, glBoth);
+  TLMDLBCompareItemEvent = procedure (Sender : TObject; const s1, s2 : String; var result : ShortInt) of object;
+
+  TLMDLBGetLineSettingsEvent=procedure(Sender : TObject; Index:Integer; State:TOwnerDrawState; var bColor:TColor; aFont:TFont) of object;
+
+  {------------------------------- TLMDListBox --------------------------------}
+  TLMDListBox=class(TLMDCustomScrollBox)
+  private
+    //4.0
+    FHeader        : TLMDHeaderControl;
+
+    FDelimiter     : Char;
+    FDesc,
+    FHScroll       : Boolean;
+    FGridLines     : TLMDLBGridLines;
+
+    FListBox       : TLMDExtListBox;
+    FListBoxStyle  : TListBoxStyle;
+    FSelectedFontColor,
+    FGridHorzColor,
+    FGridVertColor,
+    FSelColor      : TColor;
+    FSelectedFontStyle:TFontStyles;
+    FOnHeaderSized : TSectionEvent;
+    FOnHeaderResize: TSectionNotifyEvent;
+    FOnDrawItem    : TDrawItemEvent;
+    FOnCompare     : TLMDLBCompareItemEvent;
+
+    // 4.0
+    FVirtualWidth  : Integer;   //-> Width of inner ListBox
+    {Ini-Support}
+    FIniLink       : TLMDIniCtrl;
+    FIniUse        : TLMDIniUse;
+    FSection,
+    FKey           : String;
+    FOnIniReadData,
+    FOnIniWriteData: TLMDIniCtrlEvent;
+    // 6.0
+    FOptions          : TLMDLabelOptions;
+    FOnPrepareDrawItem:TDrawItemEvent;
+    FGridHorzStyle: TPenStyle;
+    FGridVertStyle: TPenStyle;
+
+    // 7.0
+    FVirtualAutoWidth,
+    FAlternateLineColors:Boolean;
+    FAltColor,
+    FAltFontColor:TColor;
+    FOnGetLineSettings:TLMDLBGetLineSettingsEvent;
+
+    function GetBool(Index:Integer):Boolean;
+    function GetCanvas:TCanvas;
+    function GetColor(Index:Integer):TColor;
+    function GetCursor(Index:Integer):TCursor;
+    function GetFont(Index:Integer):TFont;
+    function GetHint:String;
+    function GetImeMode:TImeMode;
+    function GetImeName:TImeName;
+
+    function GetInteger(Index:Integer):Integer;
+    function GetItems:TStrings;
+    function GetDragMode:TDragMode;
+    function GetMeasureItemEvent:TMeasureItemEvent;
+    function GetSectionEvent:TSectionNotifyEvent;
+    function GetSectionTrackEvent:TSectionTrackEvent;
+    function GetSelected(index:integer):Boolean;
+    function GetDrawSectionEvent:TDrawSectionEvent;
+    // V6.01
+    {$IFDEF LMDCOMP6}
+    function GetOnData:TLBGetDataEvent;
+    function GetOnDataFind:TLBFindDataEvent;
+    function GetCount:Integer;
+    procedure SetOnData(aValue:TLBGetDataEvent);
+    procedure SetOnDataFind(aValue:TLBFindDataEvent);
+    procedure SetCount(aValue:Integer);
+    {$ENDIF}
+    procedure SetBool(Index:Integer;aValue:Boolean);
+    procedure SetColor(Index:Integer; aValue:TColor);
+    procedure SetCursor(Index:Integer; aValue:TCursor);
+    procedure SetGridLines(aValue:TLMDLBGridLines);
+    procedure SetDelimiter(aValue:Char);
+    procedure SetDragMod(aValue:TDragMode);
+    procedure SetFont(Index:Integer; aValue:TFont);
+    procedure SetHint(aValue:String);
+    procedure SetImeMode(aValue:TImeMode);
+    procedure SetImeName(aValue:TImeName);
+    procedure SetInteger(Index:Integer; aValue:Integer);
+    procedure SetListBoxStyle(aValue:TListBoxStyle);
+    procedure SetMeasureItemEvent(aValue:TMeasureItemEvent);
+    procedure SetSelectedFontStyle(const aValue:TFontStyles);
+    procedure SetPenStyle(const Index: Integer; const Value: TPenStyle);
+    procedure SetSectionEvent(aValue:TSectionNotifyEvent);
+    procedure SetSectionTrackEvent(aValue:TSectionTrackEvent);
+    procedure SetDrawSectionEvent(aValue:TDrawSectionEvent);
+
+    // 4.0
+    procedure SetItems(aValue:TStrings);
+    procedure SetVirtualWidth(aValue:Integer);
+    procedure SetSelected(index:integer;flag:boolean);
+    procedure HeaderSized(Sender:THeaderControl;Section: THeaderSection);
+    procedure DrawItem(Control:TWinControl;Index:Integer;Rect:TRect;State:TOwnerDrawState);
+
+    // 4.0 Ini-Support
+    procedure SetIniLink(aValue:TLMDIniCtrl);
+    function SaveKey:Boolean;
+    function SaveSection:Boolean;
+    {-----}
+
+    // 6.0
+    procedure SetOptions (aValue : TLMDLabelOptions);
+    function GetOptionsFlag:Word;
+    //----
+     procedure SetHeaderSections(aValue:THeaderSections);
+    function GetHeaderSections:THeaderSections;
+    // --
+    procedure CMTRANSPARENTCHANGED(var Message: TMessage); message CM_TRANSPARENTCHANGED;
+    procedure WMEraseBkgnd(var Message: TWMEraseBkgnd); message WM_ERASEBKGND;
+    function GetOnSelect: TNotifyEvent;
+    procedure SetOnSelect(const Value: TNotifyEvent);
+    //procedure GetChange(Sender: TObject);
+  protected
+    procedure AlignControls(AControl: TControl;var Rect : TRect);override;
+    procedure InternalMouseMove(Shift: TShiftState; X, Y: Integer);virtual;
+    function  CalcColumnsWidth:Integer;
+    procedure CreateParams(var Params: TCreateParams); override;
+    procedure DefineProperties(Filer:TFiler);override;
+    procedure DoReadData;dynamic;
+    procedure DoWriteData;dynamic;
+    procedure Loaded; override;
+    procedure Notification(aComponent:TComponent;Operation:TOperation);override;
+    procedure ReadState(Reader:TReader);override;
+    procedure Resize; override;                   
+    // 7.0
+    procedure UpdateVirtualWidth;
+    // ---
+  public
+    procedure SpecialSort(sortOrder : Array of Integer);overload;
+    procedure SpecialSort;overload;
+    constructor Create(AOwner:TComponent); override;
+    destructor Destroy; override;
+    function AddLine(const X:array of String):Integer;
+    procedure Clear;
+    procedure PrepareDrawItem(Rect:TRect;State:TOwnerDrawState;Index:Integer=-1);
+    procedure SetFocus;override;
+    function GetIniString:String;
+    procedure SetIniString(w:String);
+    function GetPartString(const w:String;col:Integer):String;
+    function ItemAtPos(Pos:TPoint;Existing:Boolean):Integer;
+    function ItemPart(Index:Integer; Col:Integer):String;
+    procedure SetItemPart(Index:Integer; Col:Integer; partStr : String);
+    function Focused: Boolean; override;
+
+    // 4.0
+    procedure ReadData;
+    procedure WriteData;
+    property Canvas:TCanvas read GetCanvas;
+    property Header:TLMDHeaderControl read FHeader;
+    property ItemIndex:Integer index 1 read GetInteger write SetInteger;
+    property LB:TLMDExtListBox read FListBox;
+    property SectionCount:Integer index 5 read GetInteger;
+    property SelCount:Integer index 3 read GetInteger;
+    property Selected[Index:integer]:Boolean read GetSelected write SetSelected;
+    property Showing;
+    property TopIndex:Integer index 2 read GetInteger write SetInteger;
+
+    property SortDescending : Boolean read FDesc write FDesc default false;
+    //7.0
+    property ColumnsWidth:Integer read CalcColumnsWidth;
+    //--
+
+    {$IFDEF LMDCOMP6}
+    property Count: Integer read GetCount write SetCount;
+    {$ENDIF}
+  published
+    property About;
+    property Align;
+    property AllowResize:Boolean index 5 read GetBool write SetBool default True;
+    property AutoScroll:Boolean index 21 read GetBool;
+    property Bevel;
+
+    property Color:TColor index 0 read GetColor write SetColor default clWhite;
+    property Cursor:TCursor index 0 read GetCursor write SetCursor default crDefault;
+    property Delimiter:Char read FDelimiter write SetDelimiter default ';';
+
+    property DragCursor:TCursor index 1 read GetCursor write SetCursor default crDrag;
+    property DragMode:TDragMode read GetDragMode write SetDragMod default dmManual;
+    property Enabled:Boolean index 0 read GetBool write SetBool default True;
+    property ExtendedSelect:Boolean index 1 read GetBool write SetBool default True;
+
+    property Font:TFont index 1 read GetFont write SetFont;
+    property GridHorzColor:TColor index 2 read FGridHorzColor write SetColor default clSilver;
+    property GridLines:TLMDLBGridLines read FGridLines write SetGridLines default glNone;
+    property GridVertColor:TColor index 3 read FGridVertColor write SetColor default clSilver;
+    property HeaderFont:TFont index 0 read GetFont write SetFont;
+    property HeaderHeight:Integer index 0 read GetInteger write SetInteger default 25;
+    property HeaderSections:THeaderSections read GetHeaderSections write SetHeaderSections;
+    property HeaderVisible:Boolean index 2 read GetBool write SetBool default True;
+    property HeaderHotTrack:Boolean index 12 read GetBool write SetBool default false;
+    property HeaderFlat:Boolean index 13 read GetBool write SetBool default false;
+    property Hint:String read GetHint write SetHint;
+    property ImeMode:TImeMode read GetImeMode write SetImeMode default imDontCare;
+    property ImeName:TImeName read GetImeName write SetImeName;
+    property ItemHeight:Integer index 4 read GetInteger write SetInteger;
+    property Items:TStrings read GetItems write SetItems;
+    property MultiSelect:Boolean index 3 read GetBool write SetBool default false;
+    property ParentShowHint:Boolean index 7 read GetBool write SetBool default True;
+    property PopupMenu;
+    property SelectedColor:TColor index 1 read GetColor write SetColor default clHighLight;
+
+    property ShowHint:Boolean index 6 read GetBool write SetBool default false;
+    property Sorted:Boolean index 4 read GetBool write SetBool default false;
+
+    property Style:TListBoxStyle read FListBoxStyle write SetListBoxStyle default lbStandard;
+    property TabOrder;
+    property TabStop:Boolean index 8 read GetBool write SetBool default True;
+    property Visible;
+
+    // NEW in 4.0
+    // ------------
+    // hide the VertScrollBar property
+    property VertScrollBar:Boolean index 20 read GetBool;
+    property VirtualWidth:Integer read FVirtualWidth write SetVirtualWidth default 0;
+
+    //Ini-Support
+    property IniLink:TLMDIniCtrl read FIniLink write SetIniLink;
+    property IniUse:TLMDIniUse read FIniUse write FIniUse default ioNone; {not active by default}
+    property Section:String read FSection write FSection stored SaveSection;
+    property IniKey:String read FKey write FKey stored SaveKey;
+    property OnIniReadData:TLMDIniCtrlEvent read FOnIniReadData write FOnIniReadData;
+    property OnIniWriteData:TLMDIniCtrlEvent read FOnIniWriteData write FOnIniWriteData;
+
+    // NEW in 6.0
+    // ------------
+    property ColumnOptions:TLMDLabelOptions read FOptions write SetOptions default [];
+
+    // NEW in 6.1
+    // ------------
+    property CtlXP;
+
+    // NEW in 7.0
+    // ------------
+    property AlternateColors:Boolean index 14 read FAlternateLineColors write SetBool default false;
+    property AltLineColor:TColor index 5 read FAltColor write SetColor default clSilver;
+    property AltFontColor:TColor index 6 read FAltFontColor write SetColor default clWindowText;
+    property BeveledFocus:Boolean index 15 read GetBool write SetBool default false;
+    property BevelFocusShadowColor:TColor index 7 read GetColor write SetColor default clGray;
+    property BevelFocusLightColor:TColor index 8 read GetColor write SetColor default clWhite;
+    property VirtualAutoWidth:Boolean index 16 read FVirtualAutoWidth write SetBool default false;
+    property OnGetLineSettings:TLMDLBGetLineSettingsEvent read FOnGetLineSettings write FOnGetLineSettings;
+    // ---
+
+    property GridHorzStyle:TPenStyle index 0 read FGridHorzStyle write SetPenStyle default psSolid;
+    property GridVertStyle:TPenStyle index 1 read FGridVertStyle write SetPenStyle default psSolid;
+    property ItemAutoHeight:Boolean index 9 read GetBool write SetBool default false;
+    property SelectedFontColor:TColor index 4 read FSelectedFontColor write SetColor default clHighlightText;
+    property SelectedFontStyle:TFontStyles read FSelectedFontStyle write SetSelectedFontStyle default [];
+    property Transparent;
+
+     {Events}
+    property OnClick;
+    property OnDblClick;
+    property OnEnter;
+    property OnExit;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnStartDrag;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnResize;
+    property OnKeyDown;
+    property OnKeyUp;
+    property OnKeyPress;
+
+    // specific events
+    // ListBox
+    property OnMeasureItem:TMeasureItemEvent read GetMeasureItemEvent write SetMeasureItemEvent;
+    property OnDrawItem:TDrawItemEvent read FOnDrawItem write FOnDrawItem;
+    // 6.0
+    property OnPrepareDrawItem:TDrawItemEvent read FOnPrepareDrawItem write FOnPrepareDrawItem;
+
+    // Header
+    property OnHeaderSized:TSectionEvent read FOnHeaderSized write FOnHeaderSized;
+    property OnHeaderDrawSection:TDrawSectionEvent read GetDrawSectionEvent write SetDrawSectionEvent;
+    property OnHeaderSectionClick:TSectionNotifyEvent read GetSectionEvent write SetSectionEvent;
+    property OnHeaderSectionResize:TSectionNotifyEvent read FOnHeaderResize write FOnHeaderResize;
+    property OnHeaderSectionTrack:TSectionTrackEvent read GetSectionTrackEvent write SetSectionTrackEvent;
+
+    property OnSelect:TNotifyEvent read GetOnSelect write SetOnSelect;
+
+    // V4 enhancements
+    property Anchors;
+    property Constraints;
+    property DragKind;
+    property BiDiMode;
+    property ParentBiDiMode;
+    property OnEndDock;
+    property OnStartDock;
+
+    // Sorting
+    property OnSSCompareItem : TLMDLBCompareItemEvent read FOnCompare write FOnCompare;
+
+    // V6 Enhancements
+    {$IFDEF LMDCOMP6}
+    property OnData: TLBGetDataEvent read GetOnData write SetOnData;
+    property OnDataFind: TLBFindDataEvent read GetOnDataFind write SetOnDataFind;
+    {$ENDIF}
+  end;
+
+implementation

@@ -1,0 +1,158 @@
+
+uses
+  Windows,
+  Forms, //TScrollBox
+  Graphics,
+  Controls,
+  Messages,
+  Classes,
+  intfLMDBackground,
+  LMDXPStyles,
+  LMDBase,
+  LMDBevel,
+  LMDGraph;
+
+type
+
+  TLMDScrollBoxBevel=class(TLMDBevel)
+  public
+    constructor Create;override;
+  published
+    property Mode default bmWindows;
+  end;
+
+  {--------------------- TLMDScrollBox ----------------------------------------}
+  TLMDCustomScrollBox=class(TScrollBox, ILMDBackground)
+  private
+    FAbout         : TLMDAboutVar;
+    FBevel         : TLMDScrollBoxBevel;
+    FCanvas        : TCanvas;
+    FXP,
+    FOptScrollCodes,
+    FTransparent,
+    FInstantUpdate,
+    FFullRepaint: Boolean;
+    FDelta,
+    FInternal      : Byte;
+    FOnPaint       : TNotifyEvent;
+
+    // added by Hugo
+    FOnScroll      : TNotifyEvent; // Not used anymore. Was an event that only
+                                  // occurred if a REAL scroll occurred. But I do not use
+                                  // it anymore. Maybe you should implement it with the
+                                  // parameters vertical or horizontal scroll, and the amount
+                                  // of pixel shifted. An event is more easily altered than
+                                  // overriding the class
+    FSaveResources : Boolean;
+    FFirstTimePaint : Boolean; // don't do it everytime a paint-event occurs, but make sure
+                                // it happens at least one time after loading. It would even
+                                // be better to do it WHILE loading, because now the resources
+                                // skyrocket and then drop to almost nothing.
+    // up to here
+
+    procedure SetBevel(aValue: TLMDScrollBoxBevel);
+    procedure SetDelta(aValue:Byte);
+    procedure SetTransparent(aValue:Boolean);
+    procedure SetCtlXP (aValue: Boolean);
+    function GetBorderStyle:TBorderStyle;
+    //function VertScrollBarVisible: Boolean;
+    //function HorzScrollBarVisible: Boolean;
+    function ScrollBarsVisible: Boolean;
+    procedure CMColorChanged(var Message: TMessage); message CM_COLORCHANGED;
+    procedure CMParentColorChanged(var Message: TMessage); message CM_PARENTCOLORCHANGED;
+    procedure CMDesignHitTest(var Message: TCMDesignHitTest); message CM_DESIGNHITTEST;
+    // 6.1
+    procedure WMThemeChanged(var Msg:TMessage); message WM_THEMECHANGED;
+    // RM
+    procedure CMCtl3DChanged(var Message: TMessage); message CM_CTL3DCHANGED;
+    procedure WMNCCalcSize(var Message: TWMNCCALCSIZE); message WM_NCCALCSIZE;
+    procedure WMNCHitTest(var Message: TWMNCHitTest); message WM_NCHITTEST;
+    procedure WMEraseBkGnd(var Message : TWMEraseBkGnd);message WM_ERASEBKGND;
+    procedure WMNCPaint(var Msg: TWMNCPaint); message WM_NCPAINT;
+    procedure WMMove(var Message: TWMMove); message WM_MOVE;
+    procedure WMPaint(var Message: TWMPaint); message WM_PAINT;
+    procedure WMSIZE(var Message: TWMSIZE); message WM_SIZE;
+    procedure WMHScroll(var Message: TWMHScroll); message WM_HSCROLL;
+    procedure WMVScroll(var Message: TWMVScroll); message WM_VSCROLL;
+
+    // added by Hugo
+    procedure DestroyHandleForInvisibleControls; // Here it all happens
+    procedure SetSaveResources(const Value: boolean); // just to set var and call DestroyHa...
+    // up to here
+
+  protected
+    function BeveledRect:TRect;
+    function  CheckOptimized:Boolean;
+    procedure CreateParams(var Params: TCreateParams); override;
+    procedure CreateWnd;override;
+    procedure GetChange(Sender:TObject);virtual;
+    procedure Paint;
+
+    procedure GetXPBevelParams (var aClassName: WideString; var aPartId, aStateId : Integer); dynamic;
+    function BevelXP(aCanvas: TCanvas; aRect: TRect): TRect;
+
+    procedure PaintBevel;
+    procedure PaintWindow(DC: HDC); override;
+
+    // XP-Support
+    //***********
+    //handle theme changes
+    procedure DoThemeChanged; virtual;
+    // specifies whether XP Style covers full client area
+    function  IsXPPartiallyTransparent:Boolean;virtual;
+    //UseXP will return true,
+    //if the system supports xp, xp theme support is switched on, the components
+    //local variable supportXp is active or global (and global settings are active)
+    //and if ControlSupportsXp returns true ...
+    function UseXP: Boolean;
+    //this method must be overwritten by controls supporting a special WinXP
+    //look for being able to use the Bevel bmWindows mode correctly under all
+    //circumstances
+    function ControlSupportsXP: Boolean; virtual;
+    // returns whether XP transparency is supported
+    function XPSupportsTransparency: Boolean; virtual;
+
+    // Changed 6.1
+    property CtlXP:Boolean read FXP write SetCtlXP default true;
+    //***********
+  public
+    constructor Create(AOwner : TComponent);override;
+    destructor Destroy; override;
+
+    // 7.0
+    function BackBitmapCheck:Boolean;virtual;
+    function BackBitmap:TBitmap;virtual;
+    function BackMapPoint(const aValue:TPoint):TPoint;virtual;
+    function BackDrawArea(Canvas:TCanvas; const dest:TRect; const src:TPoint; flags:Word=0):Boolean;virtual;
+    function isTransparentSet: Boolean;
+    function BackBitmapPalette: HPalette;
+    procedure BackUpdate;
+    function BackControl (index: Integer): TControl;
+    function BackControlCount: Integer;
+    // --
+    property Canvas: TCanvas read FCanvas;
+
+    property Bevel: TLMDScrollBoxBevel read FBevel write SetBevel;
+    property InstantUpdate:Boolean read FInstantUpdate write FInstantUpdate default True;
+    property Transparent:Boolean read FTransparent write SetTransparent default false;
+    property UpdateDelta:Byte read FDelta write SetDelta default 1;
+    property OnPaint:TNotifyEvent read FOnPaint write FOnPaint;
+    //property MouseWheelSupport:Boolean read FMouseWheel write FMouseWheel default false;
+
+    property OptScrollCodes : Boolean read FOptScrollCodes write FOptScrollCodes default true;
+  published
+    property About:TLMDAboutVar read FAbout write FAbout;
+    property BorderStyle:TBorderStyle read GetBorderStyle;
+    property Ctl3D default true;
+    property ParentCtl3D default false;
+
+    property FullRepaint:Boolean read FFullRepaint write FFullRepaint default false;
+
+    // added by Hugo
+    property OnScroll : TNotifyEvent read FOnScroll write FOnScroll;
+    property SaveResources : boolean read FSaveResources write SetSaveResources default false;
+    // up to here
+  end;
+
+
+implementation

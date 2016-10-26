@@ -1,0 +1,54 @@
+
+uses
+  Classes,
+  LMDCustomListBox;
+
+type
+  TLMDExtListBox = class (TLMDCustomListBox)
+  {$IFDEF LMDCOMP6}
+  public
+    property Count;
+  {$ENDIF}
+  published
+    {$IFDEF LMDCOMP6}
+    property AutoComplete;
+    property VirtualMode;
+    {$ENDIF}
+    property Columns;
+    property Items;
+    property ItemAutoHeight;
+    property EditOptions;
+    property LargeTextOptions;
+    property VerticalScrollBar;
+    property Margin;
+    property MultiLine;
+
+    property HorzGridColor;
+    property HorzGridStyle;
+    property HorzGridLine;
+
+    // Event for internal edit control
+    property OnEditShow;
+    property OnEditMeasure;
+    property OnEditChange;
+    property OnEditHide;
+
+    {$IFDEF LMDCOMP6}
+    property OnData;
+    property OnDataObject;
+    property OnDataFind;
+    {$ENDIF}
+  end;
+
+
+  TLMDLabeledExtListBox = class(TLMDExtListBox)
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property LabelPosition;
+    property LabelSpacing;
+    property LabelSync;
+    property EditLabel;
+  end;
+
+implementation

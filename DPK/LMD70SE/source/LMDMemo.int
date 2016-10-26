@@ -1,0 +1,108 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  LMDBaseEdit, LMDCustomMemo;
+
+type
+  TLMDMemo = class(TLMDCustomMemo)
+  protected
+  public
+    // readonly
+    property Column;
+    property Row;
+  published
+    property About;
+    property Align;
+    property Alignment;
+    property AskForLoop;
+    property Bevel;
+//    property BevelOnMouseAbove;
+    property Caret;
+    property Color;
+    property Cursor;
+    property DragCursor;
+    property DragMode;
+    property Enabled;
+    property Flat;
+    property FocusOnMouseAbove;
+    property Font;
+    property Font3D;
+    property Height;
+    property HelpContext;
+    property HideSelection;
+    property HighlightBack;
+    property HighlightText;
+    property Hint;
+    property ImageIndex;
+    property ImageList;
+    property ImeMode;
+    property ImeName;
+    property Left;
+    property Lined;
+    property Lines;
+    property LineStyle;
+    property ListIndex;
+    property Margin;
+    property Name;
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ReadOnly;
+    property ScrollBars;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+//    property Tabs;
+    property TabChars;
+    property Tag;
+    property Text;
+    property Top;
+    property Transparent;
+    property Visible;
+    property WantReturns;
+    property WantTabs;
+    property Width;
+    property WordWrap;
+    property HorizScrollBar;
+    property VertScrollBar;
+
+    property OnAfterEnter;
+    property OnAfterExit;
+    property OnChange;
+    property OnClick;
+    property OnCurrentRowChanged;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnMarginRowPaint;
+    property OnModified;
+    property OnMouseDown;
+    property OnMouseEnter;
+    property OnMouseExit;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnMouseWheel;
+    property OnRowCountChanged;
+    property OnStartDrag;
+    property OnTextChangedAt;
+    property OnCursorPosChanged;
+  end;
+
+  TLMDLabeledMemo = class(TLMDMemo)
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property LabelPosition;
+    property LabelSpacing;
+    property LabelSync;
+    property EditLabel;
+  end;
+
+implementation

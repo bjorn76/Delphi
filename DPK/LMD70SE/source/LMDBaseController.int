@@ -1,0 +1,38 @@
+uses
+  Classes,
+  Controls,
+  LMDCustomComponent;
+
+type
+
+  TLMDBaseController=class;
+
+  {************************ TLMDChangeLink  ***********************************}
+  TLMDChangeLink = class
+  private
+    FSender:TLMDBaseController;
+    FOnChange:TNotifyEvent;
+  public
+    destructor Destroy; override;
+    procedure Change; dynamic;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    property Sender: TLMDBaseController read FSender write FSender;
+  end;
+
+  {************************ TLMDBaseController ********************************}
+  TLMDBaseController = class(TLMDCustomComponent)
+  private
+    FClients:TList;
+  protected
+    procedure Change;override;
+  public
+    constructor Create(aOwner:TComponent);override;
+    destructor Destroy;override;
+    procedure RegisterChanges(aValue: TLMDChangeLink);
+    procedure UnRegisterChanges(aValue: TLMDChangeLink);
+  published
+    property About;
+    property OnChange;
+  end;
+
+implementation

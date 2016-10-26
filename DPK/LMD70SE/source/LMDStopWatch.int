@@ -1,0 +1,44 @@
+
+uses
+  Windows,
+  Classes,
+  Controls,
+  LMDCustomComponent;
+
+type
+  TLMDStopWatch=class(TLMDCustomComponent)
+  private
+    FCaption: TCaption;
+    FDigits : Byte;
+    FStart,
+    FStop   : _LARGE_INTEGER;
+    FStartTime,
+    FStopTime: LongInt;
+    FRunning,
+    FWaitCursor: Boolean;
+    FControl: TControl;
+    FResult : Extended;
+    FSuffix : String;
+    function GetTimeString:String;
+    function GetDisplayCaption:String;
+    function GetActive: Boolean;
+    procedure SetActive (aValue: Boolean);
+  public
+    constructor Create(AOwner:TComponent); override;
+    procedure Start;
+    function Stop:Extended;
+    property Time:Extended read FResult;
+    property TimeString: String read GetTimeString;
+    property DisplayCaption: String read GetDisplayCaption;
+    property Active: Boolean read GetActive write SetActive;
+  published
+    property About;
+    property Control: TControl read FControl write FControl;
+    property Digits:Byte read FDigits write FDigits;
+    property Caption:TCaption read FCaption write FCaption;
+    property Suffix:String read FSuffix write FSuffix;
+    property WaitCursor: Boolean read FWaitCursor write FWaitCursor default false;
+  end;
+
+
+implementation

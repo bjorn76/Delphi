@@ -1,0 +1,23 @@
+
+uses
+  LMDCustomSimpleLabel;
+
+type
+  TLMDSimpleLabel=class(TLMDCustomSimpleLabel)
+  published
+    property About;
+    property Action;
+    property Align;
+    property FontSmoothing;
+    property Caption;
+    property Font;
+    property Font3D;
+    property Jump;
+    property ActiveColor;
+    property InActiveColor;
+    property JumpUnderline;
+    property JumpMode;
+    property Options;
+  end;
+
+implementation

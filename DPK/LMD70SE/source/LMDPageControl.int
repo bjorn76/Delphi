@@ -1,0 +1,23 @@
+
+uses
+  classes, ComCtrls, messages, Menus, LMDXPstyles, LMDBase;
+
+type
+  TLMDPageControl=class(TPageControl)
+  private
+    FAbout    : TLMDAboutVar;
+  published
+    property About:TLMDAboutVar read FAbout write FAbout;
+  end;
+
+  TLMDTabSheet = class(TTabSheet)
+  private
+    FAbout    : TLMDAboutVar;
+    procedure WMERASEBKGND(var Message: TWMERASEBKGND); message WM_ERASEBKGND;
+    procedure WMThemeChanged(var Msg:TMessage); message WM_THEMECHANGED;
+  public
+  published
+    property About:TLMDAboutVar read FAbout write FAbout;
+  end;
+
+implementation

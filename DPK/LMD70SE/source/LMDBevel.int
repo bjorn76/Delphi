@@ -1,0 +1,76 @@
+
+uses
+  Windows,
+  Graphics,
+  Classes,
+  lmdgraph,
+  LMDObject;
+
+type
+  TLMDBevel = class(TLMDObject)
+  private
+    FBevelStyleInner,
+    FBevelStyleOuter  : TLMDBevelStyle;
+    FBevelWidthInner,
+    FBevelWidthOuter  : TLMDBevelWidth;
+    FBorderColor      : TColor;
+    FBorderSpace,
+    FBorderWidth      : TLMDBorderWidth;
+    FBorderSides      : TLMDFrameSides;
+    FEdgeStyle        : TLMDEdgeStyle;
+    FExt,
+    FExtr             : Integer;
+    FLightColor       : TColor;
+    FMode             : TLMDBevelMode;
+    FShadowColor      : TColor;
+    FStyle            : TLMDBorderStyle;
+    FSupport          : Boolean;
+    //FRecreateWnd      : Boolean;
+    procedure SetBevelStyleInner(aValue: TLMDBevelStyle);
+    procedure SetBevelStyleOuter(aValue: TLMDBevelStyle);
+    procedure SetBevelWidthInner(aValue: TLMDBevelWidth);
+    procedure SetBevelWidthOuter(aValue: TLMDBevelWidth);
+    procedure SetColor(Index:Integer; aValue: TColor);
+    procedure SetBorderWidth(aValue: TLMDBorderWidth);
+    procedure SetBorderSides(aValue: TLMDFrameSides);
+    procedure SetBorderSpace(aValue: TLMDBorderWidth);
+    procedure SetEdgeStyle(aValue:TLMDEdgeStyle);
+    procedure SetMode(aValue:TLMDBevelMode);
+    procedure SetStyle(aValue:TLMDBorderStyle);
+    function  GetBevelExtend:Integer;
+    //function GetRecreateWnd:Boolean;
+  protected
+    procedure Change;override;
+  public
+    constructor Create;override;
+    procedure Assign(Source:TPersistent);override;
+    function GetSetStr : String; override;
+    function ClientRect(ControlRect:TRect):TRect;
+    function PaintBevel(aCanvas:TCanvas;aRect:TRect;Transparent:Boolean):TRect;
+    property BevelExtend:Integer read FExt;
+    property BevelExtendRight:Integer read FExtR;
+    //4.0
+    //property RecreateWnd:Boolean read GetRecreateWnd;
+    property SupportWindowsMode:Boolean read FSupport write FSupport;
+  published
+    property StyleInner:TLMDBevelStyle read FBevelStyleInner write SetBevelStyleInner default bvNone;
+    property StyleOuter:TLMDBevelStyle read FBevelStyleOuter write SetBevelStyleOuter default bvNone;
+    property WidthInner:TLMDBevelWidth read FBevelWidthInner write SetBevelWidthInner default 1;
+    property WidthOuter:TLMDBevelWidth read FBevelWidthOuter write SetBevelWidthOuter default 1;
+    property BorderColor:TColor index 0 read FBorderColor write SetColor default clBtnFace;
+    property BorderSides:TLMDFrameSides read FBorderSides write SetBorderSides default
+                                             [fsBottom, fsLeft, fsRight, fsTop];
+    property BorderWidth:TLMDBorderWidth read FBorderWidth write SetBorderWidth default 0;
+    property BorderInnerWidth:TLMDBorderWidth read FBorderSpace write SetBorderSpace default 0;
+    property EdgeStyle:TLMDEdgeStyle read FEdgeStyle write SetEdgeStyle default etEtched;
+    property LightColor:TColor index 1 read FLightColor write SetColor default clBtnHighlight;
+    // if a default value is set this value will not be stored in controls which need
+    // a different default (e.g. edit control have as default bmWindows, is s.o.
+    // changes this to bmCustom and this is the bevel's default this will not
+    // be stored!!!!!!)
+    property Mode:TLMDBevelMode read FMode write SetMode; {3.5: default bmCustom;, removed JH, 13.03.2001}
+    property ShadowColor:TColor index 2 read FShadowColor write SetColor default clBtnShadow;
+    property StandardStyle:TLMDBorderStyle read FStyle write SetStyle default lsSingleLowered;
+  end;
+
+implementation

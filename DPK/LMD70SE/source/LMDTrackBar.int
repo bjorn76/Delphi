@@ -1,0 +1,11 @@
+
+uses
+  LMDCustomTrackBar;
+
+type
+  TLMDTrackBar = class (TLMDCustomTrackBar)
+  published
+    property Position;
+  end;
+
+implementation

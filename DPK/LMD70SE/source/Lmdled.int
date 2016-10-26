@@ -1,0 +1,96 @@
+
+uses
+  Windows, SysUtils, Messages, Classes, Graphics, Controls, menus,
+  LMDObject, lmdgraph;
+
+type
+  {. - .
+   |\ /|
+   . - .
+   |/ \|
+   . - .}
+  TLMDLEDLights=(llTop, llTopLeft, llTopRight,
+                 llMiddle, llBottomLeft, llBottomRight,
+                 llBottom, llInTopMiddle, llInBottomMiddle,
+                 llInTopLeft, llInTopRight, llInBottomLeft, llInBottomRight,
+                 llPointMiddle, llPointTop, llPointBottom);
+
+  TLMDLEDSET=set of TLMDLEDLights;
+
+  TLMDLEDStyle=(lsString, lsInteger);
+  TLMDLEDPoints=array[0..5] of TPoint;
+  TLMDLEDCalc=array[TLMDLEDLights] of TLMDLEDPoints;
+
+  {---------------------- Object TLMDLED --------------------------------------}
+  TLMDLED = class(TLMDObject)
+  private
+    FBack, FInactive, FActive:TColor;
+    FHorz, FThick, FVert:Byte;
+    FIsFlashing, FFlag, FEnhEnabled:Boolean;
+    FRows, FCols:Byte;
+
+    FLEDs:TLMDLEDCalc;
+    FBitmap:TBitmap;
+
+    {compatibility}
+    FCaption:string;
+    {$IFDEF LMDTOOLS10}
+    FDigits:Byte;
+    FStyle:TLMDLEDStyle;
+    FTransparent:Boolean;
+    FValue:Longint;
+    {$ENDIF}
+
+    {Sets}
+    procedure SetByte(Index:Integer; aValue:Byte);
+    procedure SetColor(Index:Integer; aColor:TColor);
+    procedure SetEnabled(aValue:Boolean);
+
+    procedure CreateBmp;
+    {$IFDEF LMDTOOLS10}
+    procedure ReadIdent(Reader:TReader);
+    procedure ReadBoolean(Reader:TReader);
+    procedure ReadString(Reader:TReader);
+    procedure ReadDigits(Reader:TReader);
+    procedure ReadInteger(Reader:TReader);
+    {$ENDIF}
+  protected
+    {$IFDEF LMDTOOLS10}procedure DefineProperties(Filer:TFiler);override;{$ENDIF}
+    function GetHeight:Integer;
+    function GetWidth:Integer;
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+
+    procedure Assign(Source:TPersistent);override;
+    function CalcBoundsRect(const sText:String; Ext:Integer):TRect;
+    procedure PaintLED(ACanvas :TCanvas; ARect:TRect; sText:String; Enabled, flag:Boolean);
+
+    procedure BeginFlash; virtual;
+    procedure EndFlash; virtual;
+
+    property Rows:Byte read FRows;
+    property Columns:Byte read FCols;
+
+    {for compatibility}
+    property Caption:string read FCaption;
+    property BackColor:TColor index 2 read FBack write SetColor;
+
+    property LEDHeight:Integer read GetHeight;
+    property LEDWidth:Integer read GetWidth;
+    {$IFDEF LMDTOOLS10}
+    property Digits:Byte read FDigits;
+    property Style:TLMDLEDStyle read FStyle;
+    property Transparent:Boolean read FTransparent;
+    property Value:Longint read FValue;
+    {$ENDIF}
+  published
+    property ActiveColor:TColor index 0 read FActive write SetColor default clLime;
+    property DisabledDigits:Boolean read FEnhEnabled write SetEnabled default True;
+    property Horzsize:Byte index 1 read FHorz write SetByte default 7;
+    property InActiveColor:TColor index 1 read FInActive write SetColor default clGreen;
+    property Thickness:Byte index 2 read FThick write SetByte default 2;
+    property Vertsize:Byte index 3 read FVert write SetByte default 9;
+  end;
+
+implementation

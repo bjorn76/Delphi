@@ -1,0 +1,28 @@
+
+uses
+  Classes,
+  Controls,
+  Windows,
+  Graphics,
+  LMDCustomListComboBox;
+
+type
+  TLMDListComboBox = class (TLMDCustomListComboBox)
+  published
+    property Items;
+    property Style;
+    property DropDownWidth;
+    property DropDownCount;
+  end;
+
+  TLMDLabeledListComboBox = class(TLMDListComboBox)
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property LabelPosition;
+    property LabelSpacing;
+    property LabelSync;
+    property EditLabel;
+  end;
+
+implementation

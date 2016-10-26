@@ -1,0 +1,51 @@
+
+uses
+  Windows,
+  SysUtils,
+  Classes,
+  LMDWave,
+  LMDCustomContainer;
+
+type
+
+  {waves}
+  {------------------------ Class TLMDWaveListItem ----------------------------}
+  TLMDWaveListItem = class(TLMDListItem)
+  private
+    FWave:TLMDWave;
+    procedure SetWave(aValue:TLMDWave);
+  protected
+    procedure DefineProperties(Filer: TFiler);override;
+    function  GetEmpty:Boolean;override;
+    procedure ReadData(Stream:TStream);override;
+    procedure WriteData(Stream:TStream);override;
+    function  WriteFlag:Byte; override;
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+    procedure Assign(Source: TPersistent); override;
+    procedure FreeData; override;
+    property Compressed;
+  published
+    property Wave:TLMDWave read FWave write SetWave stored false;
+    property Description;
+    property Ident;
+  end;
+
+  {------------------------ Class TLMDWaveList --------------------------------}
+  TLMDWaveList=class(TLMDCustomContainer)
+  private
+    function GetArrayItem(index:Integer):TLMDWaveListItem;
+    function GetArrayNameItem(Index:String):TLMDWaveListItem;
+  protected
+  public
+    constructor Create(AOwner:TComponent);override;
+    property Items[Index:Integer]:TLMDWaveListItem read GetArrayItem;default;
+    property ItemByName[Index:String]:TLMDWaveListItem read GetArrayNameItem;
+  published
+    property DefaultCompressed;
+  end;
+
+function LMDWVLGetItem(const FileName:String; index:Integer; aWave:TLMDWave):Boolean;
+
+implementation

@@ -1,0 +1,166 @@
+
+uses
+  Windows,
+  Messages,
+  Classes,
+  Controls,
+  Graphics,
+  LMDCont,
+  LMDBaseController,
+  LMDGraph,
+  LMD3DCaption,
+  LMDButtonControl,
+  LMDGlyphTextLayout,
+  LMDCustomGroupBox,
+  LMDCustomImageList;
+
+type
+  TLMDChildHelpContextID = (ciDefault, ciSameAsParent, ciAutoNumbered);
+  TLMDChildBtnClick = procedure (Sender: TObject; ButtonIndex:Integer) of object;
+
+  TLMDCustomButtonGroup = class(TLMDCustomGroupBox)
+  private
+    FBtnAlignment      : TLMDGlyphTextLayout;
+    FItemHeight,
+    FitemOffset        : Integer;
+    FColumns           : Integer;
+    FFlatGlyphs,
+    FGlyphFlat,
+    FUseBitmap,
+    FUseFocusColor,
+    FReadOnly          : Boolean;
+    FFont3D            : TLMD3DCaption;
+    FFocusStyle        : TLMDGlyphTextFocusStyle;
+    FFocusColor        : TColor;
+    FOnChange          : TLMDChildBtnClick;
+
+    {second imagelist support}
+    FGlyphImageList    : TLMDCustomImageList;
+    FGlyphListIndex    : Integer;
+    FGlyphChangeLink   : TLMDChangeLink;
+
+    // 6.1
+    FIgnoreItemCount:Boolean;
+    // --
+    procedure SetGlyphImageList(aValue:TLMDCustomImageList);
+    procedure SetGlyphIndex(index, aValue:Integer);
+    {saving}
+    procedure ReadGIdent(Reader:TReader);
+    procedure WriteGIdent(Writer:TWriter);
+    function  CheckGCont:Boolean;
+    function HasGControl:Boolean;
+    {----  }
+    procedure ButtonClick(Sender: TObject);
+    procedure ItemsChange(Sender: TObject);
+    procedure SetColumns(aValue: Integer);
+    procedure SetItems(aValue: TStringList);
+    procedure SetItemHeight(aValue:Integer);
+    procedure SetItemOffset(aValue:Integer);
+    procedure SetID(aValue:TLMDChildHelpContextID);
+    procedure SetFocusColor(aValue:TColor);
+    procedure SetUseFocusColor(aValue:Boolean);
+    procedure SetGlyphFlat(aValue:Boolean);
+    procedure SetIgnore(const aValue:Boolean);
+    procedure SetGlyphSize(aValue:Byte);
+    procedure SetFlatGlyphs (aValue : Boolean);
+    procedure SetBtnAlignment (aValue : TLMDGlyphTextLayout);
+
+    procedure SetTransparent(aValue:Boolean);
+    procedure SetFocusStyle(aValue:TLMDGlyphTextFocusStyle);
+    procedure SetFont3D (aValue : TLMD3DCaption);
+    procedure SetTransparentColor(aValue:TColor);
+
+    procedure CMEnabledChanged(var Message: TMessage); message CM_ENABLEDCHANGED;
+    procedure CMFontChanged(var Message: TMessage); message CM_FONTCHANGED;
+    procedure WMSize(var Message: TWMSize); message WM_SIZE;
+  protected
+    FUpdating,
+    FGlyphTransparent,
+    FReading           : Boolean;
+    FResult            : LongInt;
+    FButtons           : TList;
+    FGlyphIndex        : Integer;
+    FItems             : TStringList;
+    FGlyphSize         : Byte;
+    FTransparentColor  : TColor;
+    FID                : TLMDChildHelpContextID;
+
+    // 6.1
+    procedure DoThemeChanged;override;
+    // ---
+
+    procedure ArrangeButtons;
+    function CanAutoSize(var NewWidth, NewHeight: Integer): Boolean; override;
+    procedure DefineProperties(Filer:TFiler);override;
+    procedure ReadState(Reader: TReader); override;
+    procedure GetChildren(Proc: TGetChildProc; Root: TComponent);override;
+    procedure GetChange(Sender:TObject);override;
+    procedure Loaded;override;
+    procedure SetButtonCount(aValue: Integer); virtual; abstract;
+    procedure UpdateButtons; virtual; abstract;
+    function GetFieldValue:LongInt; virtual;
+
+    {second imagelist support}
+    function IMLGlyphEmpty:Boolean;
+    procedure GetIMLGlyphChange(Sender:TObject);
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override ;
+
+    {end}
+    property Columns: Integer read FColumns write SetColumns default 1;
+
+    {additional settings for internal buttons}
+    property FocusStyle:TLMDGlyphTextFocusStyle read FFocusStyle write SetFocusStyle default fcText;
+    property GlyphTransparent:Boolean read FGlyphTransparent write SetTransparent default false;
+    property GlyphTransparentColor:TColor read FTransparentColor write SetTransparentColor default clOlive;
+    property GlyphSize:Byte read FGlyphSize write SetGlyphSize;
+    property GlyphFlat:Boolean read FGlyphFlat write SetGlyphFlat default false;
+
+    property UseBitmap:Boolean read FUseBitmap write FUseBitmap default false;
+    {-----}
+    property ItemHeight: Integer read FItemHeight write SetItemHeight default -1;
+    property ItemOffset: Integer read FItemOffset write SetItemOffset default 4;
+
+    property IgnoreValue:Boolean read FIgnoreItemCount write SetIgnore default false;
+    
+    property FlatGlyphs : Boolean read FFlatGlyphs write SetFlatGlyphs default false;
+    //allow formatting of buttoncontrol glyph and text within a group
+    property BtnAlignment : TLMDGlyphTextLayout read FBtnAlignment write SetBtnAlignment;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+
+    // 6.1
+    //procedure BeginUpdate;  // allows changes without generating OnChange events
+    procedure EndUpdate(aValue:Boolean=false);override;
+    // ---
+
+    function CanModify: Boolean; virtual;
+    property Buttons:TList read FButtons;
+    //internal functions
+    procedure RegisterButton (btn : TLMDButtonControl);
+    procedure UnRegisterButton (btn : TLMDButtonControl);
+
+    property Bevel;
+    property Items: TStringList read FItems write SetItems;
+    property GlyphImageList:TLMDCustomImageList read FGlyphImageList write SetGlyphImageList stored HasGControl;
+    property GlyphImageIndex:Integer index 0 read FGlyphIndex write SetGlyphIndex default 0;
+    property GlyphListIndex:Integer index 1 read FGlyphListIndex write SetGlyphIndex default 0;
+    property Font;
+    property Font3D:TLMD3DCaption read FFont3D write SetFont3D;
+    property Caption;
+    property CaptionFont;
+    property CaptionFont3D;
+    property HelpContextBtn:TLMDChildHelpContextID read FID write SetID default ciDefault;
+    property Transparent;
+    property ImageList;
+    property ImageIndex;
+    property ListIndex;
+
+    property ReadOnly:Boolean read FReadOnly write FReadOnly default false;
+    property UseFocusColor:Boolean read FUseFocusColor write SetUseFocusColor default false;
+    property FocusColor:TColor read FFocusColor write SetFocusColor default clGray;
+    property OnChange:TLMDChildBtnClick read FOnChange write FOnChange;
+  end;
+
+
+implementation

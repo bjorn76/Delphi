@@ -1,0 +1,63 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  LMDObject;
+
+const
+  buffer_type = '@LMDBufferStream-V0.1@';
+
+type
+  TLMDDestroyItemEvent = procedure (Sender : TObject; item : Pointer) of object;
+  TLMDGetItemSizeEvent = procedure (Sender : TObject; item : Pointer; var size : Integer) of object;
+
+  PLMDDynNode = ^TLMDDynNode;
+  TLMDDynNode = record
+    item : Pointer;
+    next : PLMDDynNode;
+  end;
+
+  TLMDBuffer = class(TLMDObject)
+  protected
+    FUpdateCount,
+    FMaxEntries,
+    FCount         : Integer;
+    FOnDestroyItem : TLMDDestroyItemEvent;
+    FOnGetItemSize : TLMDGetItemSizeEvent;
+
+//    procedure First; virtual; abstract;
+//    procedure Next; virtual; abstract;
+
+    procedure FirstNode (var node : Pointer); virtual; abstract;
+    procedure NextNode (var node : Pointer); virtual; abstract;
+
+    function GetItem(node : Pointer) : Pointer; virtual; abstract;
+    function GetItemSize(node : Pointer) : Integer;
+    function EOFBuffer(node : Pointer):Boolean; virtual; abstract;
+
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+
+    function isEmpty : Boolean; virtual; abstract;
+    function isFull : Boolean; virtual; abstract;
+    procedure Put (item : Pointer); virtual; abstract;
+    function Get : Pointer; virtual; abstract;
+    procedure Clear; virtual; abstract;
+
+    procedure BeginUpdate;
+    procedure EndUpdate;
+    function Updating : Boolean;
+
+    procedure LoadFromStream (Stream : TStream); virtual;
+    procedure SaveToStream (Stream : TStream); virtual;
+    procedure LoadFromFile (Filename : String);
+    procedure SaveToFile (Filename : String);
+
+    property Count : Integer read FCount;
+    property MaxEntries : Integer read FMaxEntries write FMaxEntries default -1;
+
+    property OnDestroyItem : TLMDDestroyItemEvent read FOnDestroyItem write FOnDestroyItem;
+    property OnGetItemSize : TLMDGetItemSizeEvent read FOnGetItemSize write FOnGetItemSize;
+  end;
+
+implementation

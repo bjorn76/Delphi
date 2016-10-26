@@ -1,0 +1,31 @@
+
+uses
+  Classes,
+  LMDWave,
+  LMDCustomComponent;
+
+type
+  {------------------------ Class TLMDWaveComp --------------------------------}
+  TLMDWaveComp = class(TLMDCustomComponent)
+  private
+    FWave : TLMDWave;
+    procedure SetWave(aValue:TLMDWave);
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+    procedure LoadFromFile(const Filename: string);virtual;
+    procedure SaveToFile(const FileName: String);virtual;
+    function  Play:Boolean;
+    {$IFDEF CPPBUILDER}
+    function  PlaySoundExt(aValue:TLMDSndPlayMode):Boolean;
+    {$ELSE}
+    function  PlaySound(aValue:TLMDSndPlayMode):Boolean;
+    {$ENDIF}
+    procedure Stop;
+  published
+    property About;
+    property Wave:TLMDWave read FWave write SetWave;
+  end;
+
+
+implementation

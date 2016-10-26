@@ -1,0 +1,156 @@
+
+uses
+  Forms,
+  Classes,
+  Graphics,
+  SysUtils,
+  actnlist,
+  LMDProcs,
+  LMDClass,
+  LMDIniCtrl,
+  LMDCustomComponent;
+
+type
+  {this component controls almost all properties of the LMDApplication
+   variable}
+
+  TLMDSystemOption = (soSetHintFont, soSetIconFont, soSetMenuFont);
+  TLMDSystemOptions=set of TLMDSystemOption;
+
+  {------------------------ class TLMDApplicationCtrl -------------------------}
+  TLMDApplicationCtrl = class(TLMDCustomComponent)
+  private
+    FCompany,
+    FVersion:String;
+
+    FCheckBitmap:TBitmap;
+
+    FOptions:TLMDApplicationOptions;
+
+    {LogFileFeature}
+    FLogName:String;
+    FLogPrefix:TLMDPathPrefix;
+    FLogMaxSize:LongInt;
+    FLogAction:TLMDLogAction;
+    FMaxLogSize:TLMDMaxLogSizeEvent;
+    FOnHeaderWrite : TLMDOnHeaderWrite;
+    FEffectDelay:Byte;
+
+    {global inifile}
+    FIniFile,
+    FRegPath:String;
+    FIniPrefix:TLMDPathPrefix;
+    FRootKey:TLMDRegRootKey;
+    FHTarget:TLMDIniTarget;
+
+    FOnException:TLMDExceptionEvent;
+
+    FTitle:String;
+    FHelpFile:TFileName;
+    FHintColor:TColor;
+    FHintPause:Integer;
+    FHintHidePause:Integer;
+    FHintShortPause:Integer;
+
+    FShowHint,
+    FUpdateMetricSettings,
+    FUpdateFormatSettings:Boolean;
+
+    FPicture:TPicture;
+    FOnActionExecute,
+    FOnActionUpdate:TActionEvent;
+    FHintFont,
+    FIconFont,
+    FMenuFont:TFont;
+    FSystemOptions:TLMDSystemOptions;
+
+    {old TLMDApp}
+    FOnActiveFormChange,
+    FOnActiveControlChange,
+    FOnHint,
+    FOnActivate,
+    FOnDeactivate,
+    FOnRestore,
+    FOnEditModeChange,
+    FOnMinimize:TNotifyEvent;
+    FOnShowHint:TShowHintEvent;
+    FOnMessage:TMessageEvent;
+    FOnHelp:THelpEvent;
+    FOnIdle:TIdleEvent;
+    procedure SetCheckBitmap(aValue:TBitmap);
+    procedure SetIcon(aValue:TIcon);
+    procedure SetFont(index:Integer;aValue:TFont);
+    function  GetIcon:TIcon;
+    procedure SetLogName(const aValue:String);
+  protected
+    procedure Loaded;override;
+    procedure DoEditModeChange (Sender : TObject);
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+  published
+    property About;
+
+    // 6.1
+    property CheckBitmap:TBitmap read FCheckBitmap write SetCheckBitmap;
+    property Company:String read FCompany write FCompany;
+    property Options:TLMDApplicationOptions read FOptions write FOptions
+             default [aoMouseCtrlActive, aoLogAlwaysClear, aoLogHeader, aoLogNr];
+    property Version:String read FVersion write FVersion;
+
+    {LogFileFeature, 3.01}
+    property LogMaxAction:TLMDLogAction read FLogAction write FLogAction default laNone;
+    property LogMaxsize:LongInt read FLogMaxSize write FLogMaxSize default -1;
+    property LogPrefix:TLMDPathPrefix read FLogPrefix write FLogPrefix default ppProgram;
+    property LogName:String read FLogName write SetLogName;
+
+    {3.01}
+    property DlgEffectDelay:Byte read FEffectDelay write FEffectDelay default 3;
+
+    {global ini-Support}
+    property IniFile:String read FIniFile write FIniFile;
+    property IniPrefix:TLMDPathPrefix read FIniPrefix write FIniPrefix default ppWindows;
+    property RegPath:String read FRegPath write FRegPath;
+    property RegRoot:TLMDRegRootKey read FRootKey write FRootKey default rpCurrentUser;
+    property IniTarget:TLMDIniTarget read FHTarget write FHTarget default itAuto;
+
+    {Events}
+    property OnException:TLMDExceptionEvent read FOnException write FOnException;
+    property OnMaxLogSize:TLMDMaxLogSizeEvent read FMaxLogSize write FMaxLogSize;
+
+    {old TLMDApp}
+    {**************************************************************************}
+    property HintColor:TColor read FHintColor write FHintColor default clInfoBk;
+    property HintPause:Integer read FHintPause write FHintPause default 500;
+    property HintHidePause:Integer read FHintHidePause write FHintHidePause default 2500;
+    property HintShortPause:Integer read FHintShortPause write FHintShortPause default 50;
+    property Icon:TIcon read GetIcon write SetIcon;
+    Property HelpFile:TFilename read FHelpFile write FHelpFile;
+    property ShowHint:Boolean read FShowHint write FShowHint default true;
+    property Title:String read FTitle write FTitle;
+    property UpdateMetricSettings: Boolean read FUpdateMetricSettings write FUpdateMetricSettings default true;
+    property UpdateFormatSettings:Boolean read FUpdateFormatSettings write FUpdateFormatSettings default true;
+    property HintFont:TFont index 0 read FHintFont write SetFont;
+    property IconFont:TFont index 1 read FIconFont write SetFont;
+    property MenuFont:TFont index 2 read FMenuFont write SetFont;
+    property SystemOptions:TLMDSystemOptions read FSystemOptions write FSystemOptions default [];
+
+    property OnActivate:TNotifyEvent read FOnActivate write FOnActivate;
+    property OnDeactivate:TNotifyEvent read FOnDeactivate write FOnDeactivate;
+    property OnHelp:THelpEvent read FOnHelp write FOnHelp;
+    property OnIdle:TIdleEvent read FOnIdle write FOnIdle;
+    property OnMessage:TMessageEvent read FOnMessage write FOnMessage;
+    property OnMinimize: TNotifyEvent read FOnMinimize write FOnMinimize;
+    property OnHint: TNotifyEvent read FOnHint write FOnHint;
+    property OnRestore: TNotifyEvent read FOnRestore write FOnRestore;
+    property OnShowHint:TShowHintEvent read FOnShowHint write FOnShowHint;
+    property OnEditModeChange : TNotifyEvent read FOnEditModeChange write FOnEditModeChange;
+    property OnHeaderWrite : TLMDOnHeaderWrite read FOnHeaderWrite write FOnHeaderWrite;
+    property OnActiveFormChange:TNotifyEvent read FOnActiveFormChange write FOnActiveFormChange;
+    property OnActiveControlChange:TNotifyEvent read FOnActiveControlChange write FOnActiveControlChange;
+
+    property OnActionExecute: TActionEvent read FOnActionExecute write FOnActionExecute;
+    property OnActionUpdate: TActionEvent read FOnActionUpdate write FOnActionUpdate;
+  end;
+
+implementation

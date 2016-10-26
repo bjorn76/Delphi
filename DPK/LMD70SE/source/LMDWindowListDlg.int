@@ -1,0 +1,60 @@
+
+uses
+  Forms,
+  StdCtrls,
+  Classes,
+  LMDButton,
+  LMDBaseDialog,
+  LMDExtListBox;
+
+type
+  TLMDWLFormEvent = procedure(Sender:TObject; aForm:TForm; var Accept:Boolean) of object;
+
+  TLMDWLOption=(wlAddInVisible, wlAddDialogForms, wlAddMainForm,
+                wlAddParentForm, wlAddNoCaptionForms);
+  TLMDWLOptions=set of TLMDWLOption;
+
+  {---------------------- TLMDWindowListDlg -----------------------------------}
+  TLMDWindowListDlg = class(TLMDBaseDialog)
+   private
+     FDescription: String;
+     FForm       : TForm;
+     FOptions    : TLMDWLOptions;
+     FOnShow,
+     FOnList     : TLMDWLFormEvent;
+     ok          : TLMDButton;
+     lb          : TLMDExtListBox;
+     procedure lbClick(Sender: TObject);
+     procedure lbDblClick(Sender: TObject);
+     procedure okClick(Sender: TObject);
+   public
+     constructor Create(AOwner:TComponent);override;
+     function Execute:Boolean;override;
+     function ExecuteEnh(Main:TForm):Boolean;
+     property Form:TForm read FForm;
+   published
+     property About;
+     property CaptionFill;
+     property CaptionTitle;
+     property Colors;
+     property CustomButton;
+     property CtlXP;
+     Property Description:String read FDescription write FDescription;
+     property Effect;
+     property Hints;
+     property ImageList;
+     property ImageIndex;
+     property ListIndex;
+     property Options:TLMDWLOptions read FOptions write FOptions default [wlAddInvisible];
+     property Position;
+     property RelatePos;
+     property ShowHints;
+
+     {Events}
+     property OnShow:TLMDWLFormEvent read FOnShow write FOnShow;
+     property OnList:TLMDWLFormEvent read FOnList write FOnList;
+     property OnCustomize;
+     property OnCustomClick;
+   end;
+
+implementation

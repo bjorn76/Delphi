@@ -1,0 +1,29 @@
+
+uses
+  Classes,
+  LMDCustom3DButton;
+
+type
+  TLMD3DEffectButton=class(TLMDCustom3DButton)
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property ButtonFace;
+    property ButtonLayout;
+    property DropDownMenu;
+    property EnterColor;
+    property EnterColorChange;
+    property Glyph;
+    property NumGlyphs;
+    property ImageIndex;
+    property ImageList;
+    property ListIndex;
+    property Transparent;
+    property GroupIndex;
+    property AllowAllUp;
+    property Compressed;
+    property PixelFormat;
+    property QuickDraw default false;
+  end;
+
+implementation

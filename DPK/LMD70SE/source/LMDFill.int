@@ -1,0 +1,71 @@
+
+uses
+  Windows,
+  Classes,
+  lmdgraph,
+  lmdcont,
+  LMDFillObject,
+  LMDCaption,
+  LMDGraphicControl;
+
+type
+  TLMDFill = class(TLMDGraphicControl)
+  private
+    FCaption:TLMDCaption;
+    FFillObject:TLMDFillObject;
+    procedure SetCaption(aValue:TLMDCaption);
+    procedure SetFillObject(aValue:TLMDFillObject);
+  protected
+    procedure Paint;override;
+    procedure GetChange(Sender:TObject);override;
+    function GetEmpty:Boolean;override;
+    procedure GetIMLChange(Sender:TObject); override;
+    function GetPalette:HPalette;override;
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+  published
+    property About;
+    property Align;
+    property Bevel;
+    property Caption:TLMDCaption read FCaption write SetCaption;
+    property Color;
+    property DragCursor;
+    property DragMode;
+    property Enabled;
+    property FillObject:TLMDFillObject read FFillObject write SetFillObject;
+    property ImageList;
+    property ImageIndex;
+    property ListIndex;
+    property ParentColor;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property Visible;
+
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseEnter;
+    property OnMouseExit;    
+    property OnMouseUp;
+    property OnStartDrag;
+
+    {4.0}
+    //properties
+    property Anchors;
+    property BiDiMode;
+    property DragKind;
+    property Constraints;
+    property ParentBiDiMode;
+    //events
+    property OnEndDock;
+    property OnStartDock;
+  end;
+
+
+implementation

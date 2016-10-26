@@ -1,0 +1,139 @@
+
+uses
+  Graphics, //TColor
+  Messages, //TMessage
+  Classes,  //TStringList
+  Dialogs,  //TColorDialog
+  Controls, //CM_FONTCHANGED
+  Windows,  //TRect
+  StdCtrls,  //TOwnerDrawState
+  LMDCustomComboBox;
+
+type
+  {------------------------- TLMDCustomColorBox -------------------------------}
+  TLMDColorCBStyle=(csColor, csText, csColorText, csColor3DText);
+  TLMDColorCBOption=(coDefaultColors,     {Show 16 default Colors in List}
+                     coSystemColors,      {Show Windows System Colors in List}
+                     coCustomColors,      {Show Custom Colors}
+                     coAllowAnyColor,     {Every Color can be selected}
+                     coAllowDialog);      {Right Mouseclick: Show Colordialog}
+
+  TLMDColorCBOptions=set of TLMDColorCBOption;
+  TLMDOnColorDialogEvent=procedure(Sender:TObject; ColorDialog:TColorDialog) of object;
+
+  TLMDCustomColorComboBox = class(TLMDCustomComboBox)
+  private
+    // 6.1
+    FCustomMode:Boolean;
+    // ---
+    FCounter:Integer;
+    FCustomColors:TStringList;
+    FIHeight:Integer;
+    FOptions:TLMDColorCBOptions;
+    FDisplayStyle:TLMDColorCBStyle;
+    FDlgOptions:TColorDialogOptions;
+    FOnEnterDialog,
+    FOnFinishedDialog:TLMDOnColorDialogEvent;
+    FContext:THelpContext;
+    procedure GetChange(Sender:TObject);
+    procedure FillColorList(const S:String);
+    function GetCustomColors:TStrings;
+    function GetSelectedColor:TColor;
+    function GetSelectedColorName:String;
+    function GetColor(index:Integer):TColor;
+    function GetColorName(index:Integer):String;
+    procedure SetCustomMode(aValue:Boolean);
+    procedure SetCustomColors(aValue:TStrings);
+    procedure SetDisplayStyle(aValue:TLMDColorCBStyle);
+    procedure SetOptions(aValue:TLMDColorCBOptions);
+    procedure SetSelectedColor(aValue:TColor);
+    procedure CMFontChanged(var Message: TMessage); message CM_FONTCHANGED;
+  protected
+    procedure CreateColorList;
+    procedure DrawItem(Index:Integer; Rect:TRect; State:TOwnerDrawState);override;
+    function GetColorValue:TColor;virtual;
+    procedure MeasureItem(Index: Integer; var Height: Integer); override;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);override;
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+    procedure Loaded;override;    
+    procedure Init;
+    function Execute:Boolean;  {Execute Dialog}
+    function ExecuteEnh(aList:TStrings):Boolean;
+    procedure LoadCustomColors(IniFile:TObject; const Section:String);
+    procedure SaveCustomColors(IniFile:TObject; const Section:String);
+    property Colors[index:Integer]:TColor read GetColor;
+    // 6.1
+    property ColorName[index:Integer]:String read GetColorName;
+    property SelectedColorName:String read GetSelectedColorName;
+    // ---
+    property SelectedColor:TColor read GetSelectedColor write SetSelectedColor;
+    property Text;
+  published
+    property About;
+    property CustomColors:TStrings read GetCustomColors write SetCustomColors;
+    property CustomMode:Boolean read FCustomMode write SetCustomMode default false;
+
+    property DlgOptions:TColorDialogOptions read FDlgOptions write FDlgOptions;
+    property DlgHelpContext:THelpContext read FContext write FContext;
+    property DisplayStyle:TLMDColorCBStyle read FDisplayStyle write SetDisplayStyle
+                                           default csColorText;
+    property Options:TLMDColorCBOptions read FOptions write SetOptions
+                                        default [coDefaultColors, coAllowAnyColor];
+    property Color;
+    property Ctl3D;
+
+    property DragMode;
+    property DragCursor;
+    property DropDownCount;
+    property DropDownWidth;
+    property Enabled;
+    property Flat;
+    property FocusControl;
+    property Font;
+    property ParentColor;
+    property ParentCtl3D;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+
+    //property Search;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    property UseGlobalTimer;
+    property Visible;
+    property Sorted;
+
+    {Events}
+    property OnSelect;
+    property OnChange;
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnDropDown;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnStartDrag;
+
+    property OnBeforeDialogShow:TLMDOnColorDialogEvent read FOnEnterDialog write FOnEnterDialog;
+    property OnAfterDialogShow:TLMDOnColorDialogEvent read FOnFinishedDialog write FOnFinishedDialog;
+
+    // V4 enhancements
+    property Anchors;
+    property Constraints;
+    property DragKind;
+    property BiDiMode;
+    property ParentBiDiMode;
+    property OnEndDock;
+    property OnStartDock;
+  end;
+
+
+implementation

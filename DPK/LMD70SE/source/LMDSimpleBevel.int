@@ -1,0 +1,34 @@
+
+uses
+  Graphics,
+  Classes,
+  LMDGraph,
+  LMDObject;
+
+type
+  TLMDSimpleBevelStyle=(sbNormal, sbInset, sbOffset);
+
+  TLMDSimpleBevel = class(TLMDObject)
+    private
+      FWidth:TLMDBevelWidth;
+      FStyle:TLMDSimpleBevelStyle;
+      FColor,
+      FLightColor,
+      FShadowColor:TColor;
+      procedure SetWidth(aValue: TLMDBevelWidth);
+      procedure SetStyle(aValue: TLMDSimpleBevelStyle);
+      procedure SetColor(Index: Integer; aValue: TColor);
+    public
+      constructor Create;override;
+      procedure Assign(Source:TPersistent);override;
+      function GetSetStr : String; override;
+    published
+      property Color: TColor index 2 read FColor write SetColor default clBlack;
+      property Width: TLMDBevelWidth read FWidth write SetWidth default 2;
+      property Style: TLMDSimpleBevelStyle read FStyle write SetStyle default sbNormal;
+      property LightColor: TColor index 0 read FLightColor write SetColor default clBtnHighLight;
+      property ShadowColor: TColor index 1 read FShadowColor write SetColor default clBtnShadow;
+  end;
+
+
+implementation

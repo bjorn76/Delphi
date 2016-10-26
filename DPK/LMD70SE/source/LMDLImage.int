@@ -1,0 +1,20 @@
+
+uses
+  LMDCustomLImage;
+
+type
+  TLMDLImage=class(TLMDCustomLImage)
+  protected
+    procedure Paint; override;
+  published
+    property ForceTransparent;
+    property ImageList;
+    property ImageIndex;
+    property ListIndex;
+    property SilentMove;
+    property Style;
+    property Transparent default True;
+  end;
+
+
+implementation

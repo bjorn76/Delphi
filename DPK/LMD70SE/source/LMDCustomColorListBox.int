@@ -1,0 +1,122 @@
+
+uses
+  Graphics, //TColor
+  Messages, //TMessage
+  Classes,  //TStringList
+  Dialogs,  //TColorDialog
+  Controls, //CM_FONTCHANGED
+  Windows,  //TRect
+  StdCtrls,  //TOwnerDrawState
+  LMDCustomColorComboBox,
+  LMDCustomImageListBox;
+
+type
+
+  TLMDCustomColorListBox = class(TLMDCustomDerivedImageListBox)
+  private
+    FCounter:Integer;
+    // 6.1
+    FCustomMode:Boolean;
+    // ---
+    FCustomColors:TStringList;
+    FOptions:TLMDColorCBOptions;
+    FDisplayStyle:TLMDColorCBStyle;
+    FDlgOptions:TColorDialogOptions;
+    FOnEnterDialog,
+    FOnFinishedDialog:TLMDOnColorDialogEvent;
+    FContext:THelpContext;
+    procedure GetChange(Sender:TObject);reintroduce;
+    procedure FillColorList(const S:String);
+    function GetCustomColors:TStrings;
+    function GetSelectedColor:TColor;
+    function GetSelectedColorName:String;
+    function GetColor(index:Integer):TColor;
+    function GetColorName(index:Integer):String;
+    procedure SetCustomMode(aValue:Boolean);
+    procedure SetCustomColors(aValue:TStrings);
+    procedure SetDisplayStyle(aValue:TLMDColorCBStyle);
+    procedure SetOptions(aValue:TLMDColorCBOptions);
+    procedure SetSelectedColor(aValue:TColor);
+    procedure CMFontChanged(var Message: TMessage); message CM_FONTCHANGED;
+  protected
+    procedure CreateColorList; virtual;
+    procedure DrawItem(Index:Integer; Rect:TRect; State:TOwnerDrawState);override;
+    function GetColorValue:TColor;virtual;
+    procedure MeasureItem(Index: Integer; var Height: Integer); override;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);override;
+    procedure Loaded;override;
+    procedure DoSelect; override;
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+    function Execute:Boolean;  {Execute Dialog}
+    function ExecuteEnh(aList:TStrings):Boolean;
+    // 7.0
+    procedure Init;
+    // ---
+    procedure LoadCustomColors(IniFile:TObject; const Section:String);
+    procedure SaveCustomColors(IniFile:TObject; const Section:String);
+    property Colors[index:Integer]:TColor read GetColor;
+    // 6.1
+    property ColorName[index:Integer]:String read GetColorName;
+    property SelectedColorName:String read GetSelectedColorName;
+    // ---
+    property SelectedColor:TColor read GetSelectedColor write SetSelectedColor;
+    property Text;
+  published
+    property About;
+    property CustomMode:Boolean read FCustomMode write SetCustomMode default false;
+    property CustomColors:TStrings read GetCustomColors write SetCustomColors;
+    property DlgOptions:TColorDialogOptions read FDlgOptions write FDlgOptions;
+    property DlgHelpContext:THelpContext read FContext write FContext;
+    property DisplayStyle:TLMDColorCBStyle read FDisplayStyle write SetDisplayStyle
+                                           default csColorText;
+    property Options:TLMDColorCBOptions read FOptions write SetOptions
+                                        default [coDefaultColors, coAllowAnyColor];
+    property Color;
+    property Ctl3D;
+
+    property DragMode;
+    property DragCursor;
+    property Enabled;
+    property Font;
+    property ParentColor;
+    property ParentCtl3D;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    property Visible;
+    property Sorted;
+
+    {Events}
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnStartDrag;
+
+    property OnBeforeDialogShow:TLMDOnColorDialogEvent read FOnEnterDialog write FOnEnterDialog;
+    property OnAfterDialogShow:TLMDOnColorDialogEvent read FOnFinishedDialog write FOnFinishedDialog;
+
+    // V4 enhancements
+    property Anchors;
+    property Constraints;
+    property DragKind;
+    property BiDiMode;
+    property ParentBiDiMode;
+    property OnEndDock;
+    property OnStartDock;
+  end;
+
+
+implementation

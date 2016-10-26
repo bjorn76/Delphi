@@ -1,0 +1,24 @@
+
+uses
+  Classes,
+  Controls,
+  LMDCustomShapeHint;
+
+type
+  TLMDMessageHint=class(TLMDCustomShapeHint)
+  private
+    FSetCapture:Boolean;
+    function GetState:Boolean;
+  protected
+    procedure SetEnabled(aValue:Boolean);override;
+  public
+    Constructor Create(AOwner:TComponent);override;
+    procedure HideMessage;
+    procedure ShowMessage(const Msg:string; x, y: integer);
+    procedure ShowControlMessage(const Msg:string; aControl:TControl);
+    property IsDisplaying:Boolean read GetState;
+  published
+    property SetCapture:Boolean read FSetCapture write FSetCapture default True;
+  end;
+
+implementation

@@ -1,0 +1,104 @@
+
+uses
+  Classes,
+  Windows,
+  Graphics,
+  LMDGraph;
+
+const
+  BDF_ROUNDED=$1;
+  BDF_FOCUSED=$2;
+  BDF_SPEEDBUTTON=$4;
+  BDF_EXTDOWNSTYLE=$8;
+  BDF_MIDDLE=$10;
+  BDF_DEFAULT=$20;
+  BDF_MOUSEOVER=$40;
+  BDF_SPLIT=$80;
+  BDF_SPLITPARTTWO=$100;
+  // 7.0
+  BDF_CTLXP=$200;
+
+  LMDBTNTIMERBORDER=0;
+  LMDBTNTIMERREPEATED=1;
+
+  // do not localize, NOTE: Should be removed, not required globally
+  IDS_BUTTONFACEINDICESNEW:String[20]='ButtonFaceIndicesNew';
+  IDS_BUTTONFACEINDICESNEW2:String[21]='ButtonFaceIndicesNew2';
+  IDS_BUTTONFACETRANSCOLNEW:String[23]='ButtonFaceTransColNew';
+  IDS_UNCOLORMAIN:String[11]='UnColorMain';
+  IDS_TRANSPARENT:String[11]='Transparent';
+  IDS_BUTTONFACE:String[10]='ButtonFace';
+  IDS_BUTTONFACEINDICES:String[17]='ButtonFaceIndices';
+  IDS_BUTTONFACETRANSCOL:String[18]='ButtonFaceTransCol';
+
+type
+  {****************************************************************************}
+  {* Standard Buttons
+  {****************************************************************************}
+  {Buttons}
+  TLMDButtonState=(bsUp, bsDisabledUp, bsMouseOver, bsOptionSet, bsDown,
+                   bsDragOver, bsDropDownOpen, bsDisabledDown, bsDefaultEd);
+
+  TLMDUserButtonStyle=(//ubsAutoDetect,      // non-flat standard framed button, CtlXP: Standard button
+                       ubsWin31,           // framed button, Win 31 style, CTLXP: standard button
+                       ubsWin40,           // framed button, Win 40 style, CTLXP: standard button
+                       ubsDelphi,          // framed button, Delphi style, CTLXP: standard button
+                       ubsDelphiFlat,      // flat button, Delphi 1.0 Style, CTLXP: Tool button
+                       ubsFlat,            // flat button, CTLXP: Tool button
+                       ubsFlatUnColored,   // flat button without hot state, CTLXP: Tool button
+                       ubsNavigator,       // flat button like ubsDelphiFlat, without hot state, CTLXP: Tool button
+                       ubsExplorer,         // like ubsFlatUnColored, but transparent
+                       ubsExplorerColored,  // like ubsflat, but transparent
+                       ubsIntegrated,       // for use in other controls
+                       ubsCombo,            // New in 7.0
+                       ubsOffice,           // Office XP like button CTLXP: Tool button
+                       ubsOfficeTransp,     // Office XP like button, transparent
+                       ubsWin40Ext          // like Win40, but with hotstate in frame
+                       //ubsWinXP,      //AutoDetect with CTLXP
+                       //ubsWinXPCombo, //ubsCombo + CTLXP
+                       //ubsWinXPTool   //ubsExplorer/ExplorerColored etc. + CTLXP
+                       );
+
+type
+  TLMDGlyphKind=(gkCustom, gkEllipsis, gkFile, gkFolder, gkCalculator,
+                 gkCalender, gkSearch, gkColor, gkFont);
+
+  {-> for TLMDButtonLayout}
+  TLMDArrowPosition=(apRightText, apLeftText, apRightGlyph, apLeftGlyph);
+
+
+  {TLMDUserButtonStyle=(ubsAutoDetect, ubsWin31, ubsWin40, ubsDelphi);}
+  TLMDNormalButtonStyle=(nbsAutoDetect, nbsWin31, nbsWin40);
+
+  // required globally
+const
+  TLMDNormalBtnStyleString : array[TLMDNormalButtonStyle] of string = ('','nbsWin31', 'nbsWin40');
+
+type
+  {****************************************************************************}
+  {* MultiMedia Buttons }
+  {****************************************************************************}
+  TLMDButtonFace=class(TObject);
+
+  TLMDButtonFaceIndices=array[TLMDButtonState,0..1] of LongInt;
+
+  //4.0
+  TLMDButtonFaceIndex=record
+    ListIndex, ImageIndex:Integer;
+  end;
+
+  // small helper
+  // ---------------------------------------------------------------------------
+  procedure LMDGetGlyphKind(aValue:TBitmap; Kind:TLMDGlyphKind);
+  function LMDGetButtonBevel(Style:TLMDUserButtonStyle; State:TLMDButtonState):Byte;
+  function LMDIsXPToolButton(const Value:TLMDUserButtonStyle):Boolean;
+
+  // MMButton
+  function LMDMMReturnFaceIndex(ListIndex,ImageIndex:Integer):TLMDButtonFaceIndex;
+  procedure LMDMMSynchronize(var aValue:TLMDButtonFaceIndices; HotState:Boolean=false);
+  procedure LMDMMInitFace(var aValue:TLMDButtonFaceIndices);
+
+  // helper method for automatic conversion of older button styles
+  procedure LMDButtonReadExtStyle(Reader: TReader; var aExtStyle:TLMDUserButtonStyle; var aXP:Boolean);
+
+implementation

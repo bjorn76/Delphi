@@ -1,0 +1,46 @@
+
+uses
+  Windows,
+  Graphics,
+  Classes,
+  lmdgraph,
+  LMDShapeFill;
+
+type
+  {for all components without own Brush property}
+  {----------------------TLMDFillObject--------------------------------------}
+  TLMDFillOption=(foFillInner, foQuickDraw, foGrUseBitmap);
+  TLMDFillOptions=set of TLMDFillOption;
+
+  TLMDFillObject=class(TLMDShapeFill)
+   private
+     FAlignment:TLMDAlignment;
+     FOffsetX,
+     FOffsetY:Integer;
+     FBrush:TBrush;
+     FOptions:TLMDFillOptions;
+     procedure SetAlignment(aValue:TLMDAlignment);
+     procedure SetBrush(aValue:TBrush);
+     procedure SetInteger(Index, aValue:Integer);
+     procedure SetOptions(aValue:TLMDFillOptions);
+     function GetTransparent:Boolean;
+   protected
+   public
+     constructor Create;override;
+     destructor Destroy;override;
+     procedure Assign(Source:TPersistent);override;
+     function ClipFill(aCanvas:TCanvas; aRect:TRect; orgC:TColor; pos:LongInt):Boolean;
+     function FillCanvas(aCanvas:TCanvas; aRect:TRect; orgC:TColor):Boolean;
+     property Transparent:Boolean read GetTransparent;
+   published
+     property Alignment:TLMDAlignment read FAlignment write SetAlignment default agTopLeft;
+     property Brush:TBrush read FBrush write SetBrush;
+     property OffsetX:Integer index 0 read FOffsetX write SetInteger default 0;
+     property OffsetY:Integer index 1 read FOffsetY write SetInteger default 0;
+     property Options:TLMDFillOptions read FOptions write SetOptions default
+                                     [foFillInner, foGrUseBitmap];
+     property Style default sfNone;
+   end;
+
+
+implementation

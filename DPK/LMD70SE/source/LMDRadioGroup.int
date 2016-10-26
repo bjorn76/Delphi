@@ -1,0 +1,12 @@
+
+uses
+  LMDCustomRadioGroup;
+
+type
+  TLMDRadioGroup = class(TLMDCustomRadioGroup)
+  published
+//    property BackFX;
+    property ItemIndex;
+  end;
+
+implementation

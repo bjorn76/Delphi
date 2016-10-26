@@ -1,0 +1,73 @@
+
+uses
+  Windows,
+  Classes,
+  Messages,
+  MMSystem,
+  LMDClass,
+  LMDConst,
+  //dialogs,
+  LMDCustomComponent;
+
+type
+  TLMDHiTimer = class;
+
+  {------------------------------- TLMDThreadedTimer --------------------------}
+  TLMDThreadedTimer=class(TThread)
+  private
+    FTimer:TLMDHiTimer;
+    FInterval:TLMDTimerInterval;
+  protected
+    procedure Execute; override;
+  public
+    property Interval:TLMDTimerInterval read FInterval write FInterval;
+    constructor Create(aOwner:TLMDHiTimer);
+  end;
+
+  TLMDHiTimer = class(TLMDCustomComponent)
+  private
+    FEnabled: Boolean;
+    FInternalFlag: Boolean;
+    FInterval: UINT;
+    FTimerID:UINT;
+    FTimerCaps:TTimeCaps;
+    FOnTimer:TNotifyEvent;
+    FWindowHandle:HWND;
+
+    // 4.0
+    FThread:TLMDThreadedTimer;
+    FThreadPriority: TThreadPriority;
+    FSynchronize,
+    FUseThread:Boolean;
+    procedure SetThreadPriority(aValue:TThreadPriority);
+    procedure SetUseThread(aValue:Boolean);
+
+    procedure SetEnabled(aValue: Boolean);
+    procedure SetInterval(aValue:UINT);
+    procedure SetOnTimer(aValue: TNotifyEvent);
+    procedure UpdateTimer;
+    procedure WndProc(var Msg: TMessage);
+    function GetCaps:TTimeCaps;
+    function GetInteger(index:Integer):Integer;
+  protected
+    procedure Timer; dynamic;
+  public
+    constructor Create(AOwner:TComponent);override;
+    constructor CreateExt(aOwner:TComponent; Interval:TLMDTimerInterval);
+    destructor Destroy;override;
+    property MaxInterval:Integer index 0 read GetInteger;
+    property MinInterval:Integer index 1 read GetInteger;
+  published
+    Property About;
+    property Enabled: Boolean read FEnabled write SetEnabled default False;
+    property Interval:UINT read FInterval write SetInterval default 1000;
+    property OnTimer: TNotifyEvent read FOnTimer write SetOnTimer;
+
+    property Synchronize:Boolean read FSynchronize write FSynchronize default True;
+    property UseThread:Boolean read FUseThread write SetUseThread default True;
+    property ThreadPriority:TThreadPriority read FThreadPriority write
+                            SetThreadPriority default tpNormal;
+  end;
+
+
+implementation

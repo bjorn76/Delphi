@@ -1,0 +1,119 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  ExtCtrls, Buttons, Menus,
+  LMDButtonBase,
+  LMDCustomPanelFill,
+  LMDSpeedButton,
+  LMDGraph,
+  LMDBevel,
+  LMDBase;
+
+type
+
+  TLMDSysButtonMode = (sbPin, sbClose);
+  TLMDHeaderOption = (hoHeaderButton, hoHideSysButton);
+  TLMDHeaderOptions = set of TLMDHeaderOption;
+
+  TLMDCloseEvent = procedure (Sender: TObject; wasPinned: Boolean) of object;
+
+  TLMDCustomHeaderPanel= class(TLMDCustomPanelFill)
+  private
+    FBorderWidth,
+    FHeaderHeight,
+    FRealHeaderHeight : Integer;
+    FHeaderButton,
+    FSysButton        : TLMDSpeedButton;
+    FDropMenu         : TPopupMenu;
+//    FHTransparent,
+    FShowMode         : Boolean;
+    FBtnStyle         : TLMDUserButtonStyle;
+    FSysBtnMode       : TLMDSysButtonMode;
+    FOnClose          : TLMDCloseEvent;
+    FHeaderOptions    : TLMDHeaderOptions;
+    FOnModeChange,
+    FOnHButton,
+    FOnSButton,
+    FOnOpen,
+    FOnOpenFixed      : TNotifyEvent;
+    FOldParentControl : TWinControl;
+
+    FContainer           : TForm;
+    FOldTransparent      : Boolean;
+    FOldAlign            : TAlign;
+    FOldPos              : TPoint;
+    FOldParentRect       : TRect;
+    FOldBevel            : TLMDBevel;
+
+    procedure SetHeaderHeight(aValue: Integer);
+    function  GetStyle: TLMDUserButtonStyle;
+    procedure SetStyle(const aValue: TLMDUserButtonStyle);
+    procedure SetDropMenu(aValue: TPopupMenu);
+    procedure SetSysBtnMode(aValue: TLMDSysButtonMode);
+    procedure SetHeaderOptions (aValue: TLMDHeaderOptions);
+
+    function GetPinned: Boolean;
+    function GetUnPinned: Boolean;
+
+    procedure SetBorderWidth(aValue: Integer);
+//    procedure DoHeaderFontChange(Sender: TObject);
+
+    //header buttons OnClick event handlers
+    procedure DoHeaderButtonClick(Sender: TObject);
+    procedure DoHeaderButtonMouseDown(Sender: TObject; Button: TMouseButton;
+                                      Shift: TShiftState; X, Y: Integer);
+    procedure DoSystemButtonClick(Sender: TObject);
+    //calculates size of header elements
+    procedure CalcHeaderSize;
+    procedure CMTextChanged(var Message: TMessage); message CM_TEXTCHANGED;
+    procedure CMVisibleChanged(var Message: TMessage); message CM_VISIBLECHANGED;
+    procedure CMEnableChanged(var Message: TMessage); message CM_ENABLEDCHANGED;
+    procedure WMPaint(var message: TMessage); message WM_PAINT;
+    procedure WMSize(var message: TMessage); message WM_SIZE;
+  protected
+    procedure CreateWnd; override;
+    procedure AdjustClientRect(var Rect: TRect); override;
+    procedure DrawCaption(aRect: TRect; aAlignment: TLMDAlignment); override;
+    procedure DoThemeChanged;override;
+
+    procedure Restore;
+
+    procedure DoOnOpen;
+    procedure DoOnOpenFixed;
+    procedure DoOnClose (wasPinned: Boolean);
+    procedure DoClose(Sender: TObject);
+    function ControlSupportsXP: Boolean; override;
+
+    property HeaderHeight:Integer read FHeaderHeight write SetHeaderHeight default 0;
+    property HeaderDropMenu:TPopupMenu read FDropMenu write SetDropMenu;
+    property BorderWidth:Integer read FBorderWidth write SetBorderWidth;
+    property OnHeaderButtonClick:TNotifyEvent read FOnHButton write FOnHButton;
+    property OnSystemButtonClick:TNotifyEvent read FOnSButton write FOnSButton;
+    //The ButtonStyle of the panel's system and header buttons
+    property ButtonStyle: TLMDUserButtonStyle read GetStyle write SetStyle default ubsExplorerColored;
+    //This event gets called, whenever the panel is opened unpinned
+    property OnOpen: TNotifyEvent read FOnOpen write FOnOpen;
+    //This event gets called whenever the panel is pinned
+    property OnOpenFixed: TNotifyEvent read FOnOpenFixed write FOnOpenFixed;
+    //This event gets called whenever the panel is closed / hidden
+    property OnClose: TLMDCloseEvent read FOnClose write FOnClose;
+    //This event gets called whenever the  SysButtonMode changes, it is used internally by the TLMDHeaderPanelButton component
+    property OnModeChange: TNotifyEvent read FOnmodeChange write FOnModeChange;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure Loaded; override;
+
+    procedure Open;
+    procedure OpenFixed;
+    procedure Close;
+
+    property RealHeaderHeight: Integer read FRealHeaderHeight;
+    property HeaderButton: TLMDSpeedButton read FHeaderButton;
+    property SysButtonMode: TLMDSysButtonMode read FSysBtnMode write SetSysBtnMode default sbClose;
+    property Pinned: Boolean read GetPinned;
+    property UnPinned: Boolean read GetUnPinned;
+    property HeaderOptions: TLMDHeaderOptions read FHeaderOptions write SetHeaderOptions default [];
+  end;
+
+implementation

@@ -1,0 +1,80 @@
+
+uses
+  LMDCustomParentPanel;
+
+type
+  {--------------------- TLMDBackPanel ---------------------------------------}
+  TLMDBackPanel = class(TLMDCustomParentPanel)
+  private
+  protected
+    procedure Paint;override;
+  public
+    DrawXPBack:Boolean;
+    property DockManager;
+  published
+    // 7.01
+    property NoHandleUpdate;
+    
+    // 7.0
+    property FDSupport;
+
+    // V4 enhancements
+    property Anchors;
+    property AutoSize;
+    property Constraints;
+    property UseDockManager default false;
+    property DockSite;
+    property DragKind;
+    property BiDiMode;
+    property ParentBiDiMode;
+
+    property OnCanResize;
+    property OnConstrainedResize;
+    property OnDockDrop;
+    property OnDockOver;
+    property OnEndDock;
+    property OnGetSiteInfo;
+    property OnStartDock;
+    property OnUnDock;
+    property About;
+    property Align;
+//    property BackFX;
+    property Bevel;
+    property Color;
+    property DragCursor;
+    property DragMode;
+    property Enabled;
+    property Font;
+    property ImageList;
+    property ImageIndex;
+    property ListIndex;
+    property Locked;
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property QuickDraw;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    property Transparent;
+    property Visible;
+
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseEnter;
+    property OnMouseExit;
+    property OnMouseUp;
+    property OnResize;
+    property OnStartDrag;
+  end;
+
+
+implementation

@@ -1,0 +1,41 @@
+
+uses
+  Graphics, //TColor
+  Messages, //TMessage
+  Classes,  //TStringList
+  Dialogs,  //TColorDialog
+  Controls, //CM_FONTCHANGED
+  Windows,  //TRect
+  StdCtrls,  //TOwnerDrawState
+  LMDCustomImageListBox;
+
+type
+
+  TLMDButtonListMode=(blCheckBox, blCheckBox3State, blRadioButton);
+
+  // for reuse in ComboBox version...
+  {********************* TLMDButtonListData ***********************************}
+  TLMDButtonListData=class
+  private
+    FData    : LongInt;
+    FState   : TCheckBoxState;
+    FDisabled: Boolean;
+    procedure SetChecked(Check: Boolean);
+    function GetChecked: Boolean;
+  public
+    class function GetDefaultState: TCheckBoxState;
+    property Data:LongInt read FData write FData;
+    property Checked: Boolean read GetChecked write SetChecked;
+    property State: TCheckBoxState read FState write FState;
+    property Disabled: Boolean read FDisabled write FDisabled;
+  end;
+
+
+procedure LMDDrawButtonListItem(Control: TWinControl; Canvas:TCanvas;r:TRect;aState: TCheckBoxState; BtnMode:TLMDButtonListMode;
+                                aEnabled:Boolean; BtnFlat:Boolean=False; BtnDefault:Boolean=True; BtnXP:Boolean=True);
+// Bitmask helper
+function LMDBtnMakeSaveState(State: TCheckBoxState; Disabled: Boolean): TObject;
+function LMDBtnGetSaveState(aObject: TObject): TCheckBoxState;
+function LMDBtnGetSaveDisabled(aObject: TObject): Boolean;
+
+implementation

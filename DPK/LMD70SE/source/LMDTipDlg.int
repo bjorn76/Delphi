@@ -1,0 +1,84 @@
+
+uses
+  Classes,
+  StdCtrls,
+  Forms,
+  LMDButton,
+  LMDCheckBox,
+  LMDSimpleLabel,
+  LMDBaseDialog;
+
+type
+  TLMDTipsDialogMode=(moNormal, moStart);
+
+  TLMDTipDlg = class(TLMDBaseDialog)
+    private
+      FCaptionHeader:String;
+      FCaptionHelp:String;
+      FTips:TStrings;
+      FFirst:Integer;
+      FShowStart,
+      FHide,
+      FFirstFlag:Boolean;
+      FMode:TLMDTipsDialogmode;
+      FHelpContext:THelpContext;
+
+      tiplabel: TLabel;
+      showtips: TLMDCheckBox;
+      tiptitle: TLabel;
+      prev,
+      next,
+      //sl: TLMDSimpleLabel;
+      ok, help: TLMDButton;
+
+      Actualpos:Integer;
+      Last:TStringList;
+      show:Boolean;
+      Procedure SetTips(aStrings:TStrings);
+      Procedure SetTipsCount(aInt:Integer);
+      function GetTipsCount:Integer;
+
+      procedure nexttip(Sender: TObject);
+      procedure lasttip(Sender: TObject);
+      procedure FormDestroy(Sender: TObject);
+      procedure FormActivate(Sender: TObject);
+      procedure helpClick(Sender: TObject);
+      function GetListTip(index: Integer):String;
+      procedure GetTip;
+    public
+      constructor Create(AOwner:TComponent);override;
+      destructor Destroy;override;
+      function Execute:Boolean;override;
+      function ExecuteEnh(main:TForm; Mode:TLMDTipsDialogmode):Boolean;
+    published
+      property About;
+      property CaptionFill;
+      property CaptionHeader:String read FCaptionHeader write FCaptionHeader;
+      property CaptionHelp:String read FCaptionHelp write FCaptionHelp;
+      property CaptionTitle;
+      property Colors;
+      property CustomButton;
+      property CtlXP;
+      property Effect;
+      property HideShowAtStart:Boolean read FHide write FHide default false;
+      property FirstHintNumber:Integer read FFirst write FFirst default -1;
+      property HelpContext: THelpContext read FHelpContext write FHelpContext default 0;
+      property Hints;
+      property ImageList;
+      property ImageIndex;
+      property ListIndex;
+      property Mode:TLMDTipsDialogMode read FMode write FMode default moNormal;
+      property Position;
+      property RelatePos;
+      property ShowAtStart:Boolean read FShowStart write FShowStart default false;
+      property ShowHints;
+      property Tips:TStrings read FTips write Settips;
+      property TipsCount:Integer read GetTipsCount write SetTipsCount stored false;
+
+      {Events}
+      property OnCustomize;
+      property OnCustomClick;
+   end;
+
+
+implementation

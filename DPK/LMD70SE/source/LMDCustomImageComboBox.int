@@ -1,0 +1,149 @@
+
+uses
+  Windows,
+  Controls,
+  Classes,
+  Messages,
+  StdCtrls, //TOwnerDrawState
+  LMDCustomImageListBox, //TLMDImageBoxOptions
+  LMDGlyphTextLayout,
+  LMD3DCaption,
+  LMDCont,
+  LMDGraph,
+  LMDCustomComboBox,
+  LMDCustomImageList,
+  LMDBaseController;
+
+type
+  {--------------------- TLMDCustomImageComboBox ------------------------------------}
+  TLMDCustomImageComboBox=class(TLMDCustomComboBox)
+  private
+    {ImageList Support}
+    FImageList:TLMDCustomImageList;
+    FListIndex:Integer;
+    FChangeLink:TLMDChangeLink;
+    FDelimiter:Char;
+    FDefaultItem:Integer;
+    FOptions:TLMDImageBoxOptions;
+    FFont3D:TLMD3DCaption;
+    FLayout:TLMDGlyphTextLayout;
+    //4.0
+    FMultiline,
+    FImagesOnly:Boolean;
+    procedure SetImagesOnly(aValue:Boolean);
+    procedure SetMultiline(aValue:Boolean);
+    procedure UpdateEmptyList;
+    function StoreItems:Boolean;
+    //--
+    procedure SetDefaultItem(aValue:Integer);
+    procedure SetDelimiter(aValue:Char);
+    procedure SetImageList(aValue:TLMDCustomImageList);
+    procedure SetImageIndex(Index, aValue:Integer);
+    procedure SetIndex(aValue:Integer);
+    procedure SetFont3D(aValue:TLMD3DCaption);
+    procedure SetLayout(aValue:TLMDGlyphTextLayout);
+    procedure SetOptions(aValue:TLMDImageBoxOptions);
+    function GetImageIndex(aValue:Integer):Integer;
+    function GetStringValue(aValue:Integer):String;
+    {saving}
+    {----}
+    procedure ReadIdent(Reader:TReader);
+    procedure WriteIdent(Writer:TWriter);
+    function  CheckCont:Boolean;
+    function HasControl:Boolean;
+    {----  }
+
+    procedure CNDrawItem(var Message:TWMDrawItem); message CN_DRAWITEM;
+    procedure WMNCHitTest(var Message:TMessage); message WM_NCHITTEST;
+  protected
+    procedure DefineProperties(Filer:TFiler);override;
+    procedure DrawItem(Index: Integer; Rect: TRect; State: TOwnerDrawState); override;
+    function GetFieldValue:Integer;virtual;
+    function GetItemString(Index:Integer):String;virtual;
+    procedure MeasureItem(Index: Integer; var Height: Integer); override;
+    function IMLEmpty:Boolean;
+    procedure GetIMLChange(Sender:TObject);virtual;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override ;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure Loaded; override;
+    procedure Init;
+    property Canvas;
+    property Text;
+    property ImageIndexValue[Index:Integer]:Integer read GetImageIndex write SetImageIndex;
+    property StringValue[Index:Integer]:String read GetStringValue;
+  published
+    property About;
+    property Options:TLMDImageBoxOptions read FOptions write SetOptions
+                     default [lboImageListOrder, lboCheckImageNr];
+    property Delimiter:Char read FDelimiter write SetDelimiter default '|';
+    property Font3D:TLMD3DCaption read FFont3D write SetFont3D;
+    property ImageList:TLMDCustomImageList read FImageList write SetImageList stored HasControl;
+    property ListIndex:Integer read FListIndex write SetIndex default 0;
+    property Layout:TLMDGlyphTextLayout read FLayout write SetLayout;
+    property DefaultItem:Integer read FDefaultItem write SetDefaultItem default -1;
+    // 4.0
+    property ImagesOnly:Boolean read FImagesOnly write SetImagesOnly default false;
+    property ItemIndex;
+    property Items stored StoreItems;
+    property MultiLine:Boolean read FMultiline write SetMultiline default false;
+    // --
+    property Align;
+    property Color;
+    property Ctl3D;
+    property DragCursor;
+    property DragMode;
+    property DropDownCount;
+    property DropDownWidth;
+    property Enabled;
+    property Flat;
+    property FocusControl;
+    property Font;
+    property ImeMode;
+    property ImeName;
+    property ItemHeight;
+    property MaxLength;
+    property ParentColor;
+    property ParentCtl3D;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property Sorted;
+    property TabOrder;
+    property TabStop;
+    property Visible;
+
+    {Events}
+    property OnSelect;
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnDrawItem;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnMeasureItem;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDrag;
+
+    // V4 enhancements
+    property Anchors;
+    property Constraints;
+    property DragKind;
+    property BiDiMode;
+    property ParentBiDiMode;
+    property OnEndDock;
+    property OnStartDock;
+
+  end;
+
+
+implementation

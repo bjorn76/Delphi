@@ -1,0 +1,206 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  LMDBaseEdit, LMDCustomEdit, LMDClass, LMDProcs, LMDCurrencySettings,
+  LMDDateFormat;
+
+type
+  //all possible mask styles
+  TLMDMaskType = (meInteger, meWord, meFloat, meFloatFixed, meFloatNumber, meCurrency, meDate, meTime, meMask, meNone);
+  //sample of mask styles, needed by some derived controls
+  TLMDNumberType = (ntInteger, ntFloat, ntFloatFixed, ntFloatNumber, ntCurrency);
+
+  TLMDNumberBase = 2..36;
+
+  ELMDWrongDataType = class(Exception);
+
+  { Mask (string)
+
+    a - allows any alphabetic char (lowercased)
+    A - allows any alphabetic char (uppercased)
+    b - allows any alphabetic char (lowercased and uppercased)
+
+    c - allows any alphanumeric char
+    r - user rule
+    v - +/-
+    # - +/-/numerical including 0
+    * - +/-/numerical excluding 0
+    0 - allows every numerical char including 0
+    9 - allows every numerical char excluding 0
+    8 - allows every numerical char plus space
+    1 - 0 or 1
+
+    \x - any char to be displayed - to be displayed a literal x
+    ! - permit the following kind of char
+  }
+
+  PLMDParsedMaskRecord = ^TLMDParsedMaskRecord;
+  TLMDParsedMaskRecord = record
+    chars : set of char; // all chars allowed here
+    inputallowed : boolean; //is false if there was a \x char in the Mask
+    rangecheck : boolean; //if there is a group of numeric values which should not exceed a special range this is true
+    top, bottom : integer; //if rangecheck is true it contains the range for the numeric group
+    next, prev : PLMDParsedMaskRecord;
+  end;
+
+  TLMDOnUserRule = procedure (Sender : TObject; var Ok : Boolean; c : Char; at : Integer) of Object;
+  TLMDOnRangeError = procedure (Sender: TObject; Lower, Upper: Double; var Value: Extended) of Object;
+
+  TLMDCustomMaskEdit = class(TLMDCustomEdit)
+  private
+    FSuffix,
+    FOldText,
+    FMask       : String;
+    FNumberBase : TLMDNumberBase;
+    FOnUserRule : TLMDOnUserRule;
+    FRangeCheck : Boolean;
+    FThousandDelim,
+    FDecimalDelim,
+    FBlankChar  : Char;
+    FDecimals   : Integer;
+//    FSavedDate  : TDateTime;
+    FDateSet    : TLMDDateFormat;
+    FCurSet     : TLMDCurrencySettings;
+    FTDelims, //introd, Nov 2001
+    dep_help,
+    dep         : Integer;
+    FMinValue,
+    FMaxValue   : Double;
+    FOnRangeError: TLMDOnRangeError;
+    FOnError: TNotifyEvent;
+
+    procedure SetMask (aValue : String);
+    procedure SetMaskType (aValue : TLMDMaskType);
+    procedure SetNumberBase (aValue : TLMDNumberBase);
+    procedure SetBlankChar (aValue : Char);
+    procedure SetInteger (index, aValue : Integer);
+    procedure SetDouble (index : Integer; aValue : Double);
+    procedure SetCurSet (aValue : TLMDCurrencySettings);
+    procedure SetDateFormat (aValue : TLMDDateFormat);
+    procedure SetSuffix (aValue: String);
+
+    procedure WMChar (var Msg : TWMChar); message WM_CHAR;
+    procedure WriteData (Writer : TWriter);
+    procedure ReadData (Reader : TReader);
+
+    function literalChars : String;
+    function inputCharsAllowedAt (at : Integer) : Integer;
+    //is char at pos charPos in FText literal?
+    function isLiteral (charPos : Integer) : Boolean;
+    //check whether char c is allowed
+    function RealCharAllowedAt (at : Integer; c : Char) : Boolean;
+    //check whether char c or blank is allowed
+    function CharAllowedAt (at : Integer; c : Char) : Boolean;
+    //are all chars with a ! entered?
+    function NeededEntered (s : String) : Integer;
+    function getCharAt (at : Integer) : Char;
+    //text string s valid to mask?
+    function checkText (s : String) : boolean;
+
+    //get entered text without literals (including blanks)
+//    function clearedText : String;
+    //get string (matching to mask) from text retrieved by clearedText
+//    function setClearText(clearText : String) : String;
+
+    procedure WMKILLFOCUS (var Message : TMessage); message WM_KILLFOCUS;
+    procedure WMSETFOCUS (var Message : TMessage); message WM_SETFOCUS;
+  protected
+    FMaskType : TLMDMaskType;
+    procedure HandleInsertText (at : Integer;var aValue : String); override;
+    procedure HandleReplaceText (at : Integer;aValue : String); override;
+    procedure BeforeChangeText; override;
+    procedure FinishedSetSelText; override;
+    procedure ChangedText (At : Integer); override;
+    procedure CreateSpecialText(var s : String); override;
+    procedure DefineProperties (Filer : TFiler); override;
+    procedure DoValidationError;virtual;
+    procedure CursorPosChanged; override;
+    procedure GetCommandKey (var KeyCode : Word; Shift : TShiftState); override;
+    function DoMouseWheel(Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint): Boolean; override;
+    procedure ToDate (step: Integer); //aded April 02 by JH
+    function AllowedOperation(textToInsert : String) : Boolean; override;
+    procedure GetChange (Sender : TObject); override;
+    function NoDateTime : Boolean;
+    function CalcMousePos(Pos : TSmallPoint) : Integer; override;
+
+    procedure DateFormatChange (Sender : TObject);
+    procedure DateFormatChanged (Sender : TObject);
+
+    //checks whether the current numerical input is in between of MinValue and MaxValue
+    procedure CheckNumberRange;
+    //returns the suffix added to the edit string - will return an empty string
+    //if suffix is not supported by the current masktype
+    function GetSuffix: String;
+
+    property Decimals : Integer index 0 read FDecimals write SetInteger default 1;
+    //suffix can be a measure unit (as an example), will be added to the edit
+    //string (supported masktypes only)
+    property Suffix: String read FSuffix write SetSuffix;
+    //lower border of input value -> here only checked on control exit
+    property MinValue: Double index 1 read FMinValue write SetDouble;
+    //upper border of input value -> here only checked on control exit
+    property MaxValue: Double index 2 read FMaxValue write SetDouble;
+    //if RangeCheck is disabled the control will not check a numerical input value
+    //for beeing in MinValue .. MaxValue
+    property RangeCheck: Boolean read FRangeCheck write FRangeCheck;
+    //this event gets executed if a range error is detected
+    //a programmer can return a default value for this case
+    //otherwise (according) to side of bounds error MinValue or MaxValue is used
+    property OnRangeError: TLMDOnRangeError read FOnRangeError write FOnRangeError;
+  public
+    constructor Create (aOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Loaded; override;
+    function NextEditChar : Integer;
+    function PrevEditChar : Integer;
+
+    //check cut operation -> do not cut the suffix out
+    procedure CutToClipboard; override;
+    //check paste operation -> do not replace the suffix
+    procedure PasteFromClipboard; override;
+
+    //returns content of Text (without suffix if present)
+    function GetPureText: String;
+    //sets given aValue as new text and adds the suffix
+    procedure SetTextWithSuffix (aValue: String);
+    function AsInteger : Integer;
+    function AsCardinal : Cardinal;
+    function AsInt64 : Int64;
+    function AsFloat : Double;
+    function AsDate : TDateTime;
+    function AsTime : TDateTime;
+    function AsCurrency : Double;
+    function AsString : String;
+    //new, May 2002
+    //sets the given value, using the actual formatting settings
+    //this method can be used for setting integer and word values, too.
+    procedure SetValue (aValue: Double);
+
+    property CurrencySettings : TLMDCurrencySettings read FCurSet write SetCurSet;
+    property DateSettings : TLMDDateFormat read FDateSet write SetDateFormat;
+    property Mask : String read FMask write SetMask;
+    property MaskType : TLMDMaskType read FMaskType write SetMaskType default meMask;
+    property NumberBase : TLMDNumberBase read FNumberBase write SetNumberBase default 10;
+    property BlankChar : Char read FBlankChar write SetBlankChar default '_';
+    property Text stored NoDateTime;
+
+    property OnUserRule : TLMDOnUserRule read FOnUserRule write FOnUserRule;
+  published
+    property OnValidationError:TNotifyEvent read FOnError write FOnError;
+  end;
+
+  //X ^ I
+  function LMDIntPower(X: Extended; I: Integer): Extended;
+  //string s is a number with base -> returns decimal int value of s
+  function LMDGetDecimalValue (base : Integer; s : String) : Int64;
+  //string source is a floatnumber with base -> returns decimal float value of s
+  function LMDGetDecimalFloatValue (base : Integer; source : String) : Double;
+  //value is a 10 based int, returns value as string with base
+  function LMDGetBaseString (base, value : Integer) : String;
+  //clears out all thousand separators
+  function LMDClearTS (s : String) : String;
+
+  //converts a VCL mask to a LMD mask (no 1:1 conversion!!)
+  function convertVCLMask2LMDMask (aMask : String) : String;
+
+implementation

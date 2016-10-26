@@ -1,0 +1,79 @@
+
+uses
+  LMDObject;
+
+type
+  { -------------------------------------------------------------------------- }
+  TLMDCPUInfo = packed record
+    IDString                     : array [0..11] of Char;
+    Stepping                     : Integer;
+    Model                        : Integer;
+    Family                       : Integer;
+    FPU,
+    VirtualModeExtensions,
+    DebuggingExtensions,
+    PageSizeExtensions,
+    TimeStampCounter,
+    K86ModelSpecificRegisters,
+    MachineCheckException,
+    CMPXCHG8B,
+    APIC,
+    MemoryTypeRangeRegisters,
+    GlobalPagingExtension,
+    ConditionalMoveInstruction,
+    MMX                          : Boolean;
+    SYSCALLandSYSRET,
+    FPConditionalMoveInstruction,
+    AMD3DNow                     : Boolean;
+    CPUName                      : String;
+  end;
+
+  { -------------------------------------------------------------------------- }
+  TLMDCPUInfoObject = class (TLMDObject)
+  private
+    FInfo : TLMDCPUInfo;
+
+    function GetString (Index : Integer) : String;
+    function GetInteger (Index : Integer) : Integer;
+    function GetBoolean (Index : Integer) : Boolean;
+    procedure SetDummyBool (Index : Integer; b : Boolean);
+    procedure SetDummyString (Index : Integer; s : String);
+  public
+    constructor Create; override;
+    procedure GetInfo;
+  published
+    property IDString : String index 0 read GetString;
+    property Stepping : Integer index 0 read GetInteger;
+    property Model    : Integer index 1 read GetInteger;
+    property Family   : Integer index 2 read GetInteger;
+    property FPU : Boolean index 0 read GetBoolean;
+    property VirtualModeExtensions : Boolean index 1 read GetBoolean write SetDummyBool;
+    property DebuggingExtensions : Boolean index 2 read GetBoolean write SetDummyBool;
+    property PageSizeExtensions : Boolean index 3 read GetBoolean write SetDummyBool;
+    property TimeStampCoutner : Boolean index 4 read GetBoolean write SetDummyBool;
+    property K86_ModelSpecificRegisters : Boolean index 5 read GetBoolean write SetDummyBool;
+    property MachineCheckException : Boolean index 6 read GetBoolean write SetDummyBool;
+    property CMP_XCHG_8B : Boolean index 7 read GetBoolean write SetDummyBool;
+    property APIC  : Boolean index 8 read GetBoolean write SetDummyBool;
+    property MemoryTypeRangeRegisters  : Boolean index 9 read GetBoolean write SetDummyBool;
+    property GlobalPaging : Boolean index 10 read GetBoolean write SetDummyBool;
+    property Cond_MOVE_Instruct : Boolean index 11 read GetBoolean write SetDummyBool;
+    property MMX : Boolean index 12 read GetBoolean write SetDummyBool;
+    property SysCallAndSysRet : Boolean index 13 read GetBoolean write SetDummyBool;
+    property FPCond_MOVE_Instruct : Boolean index 14 read GetBoolean write SetDummyBool;
+    property AMD3DNow : Boolean index 15 read GetBoolean write SetDummyBool;
+    property CPUName : String index 0 read GetString write SetDummyString;
+    property ExistCPUInfo : Boolean index 16 read GetBoolean write SetDummyBool;
+  end;
+
+
+  //check whether there is valid CPU info or not
+  function LMDExistCPUInfo : Boolean;
+  //get the info about the CPU
+  function LMDGetCPUInfo(out info: TLMDCPUInfo) : Boolean;
+
+  //fast info functions
+  function LMDExistMMX : Boolean;
+  function LMDExist3DNow : Boolean;
+
+implementation

@@ -1,0 +1,120 @@
+
+uses
+  Windows,
+  Classes,
+  Messages,
+  Controls,
+  Forms,
+  ComCtrls,
+  lmdbase,
+  LMDFormDisplay;
+
+type
+  TLMDFormTabControl=class(TCustomTabControl)
+  private
+    FUseRes,
+    FSaveResources:Boolean;
+    FAbout:TLMDAboutVar;
+    // 4.0
+    FList:TList;
+    FActiveIndex:Integer;
+    //FPosition:TLMDFormDisplayPosition;
+    FOnChanging:TLMDFormDisplayChangeEvent;
+    procedure SetActiveForm(aValue:TCustomForm);
+    procedure SetActiveFormIndex(aValue:Integer);
+    function GetCount:Integer;
+    function GetActiveForm:TCustomForm;
+    function GetForms(Index:Integer):TCustomForm;
+    function GetFormIndex(Index:TCustomForm):Integer;
+    procedure CMDialogKey(var Message: TCMDialogKey); message CM_DIALOGKEY;
+  protected
+    function CanChange: Boolean; override;
+    procedure Change; override;
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+    // FormList Support from Version 4
+    {$IFDEF CPPBUILDER}
+    function AddFormExt(aValue:TCustomForm; Display:Boolean):Integer;
+    {$ELSE}
+    function AddForm(aValue:TCustomForm; Display:Boolean):Integer;
+    {$ENDIF}
+    function AddFormClass(aValue:TFormClass; Display:Boolean):Integer;
+    function AddFormClassExt(aValue:TFormClass; Display:Boolean; Caption:String):Integer;
+    function FindNextForm(CurForm:TCustomForm; GoForward:Boolean): TCustomForm;
+    procedure HideForm(aValue:TCustomForm);
+    procedure MoveForm(aValue:TCustomForm; NewIndex:Integer);
+    procedure RemoveForm(aValue:TCustomForm; FreeForm:Boolean);
+    procedure SelectNextForm(GoForward: Boolean);
+    function SetActiveFormByName(aValue:String):Boolean;
+    
+    property ActiveFormIndex:Integer read FActiveIndex write SetActiveFormIndex;
+    property ActiveForm:TCustomForm read GetActiveForm write SetActiveForm;
+    property FormCount:Integer read GetCount;
+    property Forms[index:Integer]:TCustomForm read GetForms;
+    property FormIndex[index:TCustomForm]:Integer read GetFormIndex;
+
+    property DisplayRect;
+    property Tabs;
+    property TabIndex;  // must be after Tabs
+  published
+    property About:TLMDAboutVar read FAbout write FAbout stored false;
+    property SaveResources:Boolean read FSaveResources write FSaveResources default False;
+    property OnChanging:TLMDFormDisplayChangeEvent read FOnChanging write FOnChanging;
+    property UseResForms:Boolean read FUseRes write FUseRes default false;
+    // Delphi 3
+    property Align;
+    property DragCursor;
+    property DragMode;
+    property Enabled;
+    property Font;
+    property HotTrack;
+    property MultiLine;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ScrollOpposite;
+    property ShowHint;
+    property TabHeight;
+    property TabOrder;
+    property TabPosition;
+    property TabStop;
+    property TabWidth;
+    property Visible;
+    property OnChange;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDrag;
+
+    // Delphi 4
+    property Anchors;
+    property BiDiMode;
+    property Constraints;
+    property DockSite;
+    property DragKind;
+    property Images;
+    property MultiSelect;
+    property OwnerDraw;
+    property ParentBiDiMode;
+    property RaggedRight;
+    property Style;
+
+    property OnDockDrop;
+    property OnDockOver;
+    property OnDrawTab;
+    property OnEndDock;
+    property OnGetImageIndex;
+    property OnGetSiteInfo;
+    property OnResize;
+    property OnStartDock;
+    property OnUnDock;
+  end;
+
+
+implementation

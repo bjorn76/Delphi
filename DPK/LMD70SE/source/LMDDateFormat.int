@@ -1,0 +1,54 @@
+
+uses
+  Classes,
+  LMDObject;
+
+type
+  TLMDDateFormats = (dfShortSystem, dfLongSystem, dfCustom);
+
+  TLMDDateFormat = class (TLMDObject)
+  private
+    FFormatStr : String;
+    FFormat    : TLMDDateFormats;
+    FYearDelta : ShortInt;
+    FOnFormatChanged : TNotifyEvent;
+    FOnFormatChange : TNotifyEvent;
+
+    procedure SetFormatStr (aValue : String);
+    procedure SetFormat (aValue : TLMDDateFormats);
+  public
+    constructor Create; override;
+    procedure Assign (Source : TPersistent); override;
+    procedure DoFormatChanged;
+    procedure DoFormatChange;
+    function GetFormatStr : String;
+    function DateToStr (date : TDateTime) : String;
+    procedure StrToYMD (str  : String; var Y, M, D : Word);
+    function StrToDate (str  : String) : TDateTime;
+    function GetEditString (Y, M, D : Word) : String;
+    function GetDTEditString (dt : TDateTime) : String;
+    function GetLongMonthExtend : Integer;
+    function GetShortMonthExtend : Integer;
+    function GetLongDayExtend : Integer;
+    function GetShortDayExtend : Integer;
+    function NextEditPos (current : Integer; text : String) : Integer;
+    function PrevEditPos (current : Integer; text : String) : Integer;
+    function CurrentLength (current : Integer; text : String) : Integer;
+    function CurrentStart (current : Integer; text : String) : Integer;
+    function CurrentType (current : Integer; text : String) : Integer;
+//    procedure GetPatInfo (pat : Integer; var start, ende, typ : Integer);
+    function GetPattern (current : Integer; text : String) : Integer;
+    procedure GetPatInfo (pattern : Integer; text : String; var pat_start, pat_end, pat_type : Integer);
+    function CurrentYear: Word;
+    function GetYearDelta: Word;
+
+    property OnFormatChanged : TNotifyEvent read FOnFormatChanged write FOnFormatChanged;
+    property OnFormatChange : TNotifyEvent read FOnFormatChange write FOnFormatChange;    
+  published
+    property FormatStr : String read FFormatStr write SetFormatStr;
+    property Format    : TLMDDateFormats read FFormat write SetFormat default dfShortSystem;
+    property YearDelta : ShortInt read FYearDelta write FYearDelta default -1;
+  end;
+
+
+implementation

@@ -1,0 +1,243 @@
+
+uses
+  Windows,
+  StdCtrls,
+  Menus,
+  Messages,
+  Controls,
+  Graphics,
+  Classes,
+  actnlist,
+  imglist,
+  intfLMDBackground,
+  intfLMDThemes,
+  LMDClass,
+  LMDCont,
+  LMDGlyph,
+  LMDButtonBase,
+  LMDGraph,
+  LMDFXCaption,
+  LMDButtonLayout,
+  LMDBase,
+  LMDXPStyles,
+  LMDCustomImageList,
+  LMDBaseController;
+
+const
+  IDS_Style = 'Style';
+
+type
+  {****************************************************************************}
+  {* TWinButtons}
+  {****************************************************************************}
+  {----------------------------------------------------------------------------}
+  TLMDCustomButton=class(TButton, ILMDBackground, ILMDThemes)
+  private
+    FAbout         : TLMDAboutVar;
+    FButtonLayout  : TLMDButtonLayout;
+    FCanvas        : TCanvas;
+    FDropDown      : TPopupMenu;
+    FDropDownIndent: Integer;
+    FDropDownRight : Boolean;
+    FDropped       : Boolean;
+    FFontFx        : TLMDFxCaption;
+    IsFocused      : Boolean;
+    {TP}
+    FMouseOver     : Boolean;
+    {TP}
+    FMultiLine     : Boolean;
+    FRepeatedClick : Boolean;
+    FRepeatingDelay,
+    FRepeatingInterval: Word;
+
+    FState         : TLMDButtonState;
+    FStyle         : TLMDNormalButtonStyle;
+    FExtStyle      : TLMDUserButtonStyle;
+    {TP}
+    FTimerID       : TLMDTimer;
+
+    //4.01
+    FHideHint      : Boolean;
+    //5.0
+    FUseCaption    : Boolean;
+    // 7.0
+    FXP            : Boolean;
+    // ---
+    FOnDropDown,
+    FOnMouseEnter,
+    FOnMouseExit   : TNotifyEvent;
+
+    {imagelist support}
+    FImageList     : TLMDCustomImageList;
+    FIndex,
+    FListIndex     : Integer;
+    FChangeLink    : TLMDChangeLink;
+    FUseGlobalTimer: Boolean;
+    procedure SetImageList(aValue:TLMDCustomImageList);
+    procedure SetIndex(index, aValue:Integer);
+    procedure SetUseCaption(aValue:Boolean);
+    {saving}
+    {----}
+    procedure ReadIdent(Reader:TReader);
+    procedure WriteIdent(Writer:TWriter);
+    procedure ReadStyle(Reader:TReader);
+    procedure ReadExtStyle(Reader:TReader);
+
+    function  CheckCont:Boolean;
+    function HasControl:Boolean;
+    function IMLEmpty:Boolean;
+    function HasIML:Boolean;
+    procedure GetIMLChange(Sender:TObject);
+    {----  }
+
+    // 7.0
+    procedure SetCtlXP (aValue: Boolean);
+    // --
+    procedure SetGlyphKind(aValue:TLMDGlyphKind);
+    procedure SetButtonLayout(aValue: TLMDButtonLayout);
+    procedure SetDropDown(aValue: TPopupMenu);
+    procedure SetDropDownIndent(aValue: Integer);
+    procedure SetDropDownRight(aValue:Boolean);
+    procedure SetFontFx(aValue:TLMDFxCaption);
+    procedure SetMultiLine(aValue:Boolean);
+    procedure SetGlyph(aValue: TBitmap);
+    procedure SetRepeatedClick(aValue: Boolean);
+    procedure SetRepeatingInterval(aValue: Word);
+    procedure SetStyle(aValue:TLMDNormalButtonStyle);
+    procedure SetExtStyle(aValue:TLMDUserButtonStyle);
+    procedure SetNumGlyphs(aValue: TLMDNumGlyphs);
+    procedure SetVisible(aValue : Boolean);
+    function GetCaption:String;
+    function GetVisible : Boolean;
+    function GetNumGlyphs:TLMDNumGlyphs;
+    function GetGlyph:TBitmap;
+    function IsCustom:Boolean;
+
+    {TP - 3.01}
+    procedure ExecuteRepeatedClick(Sender:TObject);
+
+    // 6.1
+    procedure CMLMDThemeChanged(var Message: TMessage); message CM_LMDTHEMECHANGED;
+    //procedure CMLMDBackChanged(var Message: TMessage); message CM_LMDBACKCHANGED;
+
+    procedure CMMouseEnter(var Message: TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Message: TMessage); message CM_MOUSELEAVE;
+    procedure CNDrawItem(var Message: TWMDrawItem); message CN_DRAWITEM;
+    procedure CNMeasureItem(var Message: TWMMeasureItem); message CN_MEASUREITEM;
+    procedure CMEnabledChanged(var Message: TMessage); message CM_ENABLEDCHANGED;
+    procedure CMFontChanged(var Message:TMessage);message CM_FONTCHANGED;
+    procedure WMLButtonDblClk(var Message: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
+    procedure WMLButtonDown(var Message: TWMLButtonDown); message WM_LBUTTONDOWN;
+    procedure WMLButtonUp(var Message: TWMLButtonUp); message WM_LBUTTONUP;
+    procedure WMEraseBackground(var Message: TWMERASEBKGND); message WM_ERASEBKGND;
+    function GetCtlXP: Boolean;
+  protected
+    FGlyph:Pointer;
+    FGlyphKind     : TLMDGlyphKind;
+    procedure DefineProperties(Filer:TFiler);override;
+
+    //this method must be overwritten by controls supporting a special WinXP
+    //look for being able to use the Bevel bmWindows mode correctly under all
+    //circumstances
+    function ControlSupportsXP: Boolean; virtual;
+    //handle theme changes
+    procedure DoThemeChanged; virtual;
+    //UseXP will return true,
+    //if the system supports xp, xp theme support is switched on, the components
+    //local variable supportXp is active or global (and global settings are active)
+    function UseXP: Boolean;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override ;
+    procedure ActionChange(Sender: TObject; CheckDefaults: Boolean);override;
+    procedure BoundsChange(State:TLMDBoundsChangeStates);virtual;
+    procedure CreateParams(var Params: TCreateParams); override;
+    procedure DrawCaptionAndGlyph (aCanvas: TCanvas;aRect: TRect; flags: LongInt); virtual;
+    procedure DrawItem(const DrawItemStruct: TDrawItemStruct);virtual;
+    procedure DoRepeatedClick;virtual;
+    procedure GetChange(Sender:TObject);
+    function GetPalette: HPALETTE;  override;
+    function GetState: TLMDButtonState;
+    procedure Loaded; override;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);override;
+    // 6.0 --
+    procedure RequestDefaultGlyph;
+    // ----
+    procedure FreeTimer;
+    procedure SetButtonStyle(ADefault: Boolean);  override;
+   public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);override;
+    procedure Click; override;
+    procedure DropDown;
+
+    //new V7, JH Oct 02
+    function BackBitmap: TBitmap;
+    function BackBitmapCheck: Boolean;
+    function BackDrawArea(Canvas: TCanvas; const dest: TRect; const src: TPoint; flags:Word): Boolean;
+    function isTransparentSet: Boolean;
+    function BackMapPoint(const aValue: TPoint):TPoint;
+    function BackBitmapPalette: HPalette;
+    procedure BackUpdate;
+    function BackControl (index: Integer): TControl; virtual;
+    function BackControlCount: Integer; virtual;
+    // compatibilit types ---
+    property Style:TLMDNormalButtonStyle read FStyle write SetStyle;
+    property ExtStyle:TLMDUserButtonStyle read FExtStyle write SetExtStyle;
+    // -------
+
+    property Dropped:Boolean read FDropped;
+
+    property DropDownMenu: TPopupMenu read FDropDown write SetDropDown stored True;
+    property DropDownIndent: Integer read FDropDownIndent write SetDropDownIndent default 0;
+    property DropDownRight:Boolean read FDropDownRight write SetDropDownRight default false;
+    property OnDropDown:TNotifyEvent read FOnDropDown write FOnDropDown;
+    property GlyphKind: TLMDGlyphKind read FGlyphKind write SetGlyphKind default gkCustom;
+  published
+    property About:TLMDAboutVar read FAbout write FAbout stored false;
+    {6.1}
+    property CtlXP:Boolean read GetCtlXP write SetCtlXP default True;
+    // -----
+    property ButtonLayout: TLMDButtonLayout read FButtonLayout write SetButtonLayout;
+    property ButtonStyle: TLMDUserButtonStyle read FExtStyle write SetExtStyle default ubsWin40;
+    property Cancel;
+    property Caption;
+    property Color;
+    property Default;
+    property Enabled;
+    property Font;
+    property FontFX:TLMDFxCaption read FFontFx write SetFontFx;
+    property Glyph: TBitmap read GetGlyph write SetGlyph stored IsCustom;
+
+    //4.01
+    property HideHint:Boolean read FHideHint write FHideHint default True;
+    // 5.0
+    property UseCaption:Boolean read FUseCaption write SetUseCaption default True;
+    //--
+
+    property ImageList:TLMDCustomImageList read FImageList write SetImageList stored HasControl;
+    property ImageIndex:Integer index 0 read FIndex write SetIndex default 0;
+    property ListIndex:Integer index 1 read FListIndex write SetIndex default 0;
+
+    property ModalResult;
+    property MultiLine:Boolean read FMultiLine write SetMultiLine default false;
+    property NumGlyphs: TLMDNumGlyphs read GetNumGlyphs write SetNumGlyphs default 1;
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property RepeatedClick: Boolean read FRepeatedClick write SetRepeatedClick default False;
+    property RepeatingInterval: Word read FRepeatingInterval write SetRepeatingInterval default 100;
+    property RepeatingDelay : Word read FRepeatingDelay write FRepeatingDelay default 500;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    // 7.0
+    property UseGlobalTimer:Boolean read FUseGlobalTimer write FUseGlobalTimer default false;
+    // ---
+    property Visible : Boolean read GetVisible write SetVisible default true;
+
+    property OnMouseEnter: TNotifyEvent read FOnMouseEnter write FOnMouseEnter;
+    property OnMouseExit: TNotifyEvent read FOnMouseExit write FOnMouseExit;
+  end;
+
+
+implementation

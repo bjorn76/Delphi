@@ -1,0 +1,34 @@
+
+uses
+  messages,                //TMessage
+  classes,                 //TComponent
+  Windows,
+  Graphics,
+  intfLMDBackground,
+  LMDBase,
+  LMDCustomControl,
+  LMDBaseControl;
+
+type
+  {----------------------TLMDBaseGraphicControl--------------------------------}
+  TLMDBaseGraphicControl = class(TLMDBaseControl)
+  private
+    FTransparent:Boolean;
+    procedure SetTransparent(aValue:Boolean);
+    procedure CMTRANSPARENTCHANGED(var Message: TMessage); message CM_TRANSPARENTCHANGED;
+  protected
+    Painting:Boolean;
+    function CheckOptimized:Boolean;override;
+    procedure DisableTransMode;
+    procedure GetChange(Sender:TObject);override;
+    procedure InvalidateControl;
+    procedure Paint;override;
+    property Transparent:Boolean read FTransparent write SetTransparent default True;
+  public
+    constructor Create(AOwner:TComponent);override;
+
+    //new V7
+    function isTransparentSet: Boolean; override;
+  end;
+
+implementation

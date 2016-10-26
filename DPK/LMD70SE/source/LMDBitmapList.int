@@ -1,0 +1,84 @@
+
+uses
+  Windows,
+  SysUtils,
+  Classes,
+  graphics,
+  consts,
+  controls,
+  imglist,
+  lmdclass,
+  LMDGraph,
+  LMDCustomImageList,
+  LMDBaseController,
+  LMDCustomContainer;
+
+type
+
+  {****************************************************************************}
+  {----------------------TLMDBitmapListItem------------------------------------}
+  TLMDBitmapListItem = class(TLMDListItem)
+  private
+    FBitmap:TBitmap;
+    FPixelFormat:TLMDSavePixelFormat;
+    function GetBitmap:TBitmap;
+    procedure SetBitmap(aValue:TBitmap);
+  protected
+    function  GetEmpty:Boolean;override;
+    procedure DefineProperties(Filer: TFiler);override;
+    procedure ReadData(Stream:TStream);override;
+    procedure WriteData(Stream:TStream);override;
+    function  WriteFlag:Byte; override;
+  public
+    constructor Create(aOwner:TComponent);override;
+    destructor Destroy;override;
+    procedure Assign(Source:TPersistent);override;
+    procedure FreeData; override;
+    property Compressed;
+    property PixelFormat:TLMDSavePixelFormat read FPixelFormat write FPixelFormat default spfDefault;
+  published
+    property Bitmap:TBitmap read GetBitmap write SetBitmap stored false;
+    property Ident stored false;
+    property Description stored false;
+  end;
+
+  {----------------------TLMDBitmapList----------------------------------------}
+  TLMDBitmapList=class(TLMDCustomImageList)
+  private
+    function GetArrayItem(Index:Integer):TLMDBitmapListItem;
+    function GetArrayNameItem(Index:String):TLMDBitmapListItem;
+    function GetBitmap:TBitmap;
+  protected
+  public
+    constructor Create(aOwner:TComponent);override;
+    destructor Destroy;override;
+    {common helpers for components}
+    function BmpCanvas(index:Integer):TCanvas;override; {3.10}
+    function ItemRect(index, item:Integer):TRect;override; {3.10}
+    function Dimensions(index:Integer; tp:Byte):Integer;override;
+    function IsValidItem(index, item:Integer):Boolean;override;
+    procedure GetBitmapItem(index, item:Integer; tb:TBitmap);override;
+    function ItemCount(index:Integer):Integer;override;
+    function Masked(index:Integer):Boolean; override;
+    function Palette(index:Integer):HPalette;override;
+    function TransparentColor(index, item:Integer):TColor;override;
+    function GetColorAtPoint(aPoint: TPoint; index, item:Integer): TColor; override;
+    {Drawing}
+    procedure Draw(Canvas: TCanvas; X, Y: Integer; ListIndex, Index: Integer);override;
+    function DrawExt(Canvas:TCanvas; target:TRect; flags:Word; ListIndex, Index:Integer):TRect;override;
+    {Extended Drawing}
+    procedure ClipDraw(Canvas:TCanvas; target:TRect; flags:WORD;
+                       pos:LongInt; transColor:TColor; ListIndex, index:Integer);override;
+    {properties}
+    property Item:TBitmap read GetBitmap;
+    {Array-> Eigenschaft}
+    property Items[Index:Integer]:TLMDBitmapListItem read GetArrayItem;default;
+    property ItemByName[Index:String]:TLMDBitmapListItem read GetArrayNameItem;
+  published
+    property DefaultCompressed;
+    property DefaultPixelFormat;
+  end;
+
+function LMDBMLGetItem(const FileName:String; index:Integer; aBitmap:TBitmap):Boolean;
+
+implementation

@@ -1,0 +1,126 @@
+
+uses
+  Windows,
+  Classes,
+  Graphics,
+  LMDBaseController,
+  LMDCont,
+  LMDGraph,
+  LMDButtonBase,
+  LMDCustomImageList,
+  LMDBaseGraphicButton
+  {$IFNDEF LMDTOOLS_SPECIALEDITION}
+  ,LMDMMButtonFaceController{$ENDIF};
+
+type
+  {************************* TLMDCustomMMButton *******************************}
+  TLMDCustomMMButton=class(TLMDBaseGraphicButton)
+  private
+    // 7.0
+    {$IFNDEF LMDTOOLS_SPECIALEDITION}
+    FButtonFaceController:TLMDMMButtonFaceController;
+    FButtonFaceControllerLink:TLMDChangeLink;
+    {$ENDIF}
+    // ----
+
+    FButtonFace:TLMDButtonFace;
+    FButtonFaceImageList:TLMDCustomImageList;
+    FButtonFaceChangeLink: TLMDChangeLink;
+    FButtonFaceIndices: TLMDButtonFaceIndices;
+    FCaptionDown: integer;
+    FTransCol: TColor;
+    FForceTransparent,
+    FQuickDraw:Boolean;
+    FStyle:TLMDBitmapStyle;
+    FFaceRect:TRect;
+    {$IFNDEF LMDTOOLS_SPECIALEDITION}
+    procedure SetButtonFaceController(aValue:TLMDMMButtonFaceController);
+    {$ENDIF}
+    procedure SetButtonFaceImageList(aValue:TLMDCustomImageList);
+    procedure SetCaptionDown(aValue:integer);
+    procedure SetQuickDraw(aValue:Boolean);
+    procedure SetForceTransparent(aValue:Boolean);
+    procedure SetStyle(aValue:TLMDBitmapStyle);
+    procedure SetButtonFaceIndex(Index:TLMDButtonState; aValue:TLMDButtonFaceIndex);
+    function GetButtonFaceIndex(Index:TLMDButtonState):TLMDButtonFaceIndex;
+
+    function ButtonFaceIMLEmpty(aValue: TLMDButtonState):Boolean;
+    function HasButtonFaceIML:Boolean;
+    {saving: ButtonFace}
+    {----}
+    procedure OldReadIndexIdent(Reader: TReader);
+    procedure OldReadTransColIdent(Reader: TReader);
+    procedure ReadIndexIdent_old(S: TStream);
+    procedure ReadIndexIdent(S: TStream);
+    procedure WriteIndexIdent(S: TStream);
+    procedure ButtonFaceReadIdent(Reader:TReader);
+    procedure ButtonFaceWriteIdent(Writer:TWriter);
+    procedure ReadTransColIdent(S: TStream);
+    procedure WriteTransColIdent(S: TStream);
+    function ButtonFaceCheckCont:Boolean;
+    function ButtonFaceHasControl:Boolean;
+    {----}
+  protected
+    procedure AssignControllerValues;
+    procedure DefineProperties(Filer:TFiler);override;
+    procedure GetButtonFaceIMLChange(Sender:TObject);virtual;
+    function GetEmpty:Boolean; override;
+    function GetPalette: HPALETTE;  override;
+    function IsCustom:Boolean; override;
+    procedure Loaded;override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override ;
+    procedure Paint;override;
+    function VerifyTransparency(X, Y: Integer): Boolean; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+
+    // Disposition--
+    procedure GetButtonFaceIndices(var aValue:TLMDButtonFaceIndices);
+    procedure SetButtonFaceIndices(aValue: TLMDButtonFaceIndices);
+    procedure SetTransCol;
+    // --------
+    procedure Synchronize(const aValue: Boolean=false);
+    property ButtonFaceIndex[index:TLMDButtonState]:TLMDButtonFaceIndex read GetButtonFaceIndex write SetButtonFaceIndex;
+  published
+    // 7.0  --> ButtonFaceController feature
+    {$IFNDEF LMDTOOLS_SPECIALEDITION}
+    property ButtonFaceController:TLMDMMButtonFaceController read FButtonFaceController write SetButtonFaceController;
+    {$ENDIF}
+    // 7.0
+    property ButtonLayout;
+    property EnterColor;
+    property EnterColorChange;
+    property Glyph;
+    property Font;
+    property FontFX;
+    property ImageList;
+    property ImageIndex;
+    property ListIndex;
+    property NumGlyphs;
+    property RepeatedClick;
+    property RepeatingInterval;
+    property RepeatingDelay;
+    property UseCaption;
+    property OnDropDown;
+    // ---
+
+    property AllowAllUp;
+    property AllowMouseOver;
+    property AllowTransparency default true;
+    property ButtonFace:TLMDButtonFace read  FButtonFace write FButtonFace;
+    property ButtonFaceStyle:TLMDBitmapStyle read FStyle write SetStyle default sbNone;
+    property ButtonFaceImageList:TLMDCustomImageList read FButtonFaceImageList write SetButtonFaceImageList stored ButtonFaceHasControl;
+    property CaptionDown: integer read FCaptionDown write SetCaptionDown default 1;
+    property ForceTransparent:Boolean read FForceTransparent write SetForceTransparent default True;
+    property GroupIndex;
+    property QuickDraw:Boolean read FQuickDraw write SetQuickDraw default false;
+    property Pressed;
+    property DropDownMenu;
+    property DropDownIndent;
+    property DropDownRight;
+    property Transparent default false;
+    property MultiLine;
+  end;
+
+implementation

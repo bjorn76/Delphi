@@ -1,0 +1,122 @@
+
+uses
+  Windows,
+  Controls,
+  Classes,
+  Messages,
+  Graphics,
+  StdCtrls,
+
+  LMDBaseController,
+  LMDCustomListBox,
+  LMDCont,
+  LMDGraph,
+  LMD3DCaption,
+  LMDGlyphTextLayout,
+  LMDBase,
+  LMDXPStyles,
+  LMDCustomImageList;
+
+type
+  TLMDImageBoxOption=(lboImageListOrder, lboCheckImageNr, lboCalcHeight, lboTransparentImages);
+  TLMDImageBoxOptions=set of TLMDImageBoxOption;
+
+  {--------------------- TLMDCustomImageListBox -------------------------------------}
+  TLMDCustomImageListBox=class(TLMDCustomListBox)
+  private
+    {ImageList Support}
+    FImageList:TLMDCustomImageList;
+    FListIndex:Integer;
+    FChangeLink:TLMDChangeLink;
+
+    FDefaultItem:Integer;
+    FOptions:TLMDImageBoxOptions;
+    FLayout:TLMDGlyphTextLayout;
+    FDelimiter:Char;
+
+     //4.0
+    FImagesOnly:Boolean;
+    FGlyphNumber: Byte;
+    FGlyphColumn: Byte;
+    procedure SetImagesOnly(aValue:Boolean);
+    procedure UpdateEmptyList;
+    function StoreItems:Boolean;
+    //--
+
+    //--
+    procedure SetDefaultItem(aValue:Integer);
+    procedure SetDelimiter(aValue:Char);
+    procedure SetImageList(aValue:TLMDCustomImageList);
+    procedure SetImageIndex(Index, aValue:Integer);
+    procedure SetIndex(aValue:Integer);
+    procedure SetLayout(aValue:TLMDGlyphTextLayout);
+    procedure SetOptions(aValue:TLMDImageBoxOptions);
+    function GetImageIndex(aValue:Integer):Integer;
+
+    {saving}
+    {----}
+    procedure ReadIdent(Reader:TReader);
+    procedure WriteIdent(Writer:TWriter);
+    function  CheckCont:Boolean;
+    function HasControl:Boolean;
+    procedure SetGlyphNumber(const Value: Byte);
+    procedure SetGlyphColumn(const Value: Byte);
+    {function HasIML:Boolean;}
+    {----  }
+  protected
+    function GetStringValue(aValue:Integer):String;override;
+
+    // LMD-Tools 6.0 - functions for specifying width and height of an item
+    function GetHorzExtent(index:Integer):Integer; override;
+    function GetImageHeight(aValue:Integer):Integer;virtual;
+    function GetImageWidth(aValue:Integer):Integer;virtual;
+    // ++ GetImageIndex to get real connected Image
+    // ----
+
+    function CanEdit:Boolean;override;
+    function GetEditRect(index:Integer):TRect;override;
+
+    procedure DefineProperties(Filer:TFiler);override;
+    procedure DrawItem(Index: Integer; Rect: TRect; State: TOwnerDrawState); override;
+//    function GetFieldValue:Integer;virtual;
+    procedure GetIMLChange(Sender:TObject);virtual;
+    function IMLEmpty:Boolean;
+    procedure Loaded; override;
+    procedure MeasureItem(Index: Integer; var Height: Integer); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override ;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+
+    property Canvas;
+    property Text;
+
+    property ImageIndexValue[Index:Integer]:Integer read GetImageIndex write SetImageIndex;
+
+    property Items stored StoreItems;
+    property Layout:TLMDGlyphTextLayout read FLayout write SetLayout;
+    property ImageList:TLMDCustomImageList read FImageList write SetImageList stored HasControl;
+    property ListIndex:Integer read FListIndex write SetIndex default 0;
+    property ImagesOnly:Boolean read FImagesOnly write SetImagesOnly default false;
+
+    property GlyphNumber:Byte read FGlyphNumber write SetGlyphNumber default 1;
+    property GlyphColumn:Byte read FGlyphColumn write SetGlyphColumn default 0; 
+  published
+    property Ctl3D;
+    property Delimiter:Char read FDelimiter write SetDelimiter default '|';
+    property Options:TLMDImageBoxOptions read FOptions write SetOptions default [lboImageListOrder, lboCheckImageNr];
+    property DefaultItem:Integer read FDefaultItem write SetDefaultItem default -1;
+  end;
+
+  // only for derviced classes which used TLMDCustomImageListBox as base class before
+  TLMDCustomDerivedImageListBox=class(TLMDCustomListBox)
+  private
+    procedure ReadChar(Reader:TReader);
+    procedure ReadIdent(Reader:TReader);
+    procedure ReadInteger(Reader:TReader);
+  protected
+    procedure DefineProperties(Filer:TFiler);override;
+  end;
+
+
+implementation

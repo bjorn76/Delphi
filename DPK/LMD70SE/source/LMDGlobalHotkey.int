@@ -1,0 +1,31 @@
+
+uses
+  Windows,
+  Classes,
+  Messages,
+  Menus,
+  Controls,
+  LMDCustomComponent;
+
+type
+  TLMDGlobalHotKey = class(TLMDCustomComponent)
+  private
+    FActive: Boolean;
+    FAtom:TAtom;
+    FGlobalKey:TShortcut;
+    FOnKeyDown:TKeyEvent;
+    FWndHandle:HWnd;
+    procedure SetEnabled(aValue:Boolean);
+    procedure SetHotKey(aValue:TShortcut);
+    procedure NewWndProc(var Message:TMessage);
+  public
+    constructor Create(AOwner: TComponent);override;
+    destructor Destroy;override;
+  published
+    property About;
+    property Active:Boolean read FActive write SetEnabled default True;
+    property HotKey:TShortcut read FGlobalKey write SetHotKey;
+    property OnKeyDown: TKeyEvent read FOnKeyDown write FOnKeyDown;
+  end;
+
+implementation

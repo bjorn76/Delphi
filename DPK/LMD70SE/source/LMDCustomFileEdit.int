@@ -1,0 +1,30 @@
+
+uses
+  Classes,
+  LMDCustomBrowseEdit;
+
+type
+  TLMDCustomFileEdit = class (TLMDCustomBrowseEdit)
+  private
+    FFilenameOnly,
+    FEllipse      : Boolean;
+    FFullText     : String;
+
+    procedure SetFilenameOnly (aValue: Boolean);
+    procedure SetFilename (const aValue : String);
+    function GetFileName : String;
+  protected
+    procedure DoEnter; override;
+    procedure DoExit; override;
+    procedure UpdateText;
+    procedure SetNewText; override;
+    property FullText: String read FFullText;
+    property Filename : String read GetFilename write SetFilename;
+  public
+    constructor Create (aOwner : TComponent); override;
+    procedure Loaded; override;
+    property MinimizeName: Boolean read FEllipse write FEllipse default false;
+    property FilenameOnly: Boolean read FFilenameOnly write SetFilenameOnly;
+  end;
+
+implementation

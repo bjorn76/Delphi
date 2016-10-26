@@ -1,0 +1,113 @@
+
+uses
+  Windows,
+  Classes,
+  Graphics,
+  LMDShapeBase,
+  LMDBase,
+  LMDGraph,
+  LMDShapeButtonColor,
+  LMDShape,
+  LMDPointList,
+  LMDCont,
+  LMDShadow,
+  LMDShapeFill,
+  LMDBaseGraphicButton,
+  LMDCustomImageList,
+  LMDBaseController;
+
+type
+  TLMDShapeButtonStyle=(sbsShadow, sbs3D);
+
+  {----------------------TLMDCustomShapeButton---------------------------------}
+  TLMDCustomShapeButton = class(TLMDBaseGraphicButton)
+  private
+    FShape            : TLMDShape;
+    FColors           : TLMDShapeButtonColor;
+    FBitmap           : TBitmap;
+    FShapeFill        : TLMDShapeFill;
+    FBtnFaceImageList : TLMDCustomImageList;
+    FBtnFaceIndex,
+    FBtnFaceListIndex : Integer;
+    FBtnFaceChangeLink: TLMDChangeLink;
+    procedure SetBtnFaceImageList(aValue:TLMDCustomImageList);
+    procedure SetBtnFaceIndex(index, aValue:Integer);
+    procedure SetMode(aValue:TLMDShapeButtonMode);
+    {saving}
+    {----}
+    procedure ReadIdent(Reader:TReader);
+    procedure WriteIdent(Writer:TWriter);
+    function  CheckCont:Boolean;
+    function HasControl:Boolean;
+    {----  }
+    procedure SetShapeFill(aValue: TLMDShapeFill);
+    procedure SetColors(aValue: TLMDShapeButtonColor);
+    procedure SetBevel3D(aValue: Boolean);
+    procedure SetShape(aValue: TLMDShape);
+    procedure SetShapeStyle(aValue: TLMDShapeButtonStyle);
+    procedure ReadBool(Reader:TReader);
+  protected
+    FStyle            : TLMDShapeButtonStyle;
+    FMode             : TLMDShapeButtonMode;
+    FBevel3D          : Boolean;
+    FBrush            : TBrush;
+    FList             : TLMDPointList;
+
+    procedure BoundsChange(State:TLMDBoundsChangeStates); override;
+    procedure DefineProperties(Filer:TFiler);override;
+    procedure GetIMLFaceChange(Sender:TObject);
+    procedure GetChange(Sender: TObject);override;
+    function GetPalette:HPalette;override;
+    function IMLFaceEmpty:Boolean;
+    function IsCustom:Boolean; override;
+    procedure Loaded; override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override ;
+    function ShapeButtonColorChange: Boolean; override;
+    function VerifyTransparency(X, Y: Integer): Boolean; override;
+    property Bevel3D: Boolean read FBevel3D write SetBevel3D default False;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure Paint;override;
+    property MouseOver;
+  published
+    // 7.0
+    property ButtonLayout;
+    property EnterColor;
+    property EnterColorChange;
+    property Glyph;
+    property Font;
+    property FontFX;
+    property ImageList;
+    property ImageIndex;
+    property ListIndex;
+    property NumGlyphs;
+    property RepeatedClick;
+    property RepeatingInterval;
+    property RepeatingDelay;
+    property UseCaption;
+    property OnDropDown;
+    // ---
+
+    property AllowTransparency;
+    property AllowMouseOver;
+    property AllowAllUp;
+    property Colors: TLMDShapeButtonColor read FColors write SetColors;
+    property GroupIndex;
+    property Pressed;
+    property DropDownMenu;
+    property DropDownIndent;
+    property DropDownRight;
+    property Mode:TLMDShapeButtonMode read FMode write SetMode default sbmShapeFast;
+    property Shape: TLMDShape read FShape write SetShape;
+    property Style: TLMDShapeButtonStyle read FStyle write SetShapeStyle default sbsShadow;
+    property Transparent;
+    property ShapeFill: TLMDShapeFill read FShapeFill write SetShapeFill;
+    property ShapeFillImageList:TLMDCustomImageList read FBtnFaceImageList write SetBtnFaceImageList stored HasControl;
+    property ShapeFillImageIndex:Integer index 0 read FBtnFaceIndex write SetBtnFaceIndex default 0;
+    property ShapeFillListIndex:Integer index 1 read FBtnFaceListIndex write SetBtnFaceIndex default 0;
+    property MultiLine;
+  end;
+
+
+implementation

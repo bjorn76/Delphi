@@ -1,0 +1,363 @@
+
+uses
+  Windows, Classes, Forms, Graphics, ExtCtrls, Controls, SysUtils, Messages, Dialogs,
+  LMDObject,
+  LMDIniCtrl,
+  LMDBase,
+  LMDProcs,
+  LMDCustomComponent;
+
+const
+
+  // global available constants
+  IDS_DEFAULTDELIMITER:Char=',';
+
+  LMD_DEFINTERVAL=50;
+
+  CM_LMDPROPCHANGE = CM_BASE + 301;
+  CM_LMDCOLDESTROY = CM_BASE + 302;
+  CM_DEVICECHANGE = CM_BASE + 303;
+
+type
+
+  // 7.0
+  // ===
+  {$IFNDEF LMDCOMP6}
+  TLMDList=class(TList)
+  public
+    procedure Assign(Source: TList);
+  end;
+  {$ELSE}
+  TLMDList=TList;
+  {$ENDIF}
+
+  TLMDDateTimeFormat=Type String;
+
+  {possible values for Container}
+  //TLMDListItemClassType=(icImageList, icBitmap, icWave, icStringList, icGeneric, icRTF, icInvalid);
+
+  //4.0 DialogPositions
+  TLMDDlgPosRel = (brScreen, brScreenWorkArea, brMainForm, brActiveWindow);
+  TLMDDlgPosition = (bpCustom,
+                     bpTopLeft, bpTopCenter, bpTopRight,
+                     bpCenterLeft, bpCenter, bpCenterRight,
+                     bpBottomLeft, bpBottomCenter, bpBottomRight);
+
+  // 4.0 new timerstyles
+  TLMDTimerMode=(tmNormal, tmGlobalTimer, tmHiTimer, tmThreaded);
+
+  {----------------------------------------------------------------------------}
+  TLMDCharCase=(ccNormal, ccLowerCase, ccUpperCase);
+
+  {----------------------TLMDApplication---------------------------------------}
+  TLMDTimerPool=class;
+  TLMDTimerItem=class;
+
+  TLMDApplicationOption=(aoAutoRealizePalette, aoMouseCtrlActive, aoLogAlwaysClear,
+                         aoLogException, aoLogHeader, aoLogNr, aoLogTime, aoLogDate );
+  TLMDApplicationOptions=set of TLMDApplicationOption;
+  TLMDLogAction=(laNone, laClearLog, laBackupLog);
+
+  TLMDExceptionEvent=procedure(Sender:TObject;E:Exception;var Cancel:Boolean) of object;
+
+  TLMDMaxLogSizeEvent=procedure(Sender:TObject; const LogName:String; var Cancel:Boolean) of object;
+
+  TLMDOnHeaderWrite=procedure(Sender : TObject;var Target : Text) of object;
+
+  {ExitWindows Method}
+  TLMDExitCode=(ecQuit, ecReboot, ecRestart);
+  {**** }
+
+  TLMDEditMode = (emInsert, emShift, emCtrl, emAlt, emCaps, emNum, emScroll);
+  TLMDEditModes = Set of TLMDEditMode;
+
+  TLMDApplication = class(TComponent)
+    private
+
+      {additional Infos about application, -> used for about dialog
+                                           -> creating proper key for registry in Win32
+                                           HKEY_CURRENT_USER\CompanyName\ApplicationTitle\Version}
+      FMask,
+      FCompany,
+      FVersion:String;
+
+      {global options, objects}
+      FOptions:TLMDApplicationOptions;
+      FIniCtrl:TLMDIniCtrl;
+
+      { Edit Controls }
+      FEditMode : TLMDEditModes;
+      FOnEditModeChange : TNotifyEvent;
+
+      {fading of forms}
+      FEffectDelay:Byte;
+
+      {global pattern brushes}
+      FMonoPattern,
+      FPatternBitmap:TBitmap;
+      FLastColor:TColor;
+
+      {global timer pool, used by LMD components}
+      FTimerPool:TLMDTimerPool;
+
+      {LogFile-Feature}
+      FLogPrefix:TLMDPathPrefix;
+      FLogName:String;
+      FLogMaxSize:LongInt;
+      FUpdate:Byte;
+      FCounter:LongInt;
+      FlogAction:TLMDLogAction;
+      FOnMaxLogSize:TLMDMaxLogSizeEvent;
+      FOnHeaderWrite : TLMDOnHeaderWrite; //4.51
+
+      {StopWatch}
+      FTimerFrequency,
+      FStartTime:Int64;
+
+      // 6.1
+      FCheckBitmap:TBitmap;
+
+      { LMD MessageBox }
+      {$IFDEF CLR}
+      FMsgBoxStyle : IntPtr;
+      {$ELSE}
+      FMsgBoxStyle : Pointer;
+      {$ENDIF}
+
+      {check Previous Instance feature}
+      FMHandle:THandle;
+      FIsPrevRunning:Boolean;
+
+      {Exception}
+      FOnException:TLMDExceptionEvent;
+
+      // LMD-Tools 6.0 Enhancements
+      FCheckHeight, FCheckWidth:Integer;
+
+      // Windows XP Support
+      FLMDOnly,
+      FUseXPThemes,
+      FManifest: Boolean;
+      function GetXPThemesSupported: Boolean; //JH March 2002
+      function GetUseXPThemes:Boolean;
+      procedure SetXPThemeSupport (aValue: Boolean);
+      procedure SetXPLMDOnly (aValue: Boolean);
+      procedure DoThemeChange;
+      // --
+
+      // 6.1
+      function GetCheckCustomWidth:Integer;
+      function GetCheckCustomHeight:Integer;
+      procedure SetCheckBitmap(aValue:TBitmap);
+      // --
+
+      {private methods}
+      procedure SetLogPrefix(aValue:TLMDPathPrefix);
+      procedure SetLogName(const aValue:String);
+      procedure SetEditMode (aValue:TLMDEditModes);
+
+      function GetBitmap:TBitmap;
+      {only for internal use}
+      function GetTimer(Ident:Word):TLMDTimerItem;
+      function GetTimerIdent:Word;
+      {function GetFontList:TStrings;}
+      function GetTimerFrequency:Extended;
+    public
+      //initializes UseXPThemes property, JH March 2002
+      procedure InitXPSupport;
+
+      constructor Create(aOwner:TComponent);override;
+      destructor Destroy;override;
+
+      {global Timer feature}
+      function AddTimer(wInterval:Word; CallProc:TNotifyEvent):Word;
+      function AddTimerExt(wInterval:Word; iCallCount:Integer;
+                           bEnabled:Boolean; CallProc:TNotifyEvent):Word;
+      procedure RemoveTimer(Ident:Word);
+
+      {StopWatch feature}
+      procedure STWStart;
+      function STWStop:LongInt;
+      //7.0
+      function STWStopExt:Extended;
+
+      {global brush pattern feature}
+      function GetBrushBitmap(aColor:TColor):TBitmap;
+
+      {uses Company and version information}
+      function GetDefaultRegPath:String;
+
+      {Exit Windows-Method}
+      function QuitWindows(aValue:TLMDExitCode):Boolean;
+
+      {for internal use and only useful after initialization}
+      property IsPrevRunning:Boolean read FIsPrevRunning;
+
+      {LogFile Feature}
+      procedure HandleException(Sender:TObject; E:Exception);
+      procedure LogException(Sender:TObject);
+      procedure LogWrite(const aValue:String);
+
+      // 6.1
+      // specify default bitmap for TLMDCheckListBox controls
+      property CheckBitmap:TBitmap read FCheckBitmap write SetCheckBitmap;
+      property CheckCustomWidth:Integer read GetCheckCustomWidth;
+      property CheckCustomHeight:Integer read GetCheckCustomHeight;
+      // ---
+
+      {Properties}
+      property Company:String read FCompany write FCompany;
+      property DlgEffectDelay:Byte read FEffectDelay write FEffectDelay;
+      property Ini:TLMDIniCtrl read FIniCtrl;
+      property MsgBox : {$IFDEF CLR}IntPtr{$ELSE}Pointer{$ENDIF} read FMsgBoxStyle write FMsgBoxStyle;
+      property EditMode : TLMDEditModes read FEditMode write SetEditMode default [emInsert];
+      property OnEditModeChange : TNotifyEvent read FOnEditModeChange write FOnEditModeChange;
+
+      // Windows XP Support
+      property UseXPThemes: Boolean read GetUseXPThemes write SetXPThemeSupport;
+      property UseXPThemesLMDOnly:Boolean read FLMDOnly write SetXPLMDOnly;
+      property XPThemesSupported: Boolean read GetXPThemesSupported;
+      property XPManifestAvailable:Boolean read FManifest write FManifest;
+
+      {LogFileFeature}
+      property LogMaxsize:LongInt read FLogMaxSize write FLogMaxSize;
+      property LogMaxAction:TLMDLogAction read FLogAction write FLogAction;
+      property LogName:String read FLogName write SetLogName;
+      property LogPrefix:TLMDPathPrefix read FLogPrefix write SetLogPrefix;
+      property LogMask:String read FMask write FMask;
+
+      property PatternBitmap:TBitmap read GetBitmap;
+      property Options:TLMDApplicationOptions read FOptions write FOptions;
+      property Timer[Ident:Word]:TLMDTimerItem read GetTimer;
+      property Timers:TLMDTimerPool read FTimerPool;
+      property Version:String read FVersion write FVersion;
+
+      // 4.0 Timer
+      property TimerFrequency:Extended read GetTimerFrequency;
+
+      // LMD-Tools 6.0 Enhancements
+      property CheckDefWidth:Integer read FCheckWidth;
+      property CheckDefHeight:Integer read FCheckHeight;
+
+      {LMD Exception Handler}
+      property OnException:TLMDExceptionEvent read FOnException write FOnException;
+      property OnMaxLogSize:TLMDMaxLogSizeEvent read FOnMaxLogSize write FOnMaxLogSize;
+      property OnHeaderWrite : TLMDOnHeaderWrite read FOnHeaderWrite write FOnHeaderWrite;
+  end;
+
+  {********************** Wrapper Class ***************************************}
+  {-------------------------- TLMDTimer ---------------------------------------}
+  TLMDTimer=class(TObject)
+  private
+    FTimer:TTimer;
+    FTimerID:Word;
+    FGlobalTimer: Boolean;
+    FEnabled: Boolean;
+    FInterval: Word;
+    FOnTimer: TNotifyEvent;
+    procedure SetEnabled(const Value: Boolean);
+    procedure SetGlobal(const Value: Boolean);
+    procedure SetInterval(const Value: Word);
+    procedure RemoveTimer;
+    procedure UpdateTimer;
+  protected
+    procedure Timer(Sender:TObject);
+  public
+    constructor Create(gInterval:Word; gTimer:TNotifyEvent; gEnabled:Boolean=true;gmode:Boolean=false);
+    destructor Destroy;override;
+
+    property Enabled:Boolean read FEnabled write SetEnabled;
+    property Interval:Word read FInterval write SetInterval;
+    property GlobalMode:Boolean read FGlobalTimer write SetGlobal;
+    property OnTimer:TNotifyEvent read FOnTimer write FOnTimer;
+  end;
+
+
+  {**************************** TLMDTimerPool *********************************}
+  {----------------------------------------------------------------------------}
+  {TLMDTimerItem}
+  TLMDTimerItem=class(TObject)
+  private
+    FCallCount : Integer;
+    FCounter   : LongInt;
+    FEnabled   : Boolean;       {still Enabled?}
+    FIdent     : Word;
+    FInterval:Word;         {Interval}
+    FInternal:Integer;
+    FList:TList;
+    FOwner:TLMDTimerPool;
+    FOnTimer:TNotifyEvent;  {The event which should fired}
+    procedure SetCallCount(aValue:Integer);
+    procedure SetEnabled(aValue:Boolean);
+    procedure SetInterval(aValue:Word);
+  public
+    constructor Create(aOwner:TLMDTimerPool; aList:TList; aIndex:Word);
+    destructor Destroy;override;
+    procedure Timer;
+    property CallCount:Integer read FCallCount write SetCallCount;
+    property Counter:LongInt read FCounter;
+    property Enabled:Boolean read FEnabled write SetEnabled;
+    property Interval:Word read FInterval write SetInterval;
+    property Ident:Word read FIdent;
+
+    property HitValue:Integer read FInternal;   {internal used value}
+    property OnTimer:TNotifyEvent read FOnTimer write FOnTimer;
+  end;
+
+  TLMDTimerInterval=1..High(Word);
+  TLMDTimerPoolEvent=procedure(Sender:TObject; Ident:Word; Counter:LongInt) of object;
+
+  {the component itself}
+  TLMDTimerPool = class(TLMDCustomComponent)
+  private
+    FActive:Boolean;
+    FFLag:Boolean;
+    FHWND:HWND;
+    FPCounter:LongInt;
+    FInterval:TLMDTimerInterval;
+    FList:TList;
+    FUpdate:Byte;
+    FOnTimerEvent: TLMDTimerPoolEvent;  {for all timers}
+    procedure SetInterval(aValue:TLMDTimerInterval);
+    function GetActiveTimers:Integer;
+    function GetCount:Integer;
+    function GetTimer(Ident:Word):TLMDTimerItem;
+    procedure HandleTimers;
+    procedure UpdateMainTimer(aValue:Boolean);
+    procedure WndProc(var Msg: TMessage);
+  public
+    constructor Create(AOwner: TComponent); override;
+    constructor CreateRunTime(aOwner:TComponent; MinInterval:TLMDTimerInterval);
+    destructor Destroy; override;
+    function AddTimer(Ident:Word; wInterval:Word; CallProc:TNotifyEvent):Integer;
+    function AddTimerExt(Ident:Word; wInterval:Word; iCallCount:Integer;
+                          bEnabled:Boolean; CallProc:TNotifyEvent):Integer;
+    procedure ClearTimers;
+    function HasTimerProc:Boolean;
+    function IndexOf(Ident:Word):Integer;
+    procedure RemoveTimer(Ident:Word);
+
+    property ActiveTimers:Integer read GetActiveTimers;
+    property Count:Integer read GetCount;
+    property Timer[Ident:Word]:TLMDTimerItem read GetTimer;default;
+  published
+    property About;
+    property MinInterval:TLMDTimerInterval read FInterval write SetInterval default 1000;
+    property OnTimer:TLMDTimerPoolEvent read FOnTimerEvent write FOnTimerEvent;
+  end;
+
+  LMDEOneInstError=class(Exception)
+    constructor Create(const cName:String; aValue:Byte);          {general}
+  end;
+
+{helpers}
+
+function LMDCheckForSameClass(aOwner:TComponent; aClass:TClass; AllowDataModule:Boolean):Boolean;
+
+var
+  LMDApplication:TLMDApplication;
+  {$IFDEF LMDDISABLE_LMDTHEMES}
+  XPThemesAvailable: Boolean;
+  {$ENDIF}
+
+implementation

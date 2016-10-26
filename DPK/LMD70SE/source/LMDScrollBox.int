@@ -1,0 +1,18 @@
+
+uses
+  LMDCustomScrollBox;
+
+type
+  TLMDScrollBox = class(TLMDCustomScrollBox)
+  published
+    {$IFNDEF LMDTOOLS_SPECIALEDITION}
+      //property FaceController;
+    {$ENDIF}
+    property CtlXP;
+    property Bevel;
+    property InstantUpdate;
+    property Transparent;
+    property OnPaint;
+  end;
+
+implementation

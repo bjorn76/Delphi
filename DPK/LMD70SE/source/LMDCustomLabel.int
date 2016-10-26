@@ -1,0 +1,81 @@
+
+uses
+  Messages,
+  Classes,
+  Controls,
+  LMDGraph,
+  LMDBevel,
+  LMDFXCaption,
+  LMDBaseLabel;
+
+type
+  {-------------------TLMDCustomLabel------------------------------------------}
+  TLMDCustomLabel=class(TLMDBaseLabel)
+  private
+    FBevel:TLMDBevel;
+    FFontFx:TLMDFxCaption;
+    procedure SetBevel(aValue:TLMDBevel);
+    procedure SetFontFx(aValue:TLMDFxCaption);
+    procedure CMFontChanged(var Message:TMessage);message CM_FONTCHANGED;
+  protected
+    procedure FontChange(Sender:TObject);override;
+    function GetBevelExtend:Integer;
+    procedure GetChange(Sender:TObject);override;
+    function  GetEmpty:Boolean;override;
+    procedure Paint;Override;
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+    procedure CorrectBounds;override;
+  published
+    property Bevel:TLMDBevel read FBevel write SetBevel;
+    property FontFX:TLMDFxCaption read FFontFx write SetFontFx;
+
+    property About;
+    property Align;
+    property Alignment;
+    property AutoSize;
+    property Color;
+    property DragCursor;
+    property DragMode;
+    property Enabled;
+    property FocusControl;
+    property Font;
+    property MultiLine;
+    property Options;
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowAccelChar;
+    property ShowHint;
+    property Transparent;
+    property Visible;
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnMouseDown;
+    {3.0}
+    property OnMouseEnter;
+    property OnMouseExit;
+    {---}
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDrag;
+
+    {4.0}
+    //properties
+    property Anchors;
+    property BiDiMode;
+    property DragKind;
+    property Constraints;
+    property ParentBiDiMode;
+    //events
+    property OnEndDock;
+    property OnStartDock;
+  end;
+
+
+implementation

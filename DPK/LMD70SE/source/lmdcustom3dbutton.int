@@ -1,0 +1,91 @@
+
+uses
+  Windows,
+  Classes,
+  Graphics,
+  LMDClass,
+  LMDButtonBase,
+  LMDGraph,
+  LMDBaseGraphicButton;
+
+type
+  TLMD3DButtonBevelWidth=0..5;
+  
+  TLMDCustom3DButton=class(TLMDBaseGraphicButton)
+  private
+    FBevelWidth : TLMD3DButtonBevelWidth;
+    FButtonFace : TLMDButtonFace;
+    FPixelFormat: TLMDSavePixelFormat;
+    FClipX      : Pointer;
+    FColorLight,
+    FColorShadow,
+    FColorBevel,
+    FColorDisabled: TColor;
+    FCompressed : Boolean;
+
+    procedure SetBevelWidth(aValue: TLMD3DButtonBevelWidth);
+    procedure SetColor(Index: Integer; aValue: TColor);
+    procedure SetQuickDraw(aValue:Boolean);
+
+    {helper for reading/writing properties from TReader, TWriter}
+    procedure ReadBitmap(Stream:TStream);
+    procedure ReadCount(Reader:TReader);
+    procedure ReadWidth(Reader:TReader);
+    procedure WriteBitmap(Stream:TStream);
+    procedure WriteCount(Writer:TWriter);
+    procedure WriteWidth(Writer:TWriter);
+  protected
+    FQuickDraw,
+    FProcessRunning: Boolean;
+    procedure DefineProperties(Filer:TFiler);override;
+    procedure Paint;override;
+    function VerifyTransparency(X, Y: Integer): Boolean; override;
+    procedure DoTerminate(Sender: TObject);
+    procedure GetChange(Sender: TObject); override;
+    function GetPalette: HPALETTE;  override;
+    function IsCustom:Boolean; override;
+  public
+    FKind: integer;
+    procedure Set3DPics(TempUp,TempDown,TempDis,MonoUp,MonoDown,MonoDis: TBitmap);
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    property BevelWidth: TLMD3DButtonBevelWidth read FBevelWidth write SetBevelWidth default 2;
+    property ColorLight: TColor index 0 read FColorLight write SetColor default clBtnHighlight;
+    property ColorShadow: TColor index 1 read FColorShadow write SetColor default clBtnShadow;
+    property ColorBevel: TColor index 2 read FColorBevel write SetColor default clBlack;
+    property ColorDisabled: TColor index 3 read FColorDisabled write SetColor default clWhite;
+    property QuickDraw:Boolean read FQuickDraw write SetQuickDraw default True;
+  published
+    // 7.0
+    property ButtonLayout;
+    property EnterColor;
+    property EnterColorChange;
+    property Glyph;
+    property Font;
+    property FontFX;
+    property ImageList;
+    property ImageIndex;
+    property ListIndex;
+    property NumGlyphs;
+    property RepeatedClick;
+    property RepeatingInterval;
+    property RepeatingDelay;
+    property UseCaption;
+    property OnDropDown;
+    // ---
+
+    property AllowTransparency;
+    property ButtonFace: TLMDButtonFace read FButtonFace write FButtonFace;
+    property Compressed: Boolean read FCompressed write FCompressed default false;
+    property GroupIndex;
+    property Pressed;
+    property DropDownMenu;
+    property DropDownIndent;
+    property DropDownRight;
+    property PixelFormat:TLMDSavePixelFormat read FPixelFormat write FPixelFormat default spfDefault;
+    property Transparent default false;
+    property MultiLine;
+  end;
+
+
+implementation

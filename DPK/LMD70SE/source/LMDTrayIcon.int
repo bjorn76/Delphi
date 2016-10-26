@@ -1,0 +1,97 @@
+
+uses
+  Windows,
+  Graphics,
+  Menus,
+  Classes,
+  Messages,
+  Controls,
+  LMDBaseController,
+  LMDCustomImageList,
+  LMDCont,
+  LMDClass,
+  LMDTimer,
+  LMDWndProcComponent;
+
+type
+  TLMDTrayIcon=class(TLMDWndProcComponent)
+  private
+    FInternalShow,
+    FAnimated,
+    FActive,
+    FNoClose        : Boolean;
+    FHint           : String;
+    FIcon           : TIcon;
+    FInternal       : TPoint;
+    FPopUpMenu      : TPopUpMenu;
+    FWindowHandle   : HWND;
+    FThreadPriority : TThreadPriority;
+    FImageList      : TLMDCustomImageList;
+    FListIndex      : Integer;
+    FChangeLink     : TLMDChangeLink;
+    FTimerMode      : TLMDTimerMode;
+    FInterval       : TLMDTimerInterval;
+    FCounter        : Integer;
+    FTimerId        : TLMDTimer;
+    FTimer          : TLMDHiTimer;
+    FMinimized      : Boolean;
+    FOnNoClose,
+    FOnDblClick,
+    FOnClick,
+    FOnPopUp        : TNotifyEvent;
+    FOnMouseDown,
+    FOnMouseUp      : TMouseEvent;
+    FOnMouseMove    : TMouseMoveEvent;
+
+    procedure SetImageList (aValue:TLMDCustomImageList);
+    procedure SetActive(aValue:Boolean);
+    procedure SetHint({const} aValue:String);
+    procedure SetIcon(aValue:TIcon);
+    procedure SetPopUpMenu(aValue:TPopUpMenu);
+    procedure SetTimerMode(aValue:TLMDTimerMode);
+    procedure SetThreadPriority (aValue : TThreadPriority);
+    procedure SetInterval (aValue : TLMdTimerInterval);
+    procedure SetAnimated (aValue : Boolean);
+
+    procedure GetIMLChange(Sender:TObject);
+    procedure NotifyIcon(aValue:Word);
+    procedure NewWndProc(var Message: TMessage);
+    procedure IconChanged(Sender : TObject);
+
+    procedure ActivateTimer;
+    procedure DeActivateTimer(aValue:TLMDTimerMode);
+    procedure EnableTimer(aValue:Boolean);
+    procedure GetTimer(Sender:TObject);
+  protected
+    procedure WndProc(var Message: TMessage); override;
+    procedure Loaded; override;
+    procedure Notification(aComponent:TComponent; Operation: TOperation); override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+  published
+    property About;
+    property Active:Boolean read FActive write SetActive default True;
+    property Hint:String read FHint write SetHint;
+    property Icon:TIcon read FIcon write SetIcon;
+    property NoClose:Boolean read FNoClose write FNoClose default false;
+    property ShowMinimizedIcon:Boolean read FMinimized write FMinimized default false;
+    property PopupMenu:TPopupMenu read FPopUpMenu write SetPopUpMenu;
+    property ImageList:TLMDCustomImageList read FImageList write SetImageList;
+    property ListIndex: Integer read FListIndex write FListIndex default 0;
+    property TimerMode : TLMDTimerMode read FTimerMode write SetTimerMode default tmNormal;
+    property ThreadPriority : TThreadPriority read FThreadPriority write SetThreadPriority default tpNormal;
+    property Interval : TLMDTimerInterval read FInterval write SetInterval default 200;
+    property Animated : Boolean read FAnimated write SetAnimated default false;
+
+    {events}
+    property OnClick:TNotifyEvent read FOnClick write FOnClick;
+    property OnDblClick:TNotifyEvent read FOnDblClick write FOnDblClick;
+    property OnMouseDown:TMouseEvent read FOnMouseDown write FOnMouseDown;
+    property OnMouseMove:TMouseMoveEvent read FOnMouseMove write FOnMouseMove;
+    property OnMouseUp:TMouseEvent read FOnMouseUp write FOnMouseUp;
+    property OnPopUp:TNotifyEvent read FOnPopUp write FOnPopUp;
+    property OnNoClose:TNotifyEvent read FOnNoClose write FOnNoClose;
+  end;
+
+implementation

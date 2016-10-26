@@ -1,0 +1,261 @@
+
+uses
+  Windows,
+  Classes,
+  Messages,
+  Controls,
+  Menus,
+  Graphics,
+  actnlist,
+  imglist,
+  LMDClass,
+  LMDGlyph,
+  LMDGraph,
+  LMDShadow,
+  LMDFXCaption,
+  LMDButtonLayout,
+  LMDBaseControl,
+  LMDButtonBase;
+
+type
+  {----------------------TLMDBaseGraphicButton---------------------------------}
+  TLMDBaseGraphicButton = class(TLMDBaseControl)
+  private
+    FRepeatedClick,
+    FAllowMouseOver,
+    FAllowShadow       : Boolean;
+    FButtonLayout      : TLMDButtonLayout;
+    FFontFx            : TLMDFxCaption;
+
+    FRepeatingDelay,
+    FRepeatingInterval : Word;
+
+    //4.0
+    FDropDownCombo     : Boolean;
+    FDropdownComboWidth: Integer;
+    FOnDropDown        : TNotifyEvent;
+    // --
+
+    //4.01
+    FHideHint          : Boolean;
+    //5.0
+    FUseCaption        : Boolean;
+
+    //
+    FDropDown          : TPopupMenu;
+    FEnterColor        : TColor;
+    FDropDownIndent,
+    FGroupIndex        : Integer;
+    FDisabledGrayed,
+    FDropDownRight,
+    FEnterColorChange,
+    //FMouseOver,
+    FMultiLine,
+    FPressed,
+    FPrepareDrag       : Boolean;
+    {used only for ShapeButtons, OfficeButtons and ExplorerButtons:}
+    FTimerID           : array[0..1] of TLMDTimer;
+    {ident for global timer: belongs to office button bevels}
+    {ident for global timer: belongs to repeated clicks}
+    {internal flags}
+    FInternal          : Integer;
+    FUseGlobalTimer: Boolean;
+    {Imagelist-support}
+    function IMLEmpty:Boolean;
+    // RM 6.11
+    function GetMouseOver:Boolean;
+    // -------
+    procedure SetButtonLayout(aValue: TLMDButtonLayout);
+    procedure SetDropDown(aValue: TPopupMenu);
+    procedure SetDropDownCombo(aValue:Boolean);
+    procedure SetDropDownComboWidth(aValue: Integer);
+    procedure SetDropDownIndent(aValue: Integer);
+    procedure SetDropDownRight(aValue:Boolean);
+    procedure SetEnterColor(aValue:TColor);
+    procedure SetEnterColorChange(aValue:Boolean);
+    procedure SetFontFx(aValue:TLMDFxCaption);
+    procedure SetGlyph(aValue: TBitmap);
+    procedure SetGroupIndex(Value: Integer);
+    // LMD 6.11
+    //procedure SetMouseOver(Value: Boolean);
+    procedure SetMultiLine(aValue:Boolean);
+    procedure SetNumGlyphs(aValue: TLMDNumGlyphs);
+    procedure SetRepeatedClick(aValue: Boolean);
+    procedure SetRepeatingInterval(aValue: Word);
+    procedure SetUseCaption(aValue:Boolean);
+
+    procedure SetTransparent(aValue: Boolean);
+    function GetDroppedState:Boolean;
+    function GetGlyph:TBitmap;
+    function GetCaption:String;
+    function GetNumGlyphs:TLMDNumGlyphs;
+
+    procedure InformOptionSet;
+
+    {TP - 3.01}
+    procedure ExecuteRepeatedClick(Sender:TObject);
+    {Messages}
+    procedure CMButtonPressed(var Message: TMessage); message CM_BUTTONPRESSED;
+    procedure CMDialogChar(var Message: TCMDialogChar); message CM_DIALOGCHAR;
+    procedure CMEnabledChanged(var Message: TMessage); message CM_ENABLEDCHANGED;
+    procedure CMFontChanged(var Message:TMessage);message CM_FONTCHANGED;
+    procedure CMTextChanged(var Message:TMessage);message CM_TEXTCHANGED;
+    {procedure WMLButtonUp(var Message: TWMLButtonUp); message WM_LBUTTONUP;}
+    procedure WMLButtonDblClk(var Message: TWMLButtonDown); message WM_LBUTTONDBLCLK;
+  protected
+    FShadowDepth       : TLMDShadowDepth;
+    FState,
+    FOldState          : TLMDButtonState;
+    FAllowAllUp,
+    FAllowTransparency,
+    FUsed,
+    FTransparent       : Boolean;
+    FGlyph             : Pointer;
+
+    procedure SetPressed(Value: Boolean);
+    function GetAllowAllUp : Boolean;
+    procedure SetAllowAllUp(Value: Boolean);
+    function HasIML:Boolean;
+    function IsCustom:Boolean; virtual;
+
+    // Returns true, if OptionSet with HotState is supported
+    function IsHotOptionsetMode:Boolean;virtual;
+    // Returns true if we support any "Hot" mode
+    function IsHotState:Boolean; virtual;
+    //return true if the control has to be repainted on mouse enter / exit events
+    function RepaintOnMouse: Boolean; virtual;
+    //return true if the background of the control has to be repainted before its front is redrawn
+    function RestoreBack: Boolean; virtual;
+
+    procedure ActionChange(Sender: TObject; CheckDefaults: Boolean);override;
+    function ActionChangeable:Boolean;virtual;
+    procedure ActivateTimer(aSession: integer; anInterval:Word; aCallFunc: TNotifyEvent);
+    procedure DeActivateTimer(aSession: integer);
+    function CheckOptimized:Boolean;override;
+    procedure DoRepeatedClick;virtual;
+    procedure DrawGlyphAndText(aCanvas: TCanvas; aRect: TRect);virtual;
+    function ShapeButtonColorChange: Boolean; virtual;
+    procedure FontChange(Sender:TObject);
+    function GetPalette: HPALETTE; override;
+    procedure GetIMLChange(Sender:TObject); override;
+    procedure Loaded; override;
+    procedure MouseDown(Button:TMouseButton; Shift:TShiftState; X, Y: Integer); override;
+    procedure MouseEnter;override;
+    procedure MouseExit;override;
+    procedure MouseMove(Shift:TShiftState; X, Y: Integer); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState;  X, Y: Integer); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override ;
+    procedure StateChange(NewState:TLMDButtonState;ForceUpdate:Boolean=false);
+    function VerifyTransparency(X, Y: Integer): Boolean; virtual;
+    procedure VerifyMouseOver(Sender:TObject); virtual;
+
+    property DisabledGrayed: Boolean read FDisabledGrayed write FDisabledGrayed default true;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure Invalidate; override;
+    procedure EndRepeatedClick;
+
+    procedure Click; override;
+    procedure DropDown;
+    function GetNeededSizeRect: TRect; virtual;
+    function isTransparentSet: Boolean; override;
+
+    {read only}
+    property Dropped:Boolean read GetDroppedState;
+    property AllowMouseOver: Boolean read FAllowMouseover write FAllowMouseover;
+    property AllowTransparency: Boolean read FAllowTransparency write FAllowTransparency;
+    property MouseOver: Boolean read GetMouseOver;// write SetMouseOver;
+    property Transparent: Boolean read FTransparent write SetTransparent default false;
+    property AllowAllUp: Boolean read FAllowAllUp write SetAllowAllUp default False;
+    property DropDownCombo:Boolean read FDropDownCombo write SetDropDownCombo default false;
+    property DropDownComboWidth:Integer read FDropdownComboWidth write SetDropDownComboWidth default 12;
+    property DropDownMenu: TPopupMenu read FDropDown write SetDropDown stored True;
+    property DropDownIndent: Integer read FDropDownIndent write SetDropDownIndent default 0;
+    property DropDownRight:Boolean read FDropDownRight write SetDropDownRight default false;
+    property GroupIndex: Integer read FGroupIndex write SetGroupIndex default 0;
+    property Pressed: Boolean read FPressed write SetPressed default False;
+    property Down:Boolean read FPressed write SetPressed;
+    property MultiLine:Boolean read FMultiLine write SetMultiLine default false;
+
+    //7.0
+    property ButtonLayout: TLMDButtonLayout read FButtonLayout write SetButtonLayout;
+    property EnterColor: TColor read FEnterColor write SetEnterColor default clCaptionText;
+    property EnterColorChange: Boolean read FEnterColorChange write SetEnterColorChange default False;
+    property Glyph: TBitmap read GetGlyph write SetGlyph stored IsCustom;
+    property FontFX:TLMDFxCaption read FFontFx write SetFontFx;
+    property Font;
+    property ImageList;
+    property ImageIndex;
+    property ListIndex;
+    property NumGlyphs: TLMDNumGlyphs read GetNumGlyphs write SetNumGlyphs default 1;
+    property RepeatedClick: Boolean read FRepeatedClick write SetRepeatedClick default False;
+    property RepeatingInterval: Word read FRepeatingInterval write SetRepeatingInterval default 100;
+    property RepeatingDelay : Word read FRepeatingDelay write FRepeatingDelay default 500;
+    property UseCaption:Boolean read FUseCaption write SetUseCaption default True;
+    property OnDropDown:TNotifyEvent read FOnDropDown write FOnDropDown;
+  published
+    property About;
+    //property ButtonLayout: TLMDButtonLayout read FButtonLayout write SetButtonLayout;
+    property Caption;
+    property Color;
+    property Enabled;
+    {property EnterColor: TColor read FEnterColor write SetEnterColor default clCaptionText;
+    property EnterColorChange: Boolean read FEnterColorChange write SetEnterColorChange default False;
+    property Glyph: TBitmap read GetGlyph write SetGlyph stored IsCustom;
+    property Font;
+    property FontFX:TLMDFxCaption read FFontFx write SetFontFx;}
+
+    //4.01
+    property HideHint:Boolean read FHideHint write FHideHint default True;
+    //----
+    {property ImageList;
+    property ImageIndex;
+    property ListIndex;
+
+    property NumGlyphs: TLMDNumGlyphs read GetNumGlyphs write SetNumGlyphs default 1;}
+
+    property ParentFont;
+    property ParentShowHint;
+
+    {property RepeatedClick: Boolean read FRepeatedClick write SetRepeatedClick default False;
+    property RepeatingInterval: Word read FRepeatingInterval write SetRepeatingInterval default 100;
+    property RepeatingDelay : Word read FRepeatingDelay write FRepeatingDelay default 500;}
+    property ShowHint;
+
+    // 5.0
+    //property UseCaption:Boolean read FUseCaption write SetUseCaption default True;
+    //--
+
+    // 7.0 RM
+    property UseGlobalTimer:Boolean read FUseGlobalTimer write FUseGlobalTimer default false;
+    // ---
+
+    property Visible;
+
+    {events}
+    property OnClick;
+    property OnDblClick;
+    //property OnDropDown:TNotifyEvent read FOnDropDown write FOnDropDown;
+    property OnMouseDown;
+    property OnMouseEnter;
+    property OnMouseExit;
+    property OnMouseMove;
+    property OnMouseUp;
+
+    {4.0}
+    //properties
+    property Action;
+    property Anchors;
+    property BiDiMode;
+    property DragKind;
+    property Constraints;
+    property ParentBiDiMode;
+    //events
+    property OnEndDock;
+    property OnStartDock;
+
+  end;
+
+
+implementation

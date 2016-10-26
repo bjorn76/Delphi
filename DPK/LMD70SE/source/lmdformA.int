@@ -1,0 +1,209 @@
+
+uses
+  Windows, sysUtils, Classes, controls, messages, Graphics, Forms, shellApi, menus,
+  lmdclass, LMDCont, lmdgraph, LMDStrings, lmdbase, lmdprocs,
+  LMDObject,
+  LMDShadow,
+  LMDWndProcComponent,
+  LMDIniCtrl,
+  LMDCustomFormFill;
+
+const
+  IDS_FORMSAVE:String[4]='Form';
+
+type
+
+  TLMDDlgEffect=(deNone, deExplode, deExplodeExt);
+
+  {------------------------- TLMDForm -----------------------------------------}
+  TLMDSizingChangeEvent=procedure(Sender:TObject;xsize, ysize, flag:Word) of object;
+  TLMDMaxInfoEvent=procedure(Sender:TObject; var xpos, ypos, MaxWidth, MaxHeight:Integer) of object;
+  TLMDMovingEvent=procedure(Sender:TObject; x,y:Integer; var Cancel:Boolean) of object;
+  TLMDSendIntegerEvent=procedure(Sender:TObject; Value:Integer) of object;
+  TLMDSendStringEvent=procedure(Sender:TObject; const Section:String) of object;
+  TLMDTrackInfoEvent=procedure(Sender:TObject; var MinWidth, MinHeight, MaxWidth,
+                               MaxHeight:Integer) of object;
+
+  {Ini-Support}
+  TLMDFormIniSaveOption=(soColor, soFont, soPos, soSize, soState);
+  TLMDFormIniSaveOptions=set of TLMDFormIniSaveOption;
+
+  {general}
+  TLMDFormOption=(foAutoCenter, foAutoShow, foTryAdaptRes, foRestoreOnce);
+  TLMDFormOptions=set of TLMDFormOption;
+
+  TLMDAutoDockSide = (adLeft, adTop, adBottom, adRight);
+  TLMDAutoDockSides = set of TLMDAutoDockSide;
+
+  TLMDAutoDockObject = class (TLMDObject)
+  private
+    FAfterMove,
+    FEnabled : Boolean;
+    FMoveOut,
+    FSides   : TLMDAutoDockSides;
+    FLeft,
+    FRight,
+    FTop,
+    FBottom  : Integer;
+  public
+    constructor Create; override;
+  published
+    property AfterMove : Boolean read FAfterMove write FAfterMove default true;
+    property Enabled   : Boolean read FEnabled write FEnabled default false;
+    property Sides     : TLMDAutoDockSides read FSides write FSides default [adLeft, adTop, adBottom, adRight];
+    property MoveOut   : TLMDAutoDockSides read FMoveOut write FMoveOut default [adLeft, adTop, adBottom, adRight];
+    property Left      : Integer read FLeft write FLeft default 40;
+    property Right     : Integer read FRight write FRight default 40;
+    property Top       : Integer read FTop write FTop default 40;
+    property Bottom    : Integer read FLeft write FLeft default 40;
+  end;
+
+  TLMDForm=class(TLMDWndProcComponent)
+  private
+
+    FCharCase      : TLMDCharCase;
+
+    {Ini-Support}
+    FIniLink       : TLMDIniCtrl;
+    FIniUse        : TLMDIniUse;
+    FSection,
+    FKey           : String;
+    FIniOptions    : TLMDFormIniSaveOptions;
+
+    FAutoDock      : TLMDAutoDockObject;
+
+    FAcceptFiles   : Boolean;
+    FEffect        : TLMDDlgEffect;
+    FOptions       : TLMDFormOptions;
+
+    {resolution problem}
+    FDesignPPI     : Integer;
+    FInternal,
+    FRestored      : Boolean;
+
+    FTrackInfo,
+    FMaximized     : TRect;
+
+    FMaximizedHeight,
+    FMaximizedWidth,
+    FMaxHeight,
+    FMaxWidth,
+    FMinHeight,
+    FMinWidth,
+    FMaximizedPosX,
+    FMaximizedPosY : Integer;
+
+    FOnAPMResume    : TNotifyEvent;
+    FOnAPMCriticalResume:TNotifyEvent;
+    FOnAPMSuspend   :TLMDStandardEvent;
+    FOnCompacting   :TLMDSendIntegerEvent;
+    FOnDevModeChange:TLMDSendStringEvent;
+    FOnDisplayCHange:TLMDSizingChangeEvent;
+    FOnDragDrop     :TLMDFMDragDropEvent;
+    FOnFontCHange   :TNotifyEvent;
+    FOnMaximize     :TLMDMaxInfoEvent;
+    FOnMove         :TNotifyEvent;
+    FOnMoving       :TLMDMovingEvent;
+    FOnPaintIcon    :TNotifyEvent;
+    FOnSize         :TLMDSizingChangeEvent;
+    FOnSpoolerStatus:TLMDSendIntegerEvent;
+    FOnSysColorChange:TNotifyEvent;
+    FOnTrackInfoEvent:TLMDTrackInfoEvent;
+    FOnTimeChange   :TNotifyEvent;
+    FOnWinIniChange :TLMDSendStringEvent;
+
+    FOwnerFormShow,
+    FOwnerFormDestroy: TNotifyEvent;
+
+    {3.01}
+    FOnNoData       :TNotifyEvent;
+
+    procedure OwnerFormShow(Sender:TObject);
+    procedure OwnerFormDestroy(Sender:TObject);
+    procedure SetAutoDock(const Value: TLMDAutoDockObject);
+    function GetRealValue(aValue:Integer; vertical:Boolean):Integer;
+    procedure HandleMessage(var Message:TMessage);
+    procedure SetAcceptFiles(aValue:Boolean);
+    procedure SetInteger(Index:Integer; aValue:Integer);
+    procedure SetRunTimeValues;
+
+    procedure SetIniLink(aValue:TLMDIniCtrl);
+    function SaveKey:Boolean;
+    function SaveSection:Boolean;
+    function GetWorkRect: TRect;
+  protected
+    procedure Init;override;
+    procedure Notification(AComponent:TComponent;Operation:TOperation);override;
+    procedure ReadState(Reader: TReader); override;
+    procedure RestoreState;override;
+    procedure WndProc(var Message: TMessage);override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure SetMaximizedRect(aRect:TRect);
+    procedure SetTrackMaxValues(aValue:TPoint);
+    procedure SetTrackMinValues(aValue:TPoint);
+
+    procedure AdaptResolution;
+    function GetIniString:String;
+    procedure SetIniString(const aString:String);
+
+    {3.01}
+    procedure ReadData;
+    procedure WriteData;
+
+    property ScreenWorkArea:TRect read GetWorkRect;
+  published
+    property About;
+    property AcceptFiles:Boolean read FAcceptFiles write SetAcceptFiles default false;
+    property CharCase:TLMDCharCase read FCharCase write FCharCase default ccNormal;
+    property Effect:TLMDDlgEffect read FEffect write FEffect default deNone;
+
+    property AutoDock:TLMDAutoDockObject read FAutoDock write SetAutoDock;
+
+    {Ini-Support}
+    property IniLink:TLMDIniCtrl read FIniLink write SetIniLink;
+    property IniUse:TLMDIniUse read FIniUse write FIniUse default ioNone; {not active by default}
+    property IniSaveOptions:TLMDFormIniSaveOptions read FIniOptions write FIniOptions default [soPos, soSize, soState];
+    property Section:String read FSection write FSection stored SaveSection;
+    property IniKey:String read FKey write FKey stored SaveKey;
+
+    {Additional Features}
+    property DesignPPI:Integer read FDesignPPI write FDesignPPI default 96;
+    property Options:TLMDFormOptions read FOptions write FOptions default [foAutoShow];
+
+    property Enabled;
+    property MaximizedHeight:Integer index 4 read FMaximizedHeight write SetInteger default 0;
+    property MaximizedWidth:Integer index 5 read FMaximizedWidth write SetInteger default 0;
+    property MaximizedPosX:Integer index 6 read FMaximizedPosX write SetInteger default 0;
+    property MaximizedPosY:Integer index 7 read FMaximizedPosY write SetInteger default 0;
+
+    property TrackMaxHeight:Integer index 0 read FMaxHeight write SetInteger default 0;
+    property TrackMaxWidth:Integer index 1 read FMaxWidth write SetInteger default 0;
+    property TrackMinHeight:Integer index 2 read FMinHeight write SetInteger default 0;
+    property TrackMinWidth:Integer index 3 read FMinWidth write SetInteger default 0;
+
+    {Events}
+    property OnAPMCriticalResume:TNotifyEvent read FOnAPMCriticalResume write FOnAPMCriticalResume;
+    property OnAPMResume:TNotifyEvent read FOnAPMResume write FOnAPMResume;
+    property OnAPMSuspendRequest:TLMDStandardEvent read FOnAPMSuspend write FOnAPMSuspend;
+    property OnCompacting:TLMDSendIntegerEvent read FonCompacting write FOnCompacting;
+    property OnNoRestoreData:TNotifyEvent read FOnNoData write FOnNoData;
+    property OnDevModeChange:TLMDSendStringEvent read FOnDevModeChange write FOnDevmodeChange;
+    property OnDisplayChange:TLMDSizingChangeEvent read FOnDisplayChange write FOnDisplayChange;
+    property OnIniChange:TLMDSendStringEvent read FOnWinIniChange write FOnWinIniChange;
+    property OnFMDragDrop:TLMDFMDragDropEvent read FOnDragDrop write FOnDragDrop;
+    property OnFontChange:TNotifyEvent read FOnFontChange write FOnFontCHange;
+    property OnMaximizeInfo:TLMDMaxInfoEvent read FOnMaximize write FOnMaximize;
+    property OnMove:TNotifyEvent read FOnMove write FOnMove;
+    property OnMoving:TLMDMovingEvent read FOnMoving write FOnMoving;
+    property OnPaintIcon:TNotifyEvent read FOnPaintIcon write FOnPaintIcon;
+    property OnSize:TLMDSizingChangeEvent read FOnSize write FOnSize;
+    property OnSpoolerStatus:TLMDSendIntegerEvent read FOnSpoolerStatus write FOnSpoolerStatus;
+    property OnSysColorChange:TNotifyEvent read FOnSysColorChange write FOnSysColorChange;
+    property OnTrackInfo:TLMDTrackInfoEvent read FOnTrackInfoEvent write FOnTrackInfoEvent;
+    property OnTimeChange:TNotifyEvent read FOnTimeChange write FonTimeChange;
+
+  end;
+
+implementation

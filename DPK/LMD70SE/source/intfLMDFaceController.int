@@ -1,0 +1,24 @@
+
+uses
+  Windows,
+  Graphics,
+  LMDFillObject,
+  LMDBevel,
+  LMDBitmapEffectObject,
+  LMD3DCaption,
+  intfLMDBase;
+
+type
+  ILMDFaceController = interface(IInterface)
+    ['{32BE634B-1A6E-4975-9975-241836293C61}']
+    function fcGetFocused: Boolean; 
+    function fcGetMouseAbove: Boolean;
+    function fcGetTransparent : Boolean;
+    function fcGetBackCtlXP   : Boolean;
+    function fcGetBorderCtlXP : Boolean;
+    function fcGetBorderCtl3D : Boolean;
+    function fcGetEnabled     : Boolean;
+    function fcGetBackColor   : TColor;
+  end;
+
+implementation

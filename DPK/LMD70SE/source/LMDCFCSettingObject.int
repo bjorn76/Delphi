@@ -1,0 +1,108 @@
+
+uses
+  LMDObject,
+  LMDBase,
+  Controls,
+  Classes,
+  Graphics;
+
+type
+
+  TLMDCFCSettingObjectKind = (cfcUnknown,     // 0 = invalid
+                              cfcFont,        // 1
+                              cfcFont3D,      // 2
+                              cfcFontFX,      // 3
+                              cfcFillObject,  // 4
+                              cfcBitmapEffect,// 5
+                              cfcBevel,       // 6
+                              cfcColor,       // 7
+                              cfcCtlSettings  // 8
+                              );
+
+  { ******************** TLMDCFCSettingObjects ********************************}
+  TLMDCFCSettingObjects = class(TComponent)
+  private
+    FList:TStringList;
+    function GetCount:Integer;
+    function GetItem(index:integer):TPersistent;
+    procedure SetItem(Index: Integer; aObject: TPersistent);
+    function GetName(Index: Integer): String;
+    procedure SetObjName(Index: Integer; const Value: String);
+    procedure ReadData(Reader:TReader);
+    procedure WriteData(Writer:TWriter);
+  protected
+    //procedure Notify(Ptr: Pointer; Action: TListNotification); override;
+    procedure DefineProperties(Filer: TFiler); override;
+  public
+    constructor Create(aOwner:TComponent);override;
+    destructor Destroy; override;
+
+    procedure Assign(Source:TPersistent);override;
+    function Add(aObject: TPersistent; aName:String=''): Integer;overload;
+    function Add(aKind: TLMDCFCSettingObjectKind): Integer;overload;
+
+    procedure Clear;
+    class procedure CreateCFCObject(aClass:TPersistentClass; var anObject: TPersistent);
+    function FindInstanceOf(AClass: TPersistentClass; AExact: Boolean = True; AStartAt: Integer = 0): Integer;
+
+    procedure Insert(Index: Integer; aObject: TPersistent; const aName:String='');
+
+    function IndexOf(const aName:String): Integer;
+    function IndexOfObject(aObject: TPersistent): Integer;
+    function NameOfObject(aObject: TPersistent):String;
+
+    function Remove(aObject: TPersistent): Integer;
+    function UniqueName(const BaseName:String):String;
+
+    // i/o
+    procedure SaveToStream(Stream:TStream);
+    procedure SaveToFile(const aFilename: string);
+    procedure LoadFromStream(Stream:TStream);
+    procedure LoadFromFile(const aFilename: string);
+
+    property Count:Integer read GetCount;
+
+    property Items[Index: Integer]: TPersistent read GetItem write SetItem; default;
+    property Names[Index: Integer]: String read GetName write SetObjName;
+  end;
+
+  { ******************** TLMDColorObject **************************************}
+  TLMDColorObject=class(TLMDObject)
+  private
+    FColor: TColor;
+    procedure SetColor(const Value: TColor);
+  protected
+    procedure Change;override;
+  public
+    constructor Create;override;
+    procedure Assign(Source:TPersistent);override;
+    function GetSetStr : String; override;
+  published
+    property Color:TColor read FColor write SetColor default clBtnFace;
+  end;
+
+  { ******************** TLMDColorObject **************************************}
+  TLMDCtlSettings=class(TLMDObject)
+  private
+    FTransparent: Boolean;
+    FCtlXP:Boolean;
+    procedure SetBoolean(Index:Integer; const Value: Boolean);
+    function GetBoolean(Index:Integer):Boolean;
+  protected
+    procedure Change;override;
+  public
+    constructor Create;override;
+    procedure Assign(Source:TPersistent);override;
+    function GetSetStr : String; override;
+  published
+    property Transparent:Boolean index 0 read GetBoolean write SetBoolean default false;
+    property CtlXP:Boolean index 1 read GetBoolean write SetBoolean default True;
+  end;
+
+  // helper methods
+  function LMDCFCGetSettingsKindClass(aObject:TPersistentClass):TLMDCFCSettingObjectKind;
+  function LMDCFCGetSettingsKindObject(aObject:TPersistent):TLMDCFCSettingObjectKind;
+  function LMDCFCGetSettingsClass(aKind:TLMDCFCSettingObjectKind):TPersistentClass;
+
+
+implementation

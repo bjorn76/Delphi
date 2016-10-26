@@ -1,0 +1,95 @@
+
+uses
+  Classes,
+  Graphics,
+  Controls,
+  LMD3DCaption,
+  LMDFillObject,
+  LMDBevel,
+  LMDBitmapEffectObject,
+  LMDCFCStateObject,
+  LMDCFCSettingObject,
+  LMDCustomComponent;
+
+type
+  TLMDFaceController = class (TLMDCustomComponent)
+  private
+    FSettingObjects   : TLMDCFCSettingObjects;
+    FControls         : TList;
+    { FDefinedStates:
+      is a predefined list of states per control class type
+      the number of supported control classes (i.e.) the class list
+      is managed by the register function
+    }
+    FDefinedStates    : TLMDCFCStateObjects;
+
+    procedure SetStateObjects (anObject: TLMDCFCStateObjects);
+    procedure SetSettingObjects (aValue: TLMDCFCSettingObjects);
+
+    procedure LoadSettingsFromStream(Stream:TStream);
+    procedure SaveSettingsToStream(Stream:TStream);
+  protected
+    procedure DefineProperties (Filer: TFiler); override;
+
+    //read control settings!!
+    function controlFocused     (aControl: TControl): Boolean;
+    function controlMouseAbove  (aControl: TControl): Boolean;
+    function controlTransparent (aControl: TControl): Boolean;
+    function controlBackCtlXP   (aControl: TControl): Boolean;
+    function controlBackColor   (aControl: TControl): TColor;
+    function controlBorderCtlXP (aControl: TControl): Boolean;
+    function controlBorderCtl3D (aControl: TControl): Boolean;
+    function controlPressed     (aControl: TControl): Boolean;
+    function controlModified    (aControl: TControl): Boolean;
+    function controlReadOnly    (aControl: TControl): Boolean;
+    function controlWrongData   (aControl: TControl): Boolean;
+    function controlDisabled    (aControl: TControl): Boolean;
+
+    function GetStateObject(aControl: TControl; objectClass: TPersistentClass): TPersistent;
+    procedure Loaded;override;
+  public
+    constructor Create (aComponent: TComponent); override;
+    destructor Destroy; override;
+    procedure Assign (Source: TPersistent); override;
+
+    function AddSettingObject(aSettingObject: TPersistent {Name}):Integer;overload;
+    function AddSettingObject(aKind: TLMDCFCSettingObjectKind{Name}):Integer;overload;
+
+    procedure RemoveSettingObject (aSettingObject: TPersistent);
+
+    function GetFont        (aControl: TControl): TFont;
+    function GetFont3D      (aControl: TControl): TLMD3DCaption;
+    function GetTransparent (aControl: TControl): Boolean;
+    function GetBackCtlXP   (aControl: TControl): Boolean;
+    function GetBackColor   (aControl: TControl): TColor;
+    function GetFillObject  (aControl: TControl): TLMDFillObject;
+    function GetBackFX      (aControl: TControl): TLMDBitmapEffectObject;
+    function GetBorderCtlXP (aControl: TControl): Boolean;
+    function GetBorderCtl3D (aControl: TControl): Boolean;
+    function GetBevel       (aControl: TControl): TLMDBevel;
+
+    //paint control
+    function findState (aControl: TControl): TLMDCFCStateObject;
+    function Paint (aControl: TControl): Boolean;
+
+    //register / unregister controls -> registered controls will be informed of
+    //component changes
+    procedure RegisterControl (aControl: TControl);
+    procedure UnregisterControl (aControl: TControl);
+
+        {i/o}
+    procedure LoadFromFile(const aFilename: string);
+    procedure SaveToFile(const aFilename: string);
+
+    procedure UpdateControls;
+{    property SettingObject [index: Integer]: TLMDCFCSettingObject
+                                                        read GetSettingObject
+                                                        write SetSettingObject;}
+
+    property Settings: TLMDCFCSettingObjects read FSettingObjects write SetSettingObjects;
+  published
+    property About;
+    property States : TLMDCFCStateObjects read FDefinedStates write SetStateObjects;
+  end;
+
+implementation

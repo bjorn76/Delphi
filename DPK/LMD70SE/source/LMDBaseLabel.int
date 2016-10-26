@@ -1,0 +1,86 @@
+
+uses
+  messages,                 //TMessage
+  classes,                  //TComponent
+  controls,                 //TWinControl
+  Graphics,
+  LMDClass,
+  LMDGraph,                 //TLMDAlignment
+  LMDBaseGraphicControl;
+
+type
+  TLMDLabelOption=(loPathEllipsis, loEndEllipsis, loEditControl);
+  TLMDLabelOptions=set of TLMDLabelOption;
+
+  {-------------------------- TLMDBaseLabel -----------------------------------}
+  TLMDBaseLabel = class(TLMDBaseGraphicControl)
+  private
+    FAccelChar,
+    FDBControl,
+    FTwinkle,
+    FMultiLine        : Boolean;
+    FAlignment        : TLMDAlignment;
+    FOptions          : TLMDLabelOptions;
+    FTwinkleTimerId   : TLMDTimer;
+    FTwinkleVisible,
+    FTwinkleInVisible : Integer;
+    FTwinkleColor     : TColor;
+    FAntialiased: Boolean;
+    FUseGlobalTimer: Boolean;
+    procedure SetAlignment (aValue : TLMDAlignment);
+    procedure SetOptions (aValue : TLMDLabelOptions);
+    procedure SetInteger (index, aValue : Integer);
+    procedure SetBool(index : Integer; aValue : Boolean);
+    procedure SetControl(aValue:TWinControl);
+    procedure CMDialogChar(var Message: TCMDialogChar); message CM_DIALOGCHAR;
+    procedure CMFontChanged(var Message:TMessage);message CM_FONTCHANGED;
+    procedure CMTextChanged(var Message:TMessage);message CM_TEXTCHANGED;
+    procedure SetAntialised(const Value: Boolean);
+  protected
+    FControl     : TWinControl;
+    FAutoSize,
+    FTwinkleFlag,
+    FCChange     : Boolean;
+    function CheckAntiAliasedState:Boolean;
+    procedure OnTwinkleTimer (Sender : TObject);
+    procedure GetChange(Sender:TObject);override;
+    function  GetEmpty:Boolean;override;
+    function GetLabelText:String; virtual;
+    function GetOptionsFlag:Word;
+    procedure FontChange(Sender:TObject);virtual;
+    procedure Loaded;override;
+    Procedure Notification(AComponent: TComponent;Operation: TOperation); override;
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy; override;
+    // 7.0
+    class function SystemFontSmoothingState:Boolean;
+    property FontSmoothing:Boolean read FAntialiased write SetAntialised default false;
+
+    function GetControl : TWinControl;
+    procedure CorrectBounds;virtual;
+
+    property Alignment:TLMDAlignment read FAlignment write SetAlignment default agTopLeft;
+    property AutoSize:Boolean index 0 read FAutoSize write SetBool default True;
+    property Caption;
+    property Color;
+    property DBControl:Boolean read FDBControl write FDBControl; {only for internal use}
+    property FocusControl: TWinControl read FControl write SetControl;
+    property Font;
+    property MultiLine:Boolean index 1 read FMultiLine write SetBool default False;
+    property Options:TLMDLabelOptions read FOptions write SetOptions;
+    property ShowAccelChar:Boolean index 2 read FAccelChar write SetBool default True;
+    property Transparent;
+    property Twinkle : Boolean index 3 read FTwinkle write SetBool default false;
+    property TwinkleVisible : Integer index 0 read FTwinkleVisible write SetInteger default 700;
+    property TwinkleInVisible : Integer index 1 read FTwinkleInVisible write SetInteger default 700;
+    property TwinkleColor : TColor read FTwinkleColor write FTwinkleColor default clNone;
+    // 7.0
+    property UseGlobalTimer:Boolean read FUseGlobalTimer write FUseGlobalTimer default false;
+    // ---
+  published
+    property BiDiMode;
+    property ParentBiDiMode; 
+  end;
+
+implementation

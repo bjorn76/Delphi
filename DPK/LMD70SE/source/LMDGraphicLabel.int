@@ -1,0 +1,32 @@
+
+uses
+  LMDCustomGraphicLabel;
+
+type
+  TLMDGraphicLabel=class(TLMDCustomGraphicLabel)
+  published
+    property About;
+    property Align;
+    property Attributes;
+    property AutoSize;
+    property Bevel;
+    property BrushBackColor;
+    property Caption;
+    property DragMode;
+    property DragCursor;
+    property Factor;
+    property FillObject;
+    property Font;
+    property FontFX;
+    property ImageIndex;
+    property ImageList;
+    property ListIndex;
+    property InvertCaption;
+    property Perspective;
+    property PerspectiveDepth;
+    property Toggle;
+    property Transform;
+    property Transparent;
+  end;
+
+implementation

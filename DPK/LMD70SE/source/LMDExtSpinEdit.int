@@ -1,0 +1,32 @@
+
+uses
+  classes,
+  LMDCustomExtSpinEdit;
+
+type
+  TLMDExtSpinEdit = class (TLMDCustomExtSpinEdit)
+  published
+    property Decimals;
+    property MinValue;
+    property MaxValue;
+    property Suffix;
+    property EditType;
+    property Value;
+    property InfiniteMax;
+    property InfiniteMin;
+    property LargeStep;
+    property FractionStep;
+    property TabOnEnter;
+  end;
+
+  TLMDLabeledExtSpinEdit = class(TLMDExtSpinEdit)
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property LabelPosition;
+    property LabelSpacing;
+    property LabelSync;
+    property EditLabel;
+  end;
+
+implementation

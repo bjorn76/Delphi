@@ -1,0 +1,105 @@
+
+uses
+  Classes,
+  lmdgraph,
+  lmdclass,
+  lmdsysin,//TLMDInfoType
+  LMDCustomStatusBar,
+  LMD3DCaption,
+  LMDBevel,
+  LMDBaseLabel;
+
+type
+  {-------------------------- TLMDInformationLabel ----------------------------}
+  TLMDNumberFormat = String;
+
+  TLMDInformationLabel = class(TLMDBaseLabel)
+  private
+    FInfo : TLMDInfoType;
+    FFont3D : TLMD3DCaption;
+    FDivide : LongInt;
+    FDateTimeFormat : TLMDDateTimeFormat;
+    FNumberFormat : TLMDNumberFormat;
+    FKeySet : String;
+    timerinv,
+    FStandartCaption : Boolean;
+    FBevel : TLMDBevel;
+    FDB,
+    FTabs : ShortInt;
+    FIntervall: Word;
+    FTimerID : TLMDTimer;
+    FUseGlobalTimer: Boolean;
+    procedure SetFont3D(aValue:TLMD3DCaption);
+    procedure SetInfo (aValue : TLMDInfoType);
+    procedure SetTabs (aValue : ShortInt);
+    procedure SetDB (aValue : ShortInt);
+    procedure SetDevide (aValue : LongInt);
+    procedure SetDateTimeFormat (aValue : TLMDDateTimeFormat);
+    procedure SetNumberFormat (aValue : TLMDNumberFormat);
+    procedure SetStandartCaption (aValue : Boolean);
+    procedure SetBevel (aValue : TLMDBevel);
+    procedure SetUseGlobalTimer(const Value: Boolean);
+    procedure GetTimer(Sender:TObject);
+  protected
+    procedure GetChange (Sender: TObject); override;
+    function ReturnCaption(var s : string) : boolean;
+  public
+    constructor Create(aOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure CorrectBounds; override;    
+    procedure Paint; override;
+  published
+    property About;
+    property Align;
+    property Info : TLMDInfoType read FInfo write SetInfo;
+    property AutoSize;
+    property Font3D : TLMD3DCaption read FFont3D write SetFont3D;
+    property Font;
+    property InsertTabs:ShortInt read FTabs write SetTabs default 1;
+    property DividerValue:LongInt read FDivide write SetDevide default 0;
+    property UseStandardCaption:Boolean read FStandartCaption write SetStandartCaption default true;
+    property InsertColon : ShortInt read FDB write SetDB default -1;
+    property Bevel : TLMDBevel read FBevel write SetBevel;
+    property DateTimeFormat : TLMDDateTimeFormat read FDateTimeFormat write SetDateTimeFormat;
+    property NumberFormat : TLMDNumberFormat read FNumberFormat write SetNumberFormat;
+    property Alignment;
+    property Caption;
+    property Color;
+    property Enabled;
+    property Transparent;
+    // property Options;
+    property ParentFont;
+    property ParentColor;
+    property Hint;
+    property ShowHint;
+    property ParentShowHint;
+    property ShowAccelChar;
+
+    // 7.0
+    property UseGlobalTimer:Boolean read FUseGlobalTimer write SetUseGlobalTimer default false;
+    // ---
+
+    property Visible;
+    property Cursor;
+    { events }
+    property OnClick;
+    property OnDblClick;
+    property OnMouseDown;
+    property OnMouseEnter;
+    property OnMouseExit;
+    property OnMouseMove;
+    property OnMouseUp;
+
+    // V4 enhancements
+    property Anchors;
+    property Constraints;
+    property DragKind;
+    property BiDiMode;
+    property ParentBiDiMode;
+    property OnEndDock;
+    property OnStartDock;
+
+  end;
+
+
+implementation

@@ -1,0 +1,109 @@
+
+uses
+  Windows,
+  Graphics,
+  Classes,
+  Messages,
+  Controls, //TMouseButton
+  LMDGraphicControl;
+
+type
+  {-------------------------- TLMDTechnicalLine -------------------------------}
+  TLMDTechnicalLineTypes = (lsStraightLeftToRight, lsStraightTopToBottom,
+                            lsTopLeftToBottomRight, lsBottomLeftToTopRight,
+                            lsTopLeftEdge, lsBottomLeftEdge, lsTopRightEdge, lsBottomRightEdge,
+                            lsTopLeftCurve, lsBottomLeftCurve, lsTopRightCurve, lsBottomRightCurve);
+  TLMDLineEndings = (leNothing, leOpenArrowUp, leOpenArrowDown, leOpenArrowRight, leOpenArrowLeft,
+                            leClosedArrowUp, leClosedArrowDown, leClosedArrowLeft, leClosedArrowRight,
+                            leDiamond, leCircle, leRectangle, leRoundRect, leParallelogramm, leComb,
+                            leHalfCircleLeft, leHalfCircleRight, leHalfCircleUp, leHalfCircleDown);
+  TLMDSignPlaces = (spEnd, spStart, spBoth, spNoWhere);
+
+  TLMDTechnicalLine = class(TLMDGraphicControl)
+  private
+    FTechnicalLineType : TLMDTechnicalLineTypes;
+    FLineEndingsign,
+    FLineStartSign     : TLMDLineEndings;
+    FLineSettings      : TPen;
+    FArrowed           : Boolean;
+    FShadowDepth,
+    FSignSize          : Integer;
+    FSignPlaces        : TLMDSignPlaces;
+    FShadowColor,
+    FFillColor         : TColor;
+    FShapeOnlyMouse,
+    FShadowVisible     : Boolean;
+    drawnShape         : HRGN;
+
+    procedure SetTechnicalLineType (Value : TLMDTechnicalLineTypes);
+    procedure SetLineEnding (Value : TLMDLineEndings);
+    procedure SetLineStart (Value : TLMDLineEndings);
+    procedure SetSignSize (Value : Integer);
+    procedure SetSignPlaces (Value : TLMDSignPlaces);
+    procedure SetFillColor (Value : TColor);
+    procedure SetShadowColor (Value : TColor);
+    procedure SetShadowVisible (Value : Boolean);
+    procedure SetShadowDepth (Value : Integer);
+    procedure SetArrowed (Value : Boolean);
+    procedure WMLButtonUp(var Message: TWMLButtonUp); message WM_LBUTTONUP;
+    procedure WMLButtonDown(var Message: TWMLButtonDown); message WM_LBUTTONDOWN;        
+  protected
+    function GetEmpty:Boolean;override;
+    procedure Paint; override;
+    procedure PaintIt (aRect : TRect);
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy;override;
+  published
+    property About;
+    property Align;
+    property Bevel;
+    property Color;
+    property DragCursor;
+    property DragMode;
+    property LineType : TLMDTechnicalLineTypes read FTechnicalLineType write SetTechnicalLineType
+                        default lsStraightLeftToRight;
+    property LineEndingsign : TLMDLineEndings read FLineEndingsign write SetLineEnding default leClosedArrowRight;
+    property ParentColor;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property SignSize : Integer read FSignSize write SetSignSize default 40;
+    property SignPlaces : TLMDSignPlaces read FSignPlaces write SetSignPlaces default spEnd;
+    property LineStartSign : TLMDLineEndings read FLineStartSign write SetLineStart default leNothing;
+    property LineSettings : TPen read FLineSettings write FLineSettings;
+    property ShadowColor : TColor read FShadowColor write SetShadowColor default clBtnShadow;
+    property ShadowVisible : Boolean read FShadowVisible write SetShadowVisible default False;
+    property ShadowDepth : Integer read FShadowDepth write SetShadowDepth default 6;
+    property FillColor : TColor read FFillColor write SetFillColor default clNone;
+    property Arrowed : Boolean read FArrowed write SetArrowed default false;
+    property ShapeOnly : Boolean read FShapeOnlyMouse write FShapeOnlyMouse default false;
+    property Transparent;
+    property Visible;
+
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnMouseDown;
+    {3.0}
+    property OnMouseEnter;
+    property OnMouseExit;
+    {---}
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDrag;
+
+    {4.0}
+    //properties
+    property Anchors;
+    property DragKind;
+    property Constraints;
+    //events
+    property OnEndDock;
+    property OnStartDock;
+  end;
+
+
+implementation

@@ -1,0 +1,72 @@
+
+uses
+  Windows,
+  Classes,
+  Graphics,
+
+  lmdgraph,
+  LMDTransparent, 
+
+  LMDBaseImage;
+
+type
+  {--------------------------- TLMDCustomNImage -------------------------------}
+  TLMDCustomNImage = class(TLMDBaseImage)
+  private
+    FBitmap:TBitmap;
+    FControl:TLMDCustomNImage;
+    FTransparentStyle:TLMDTransparent;
+    procedure SetBitmap(aValue:TBitmap);
+    procedure SetControl(aControl:TLMDCustomNImage);
+    procedure SetTransparentStyle(aValue:TLMDTransparent);
+  protected
+    function CorrectBounds:Boolean;override;
+    function GetBitmap(tmp:TBitmap):TBitmap;virtual;
+    function GetEmpty:Boolean;override;
+    function GetPalette:HPalette;override;
+    function HasControl:Boolean;
+    procedure Notification(AComponent: TComponent;Operation:TOperation);override;
+    procedure Paint;override;
+    {protected properties}
+    property Bitmap:TBitmap read FBitmap write SetBitmap;
+    property Control:TLMDCustomNImage read FControl write SetControl;
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+  published
+    property Align;
+    property BackFX;
+    property Bevel;
+    property Color;
+    property DragCursor;
+    property DragMode;
+    property ParentColor;
+    property ParentShowHint;
+    property PopupMenu;
+    property QuickDraw;
+    property ShowHint;
+    property Style;
+    property TransparentStyle:TLMDTransparent read FTransparentStyle write SetTransparentStyle;
+    property Transparent default True;
+    property Visible;
+
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDrag;
+
+    // V4 enhancements
+    property Anchors;
+    property Constraints;
+    property DragKind;
+    property OnEndDock;
+    property OnStartDock;
+
+  end;
+
+implementation

@@ -1,0 +1,66 @@
+
+uses
+  Classes,
+  LMDButtonBase,
+  LMDGraph,
+  LMDBaseGraphicButton;
+
+type
+  {---------------------- TLMDCustomSpeedButton -------------------------------}
+  TLMDCustomSpeedButton=class(TLMDBaseGraphicButton)
+  private
+    procedure SetGlyphKind(aValue:TLMDGlyphKind);
+    procedure SetStyle(aValue:TLMDUserButtonStyle);
+    procedure ReadExtStyle(Reader:TReader);
+  protected
+    FGlyphKind : TLMDGlyphKind;
+    FStyle : TLMDUserButtonStyle;
+    FDesign: Boolean; //btn gets painted differently in design time if true
+    // 6.1
+    function ControlSupportsXP: Boolean; override;
+    // ---
+    procedure DefineProperties(Filer:TFiler);override;
+
+    procedure SetUnColorMain(aValue:Boolean);
+    function GetUnColorMain:Boolean;
+    function ActionChangeable:Boolean;override;
+    function IsCustom:Boolean; override;
+    function IsHotState:Boolean; override;
+    function IsHotOptionsetMode:Boolean;override;
+    function RepaintOnMouse: Boolean; override;
+    procedure GetIMLChange(Sender:TObject); override;
+    procedure Paint; override;
+    procedure RequestDefaultGlyph;
+    property Transparent default True;
+    property Design: Boolean read FDesign write FDesign default true;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    property GlyphKind: TLMDGlyphKind read FGlyphKind write SetGlyphKind default gkCustom;
+    // compatibility
+    property Style:TLMDUserButtonStyle read FStyle write SetStyle stored false;
+    property ButtonStyle:TLMDUserButtonStyle read FStyle write SetStyle default ubsWin40;
+    property UnColorMain:Boolean read GetUnColorMain write SetUnColorMain default True;
+  published
+    // 7.0
+    property ButtonLayout;
+    property CtlXP default True;
+    property EnterColor;
+    property EnterColorChange;
+    property ImageList;
+    property ImageIndex;
+    property ListIndex;
+    property NumGlyphs;
+    property Glyph;
+    property Font;
+    property FontFX;
+    property RepeatedClick;
+    property RepeatingInterval;
+    property RepeatingDelay;
+    property UseCaption;
+    property OnDropDown;
+    // ---
+  end;
+
+
+implementation

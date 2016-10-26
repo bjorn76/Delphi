@@ -1,0 +1,88 @@
+
+uses
+  Windows,
+  Classes, Graphics, Controls,
+  LMDGraph, LMDButtonLayout, LMDSpeedButton, LMDFXCaption;
+
+type
+  TLMDOnCustomBtnClick = procedure (Sender : TObject;index : Integer) of object;
+
+  {---------------------TLMDSpecialButton--------------------------------------}
+  TLMDSpecialButton = class (TCollectionItem)
+  private
+    FHint,
+    FCaption : String;
+    FGlyph   : TBitmap;
+    FCursor  : TCursor;
+    FBtn     : TLMDSpeedButton;
+    FGroupIndex : Integer;
+    FParentFont,
+    FEnabled : Boolean;
+    FOnClick : TLMDOnCustomBtnClick;
+    FLayout  : TLMDButtonLayout;
+    FFont    : TFont;
+    FFontFX  : TLMDFXCaption;
+
+    procedure SetEnabled (aValue : Boolean);
+    procedure SetString (index : integer;aValue : String);
+    procedure SetGlyph (aValue : TBitmap);
+    procedure SetBtn (aValue : TLMDSpeedButton);
+    procedure SetCursor (aValue : TCursor);
+    procedure SetLayout (aValue : TLMDButtonLayout);
+    procedure SetFont (aValue : TFont);
+    procedure SetFontFX (aValue : TLMDFXCaption);
+    procedure SetInteger (aValue : Integer);
+    procedure SetParentFont (aValue : Boolean);
+    function GetParentFont : Boolean;
+    procedure DoOnClick (Sender : TObject);
+    procedure GetChange (Sender : TObject);
+    function GetPressed: Boolean;
+    procedure SetPressed(const Value: Boolean);
+    procedure SetCtlXP(const Value: Boolean);
+    function GetCtlXP: Boolean;
+  public
+    constructor Create(Collection: TCollection); override;
+    destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure DoClick;
+    property Btn : TLMDSpeedButton read FBtn write SetBtn;
+    property Pressed:Boolean read GetPressed write SetPressed default false;
+  published
+    property Caption : String index 0 read FCaption write SetString;
+    property CtlXP:Boolean read GetCtlXP write SetCtlXP default false;
+    property Cursor : TCursor read FCursor write SetCursor default crArrow;
+    property Hint : String index 1 read FHint write SetString;
+    property Glyph : TBitmap read FGlyph write SetGlyph;
+    property Enabled : Boolean read FEnabled write SetEnabled default true;
+    property Layout : TLMDButtonLayout read FLayout write SetLayout;
+    property ParentFont : Boolean read GetParentFont write SetParentFont default true;
+    property Font : TFont read FFont write SetFont;
+    property FontFX : TLMDFXCaption read FFontFX write SetFontFX;
+    property GroupIndex : Integer read FGroupIndex write SetInteger default 0;
+    property Index;
+    property DisplayName;
+
+    property OnClick : TLMDOnCustomBtnClick read FOnClick write FOnClick;
+  end;
+
+  {---------------------TLMDSpecialButtons-------------------------------------}
+  TLMDSpecialButtons = class (TCollection)
+  private
+    FOwner  : TWinControl;
+    FInform : Boolean;
+    FOnChange:TNotifyEvent;
+    function GetItem(Index: Integer): TLMDSpecialButton;
+    procedure SetItem(Index: Integer; Value: TLMDSpecialButton);
+  protected
+    procedure Change;
+    function GetOwner: TPersistent; override;
+    procedure Update(Item: TCollectionItem); override;
+  public
+    constructor Create(Owner : TWinControl; inform : Boolean);
+    destructor Destroy; override;
+    function Add: TLMDSpecialButton;
+    property Items[Index: Integer]: TLMDSpecialButton read GetItem write SetItem; default;
+    property OnChange:TNotifyEvent read FOnChange write FOnChange;
+  end;
+
+implementation

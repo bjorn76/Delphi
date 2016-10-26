@@ -1,0 +1,156 @@
+
+uses
+  Windows,
+  Graphics,
+  Controls,
+  Classes,
+  Messages,
+  LMDGraph,
+  LMDClass,
+  LMDBase,
+  LMDTimer,
+  LMD3DCaption,
+  LMDGraphicControl;
+
+type
+  {------------------------- TLMDScrollText -----------------------------------}
+  TLMDScrollDirection=(sdBottomToTop, sdLeftToRight, sdRightToLeft, sdTopToBottom);
+  TLMDScrollStyle=(ssLoop, ssLoopReverse, ssOnce);
+  TLMDScrollMode=(smMarquee, smTicker);
+
+  TLMDScrollText=class(TLMDGraphicControl)
+  private
+    FAlignment : TAlignment;
+    FBack      : TBitmap;
+    FDirection : TLMDScrollDirection;
+    FFont3D    : TLMD3DCaption;
+    FInterval  : TLMDTimerInterval;
+    FLines     : TStringList;
+    FMakeVisible:Boolean;
+    FRestore   : Boolean;
+    FScroll    : Boolean;
+    FStyle     : TLMDScrollStyle;
+    FMode      : TLMDScrollMode;
+    FTimerID   : TLMDTimer;
+    FTransparent:Boolean;
+    FSteps,
+    {internal}
+    bmw, bmh, th, tw, lh,
+    FCurrent   : Integer;
+    pos        : TPoint;
+    FOnScrollStart,
+    FOnScroll,
+    FOnScrollEnd:TNotifyEvent;
+
+    //4.0
+    FTimerMode:TLMDTimerMode;
+    FTimer:TLMDHiTimer;
+    FThreadPriority:TThreadPriority;
+    procedure SetThreadPriority(aValue:TThreadPriority);
+    procedure SetTimerMode(aValue:TLMDTimerMode);
+    //---
+
+    procedure SetAlignment(aValue:TAlignment);
+    procedure SetBool(index:Integer; aValue:Boolean);
+    procedure SetDirection(aValue:TLMDScrollDirection);
+    procedure SetFont3D(aValue:TLMD3DCaption);
+    procedure SetInterval(aValue:TLMDTimerInterval);
+    procedure SetLines(aValue:TStringList);
+    procedure SetSteps(aValue:Integer);
+    procedure SetStyle(aValue:TLMDScrollStyle);
+    procedure SetMode(aValue : TLMDScrollMode);
+    procedure GetTimer(Sender:TObject);
+
+    //4.0
+    procedure ActivateTimer;
+    procedure DeActivateTimer(aValue:TLMDTimerMode);
+    procedure EnableTimer(aValue:Boolean);
+    //--
+
+    procedure CMFontChanged(var Message:TMessage);message CM_FONTCHANGED;
+  protected
+    function GetAsTickerText : String;
+    procedure BoundsChange(State:TLMDBoundsChangeStates);override;
+    procedure CalculateDimensions;
+    procedure GetChange(Sender:TObject);override;
+    function GetEmpty:Boolean;override;
+    procedure Loaded;override;
+    procedure Paint;override;
+    procedure PaintImage;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure Invalidate;override;
+    procedure BackUpdate; override;
+
+    {methods}
+    procedure Execute;
+    procedure ExecuteEnh(StartStep:Integer);
+    procedure Reverse;
+    procedure Stop;
+
+    {runtime properties}
+    property Step:Integer read FCurrent;
+  published
+    property About;
+    property Alignment: TAlignment read FAlignment write SetAlignment default taCenter;
+    {$IFNDEF LMDTOOLS_SPECIALEDITION}
+      property BackFX;
+    {$ENDIF}
+    property Direction: TLMDScrollDirection read FDirection write SetDirection default sdBottomToTop;
+    property Font3D: TLMD3DCaption read FFont3D write SetFont3D;
+    property Interval:TLMDTimerInterval read FInterval write SetInterval default 100;
+    property Lines: TStringList read FLines write SetLines;
+    property MakeVisible:Boolean index 0 read FMakeVisible write SetBool default True;
+    property Scroll:Boolean index 1 read FScroll write SetBool stored false;
+    property ScrollStyle:TLMDScrollStyle read FStyle write SetStyle default ssLoop;
+    property ScrollMode: TLMDScrollMode read FMode write SetMode default smMarquee;
+    property Steps:Integer read FSteps write SetSteps default 100;
+    property Transparent:Boolean index 2 read FTransparent write SetBool default false;
+
+    property OnStart:TNotifyEvent read FOnScrollStart write FOnScrollStart;
+    property OnScroll:TNotifyEvent read FOnScroll write FOnScroll;
+    property OnStop:TNotifyEvent read FOnScrollEnd write FOnScrollEnd;
+
+    //4.0
+    property TimerMode:TLMDTimerMode read FTimerMode write SetTimerMode default tmNormal;
+    property ThreadPriority:TThreadPriority read FThreadPriority write
+                            SetThreadPriority default tpNormal;
+
+    {inherited properties}
+    property Align;
+    property Bevel;
+    property Color;
+    property DragCursor;
+    property DragMode;
+    property Font;
+    property ParentColor;
+    property ParentShowHint;
+    property PopupMenu;
+    Property ShowHint;
+    Property Visible;
+
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDrag;
+
+    {4.0}
+    //properties
+    property Anchors;
+    property BiDiMode;
+    property DragKind;
+    property Constraints;
+    property ParentBiDiMode;
+    //events
+    property OnEndDock;
+    property OnStartDock;
+  end;
+
+
+implementation

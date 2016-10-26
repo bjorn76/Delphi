@@ -1,0 +1,93 @@
+
+uses
+  Windows,
+  SysUtils,
+  Classes,
+  graphics,
+  imglist,
+  LMDCustomImageList,
+  LMDCustomContainer;
+
+type
+
+  TLMDImageListConnector= class;
+
+  {****************************************************************************}
+  {----------------------TLMDBorImageListItem----------------------------------}
+  TLMDBorImageListItem = class (TCollectionItem)
+  private
+    FImageList  : TCustomImageList;
+    FChangeLink : TChangeLink;
+    FName       : String;
+    procedure SetImageList(aValue:TCustomImageList);
+    procedure SetName(aValue:String);
+    function GetConnector:TLMDImageListConnector;
+  protected
+  public
+    constructor Create(Collection: TCollection); override;
+    destructor Destroy; override;
+    function GetDisplayName: string; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure ImageListChange(Sender:TObject);
+    property Connector:TLMDImageListConnector read GetConnector;
+  published
+    property Name:String read FName write SetName;
+    property ImageList:TCustomImageList read FImageList write SetImageList;
+    property Index;
+  end;
+
+  {----------------------TLMDBorImageListItems---------------------------------}
+  TLMDBorImageListItems = class (TCollection)
+  private
+    FConnector: TLMDImageListConnector;
+    function GetItem(Index: Integer): TLMDBorImageListItem;
+    procedure SetItem(Index: Integer; aValue:TLMDBorImageListItem);
+  protected
+    function GetOwner: TPersistent; override;
+    procedure Update(Item: TCollectionItem);override;
+  public
+    constructor Create(Connector: TLMDImageListConnector);
+    destructor Destroy ; override;
+    function Add: TLMDBorImageListItem;
+    property Items[Index: Integer]: TLMDBorImageListItem read GetItem write SetItem; default;
+  end;
+
+    {----------------------TLMDImageListConnector--------------------------------}
+  TLMDImageListConnector= class(TLMDCustomImageList)
+  private
+    FImageLists : TLMDBorImageListItems;
+    FDummyItem  : TLMDListItem;
+    procedure SetImageLists(aValue:TLMDBorImageListItems);
+  protected
+    function GetCount:Integer;override;
+    function GetEmpty:Boolean;override;
+    function GetItem(Index:Integer):TLMDListItem;override;
+    procedure Notification(aComponent: TComponent;Operation: TOperation);override;
+  public
+    constructor Create(aOwner: TComponent); override;
+    destructor Destroy; override;
+    {helpers for components}
+    {general}
+    function BmpCanvas(index:Integer):TCanvas;override; {3.10}
+    function ItemRect(index, item:Integer):TRect;override; {3.10}
+    function Dimensions(index:Integer; tp:Byte):Integer;override;
+    procedure GetBitmapItem(index, item:Integer; tb:TBitmap); override;
+    function IsValidItem(index, item:Integer):Boolean;override;
+    function ItemCount(index:Integer):Integer;override;
+    function Masked(index:Integer):Boolean; override;
+    function Palette(index:Integer):HPalette;override;
+    function TransparentColor(index, item:Integer):TColor;override;
+    function GetColorAtPoint(aPoint: TPoint; index, item:Integer): TColor; override;
+    {Drawing}
+    procedure Draw(Canvas: TCanvas; X, Y: Integer; ListIndex, Index: Integer);override;
+    function DrawExt(Canvas:TCanvas; target:TRect; flags:Word; ListIndex, Index:Integer):TRect;override;
+    {Extended Drawing}
+    procedure ClipDraw(Canvas:TCanvas; target:TRect; flags:WORD;
+                       pos:LongInt; transColor:TColor; ListIndex, index:Integer);override;
+
+    property Contents[Index:Integer]:TLMDListItem read GetItem;
+  published
+    property ImageLists:TLMDBorImageListItems read FImageLists write SetImageLists;
+  end;
+
+implementation

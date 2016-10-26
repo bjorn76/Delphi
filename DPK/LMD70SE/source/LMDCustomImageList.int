@@ -1,0 +1,64 @@
+
+uses
+  Windows,
+  SysUtils,
+  Classes,
+  graphics,
+  consts,
+  controls,
+  imglist,
+  LMDClass,
+  LMDBase,
+  LMDGraph,
+  LMDProcs,
+  LMDCustomContainer;
+
+const
+  LMDPixelFormatColors:array[TLMDSavePixelFormat] of LongInt=(-1, 2, 16, 256{, -1});
+
+type
+
+  {----------------------TLMDCustomImageList-----------------------------------}
+  TLMDCustomImageList = class(TLMDCustomContainer)
+  private
+    procedure SetIndex(aValue:Integer);
+  protected
+    FIndex:Integer;
+    FDefaultPixel:TLMDSavePixelFormat;
+  public
+    procedure Assign(Source:TPersistent);override;
+    function BmpCanvas(index:Integer):TCanvas;virtual;abstract; {3.10}
+    function ItemRect(index, item:Integer):TRect;virtual;abstract; {3.10}
+    function Dimensions(index:Integer; tp:Byte):Integer;virtual;abstract;
+    function ItemCount(index:Integer):Integer;virtual;abstract;
+    function IsValidItem(index, item:Integer):Boolean;virtual;abstract;
+    procedure GetBitmapItem(index, item:integer; tb:TBitmap);virtual;abstract;
+    function Masked(index:Integer):Boolean; virtual; abstract;
+    function Palette(index:Integer):HPalette;virtual;abstract;
+    function TransparentColor(index, item:Integer):TColor;virtual;abstract;
+    function GetColorAtPoint(aPoint: TPoint; index, item:Integer): TColor; virtual;abstract;
+
+    {Drawing}
+    procedure Draw(Canvas: TCanvas; X, Y: Integer; ListIndex, Index: Integer);virtual; abstract;
+    function DrawExt(Canvas:TCanvas; target:TRect; flags:Word; ListIndex, Index:Integer):TRect;virtual; abstract;
+
+    {Extended Drawing}
+    procedure ClipDraw(Canvas:TCanvas; target:TRect; flags:WORD;
+                       pos:LongInt; transColor:TColor; ListIndex, index:Integer);virtual; abstract;
+
+    property Index:Integer read FIndex write SetIndex default 0;
+    property DefaultPixelFormat:TLMDSavePixelFormat read FDefaultPixel write FDefaultPixel default spfDefault;
+    //property Source;
+    //property FileName;
+    //property FilePrefix;
+  end;
+
+const
+  ITF_BMPMONO=$10;
+  ITF_BMP16=$20;
+  ITF_BMP256=$40;
+
+function LMDBmpLoad(hlib:THandle; index:Integer; aBitmap:TBitmap):Boolean;
+function LMDBmpLoadFromFile(const FileName:String; index:Integer; aBitmap:TBitmap):Boolean;
+
+implementation

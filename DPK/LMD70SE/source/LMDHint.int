@@ -1,0 +1,30 @@
+
+uses
+  Classes,
+  LMDBevel,
+  LMDCustomHint;
+
+type
+  TLMDHint = class(TLMDCustomHint)
+  private
+    FBevel:TLMDBevel;
+    procedure SetBevel(aValue:TLMDBevel);
+  protected
+    procedure SetEnabled(aValue:Boolean);override;
+  public
+    Constructor Create(AOwner:TComponent);Override;
+    destructor Destroy;override;
+  published
+    property About;
+    property Bevel:TLMDBevel read FBevel write SetBevel;
+    property Color;
+    property Enabled;
+    property Font;
+    property Font3D;
+    property MaxWidth;
+  end;
+
+var
+  HintControl:TLMDHint;
+
+implementation

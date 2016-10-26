@@ -1,0 +1,74 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  LMDObject,
+  LMDGraph,
+  LMDAlphaObject,
+  LMDBmp;
+
+type
+  TLMDBitmapEffectObject = class(TLMDObject)
+  private
+    FAlphaObject : TLMDAlphaObject;
+    FBufferValid,
+    FInvert,
+    FBuffered,
+    FGrayScale,
+    FFlipVert,
+    FMonochrome,
+    FFlipHoriz   : Boolean;
+    FBitmap      : TBitmap;
+    FBrightness  : TLMDBrightness;
+
+    procedure SetAlphaObject (aValue : TLMDAlphaObject);
+    procedure SetBoolean (index : Integer; aValue : Boolean);
+    procedure SetBrightness (aValue : TLMDBrightness);
+
+  protected
+    procedure GetChange (Sender : TObject); override;
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+    procedure Assign (Source : TPersistent); override;
+    function GetSetStr : String; override;
+
+    function Enabled : Boolean;
+
+    //directly change target bitmap
+    procedure Draw (target : TBitmap);
+
+    //draw on whole image source must have same size as target
+    procedure DrawCopy (source, target : TBitmap);
+
+    //draw source rect on whole image target  (target bitmap size = sourceRect size)
+    procedure DrawCopyFromRect (source : TBitmap; sourceRect : TRect; target : TBitmap);
+
+    //draw source rect on target at pos targetPt
+    procedure DrawCopyRect (source : TBitmap; sourceRect : TRect; target : TBitmap; targetPt : TPoint);
+
+    //source = whole back; sourcerect = piece of whole to be modified
+    //traget = whole target bitmap; tragetRect = rect in traget which shall be painted
+    //effect is calculated for whole target but only targetRect is painted
+
+    procedure DrawCutRect (source : TBitmap; sourceRect : TRect; //source image (rect)
+                           target : TBitmap; targetRect : TRect);
+
+    procedure DrawCutRect2 (source : TBitmap; sourceRect : TRect; //source image (rect)
+                            target : TBitmap; targetRect : TRect);
+
+    procedure DestroyBuffer;
+
+    property BufferBitmap : TBitmap read FBitmap;
+    property BufferValid : Boolean read FBufferValid;
+  published
+    property AlphaBlend : TLMDAlphaObject read FAlphaObject write SetAlphaObject;
+    property FlipVertical : Boolean index 0 read FFlipVert write SetBoolean default false;
+    property FlipHorizontal : Boolean index 1 read FFlipHoriz write SetBoolean default false;
+    property GrayScale : Boolean index 2 read FGraySCale write SetBoolean default false;
+    property Invert : Boolean index 3 read FInvert write SetBoolean default false;
+    property Buffered : Boolean index 4 read FBuffered write SetBoolean default false;
+    property Brightness : TLMDBrightness read FBrightness write SetBrightness default 0;
+//    property Monochrome : Boolean index 5 read FMonochrome write SetBoolean default false;
+  end;
+
+implementation

@@ -1,0 +1,57 @@
+
+uses
+  Windows,
+  SysUtils,
+  Classes,
+  graphics,
+  consts,
+  controls,
+  lmdclass,
+  lmdstrings,
+  dialogs,
+  LMDCustomComponent,
+  LMDCustomContainer,
+  LMDBaseController;
+
+type
+
+  {StringLists}
+  {------------------------- TLMDStringListItem -------------------------------}
+  TLMDStringListItem = class(TLMDListItem)
+  private
+    FStrList:TStringList;
+    function GetList:TStrings;
+    procedure SetList(aValue:TStrings);
+  protected
+    procedure DefineProperties(Filer: TFiler);override;
+    function  GetEmpty:Boolean;override;
+    procedure ReadData(Stream:TStream);override;
+    procedure WriteData(Stream:TStream);override;
+    function  WriteFlag:Byte; override;
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+    procedure Assign(Source: TPersistent);override;
+    procedure FreeData; override;
+    property Compressed;
+  published
+    property Items: TStrings read GetList write SetList stored false;
+    property Description;
+    property Ident;
+  end;
+
+  {------------------------ Class TLMDStringList ------------------------------}
+  TLMDStringList=class(TLMDCustomContainer)
+  private
+    function GetArrayItem(index:Integer):TLMDStringListItem;
+    function GetArrayNameItem(Index:String):TLMDStringListItem;
+  protected
+  public
+    constructor Create(AOwner:TComponent);override;
+    property Items[Index:Integer]:TLMDStringListItem read GetArrayItem;default;
+    property ItemByName[Index:String]:TLMDStringListItem read GetArrayNameItem;
+  published
+    property DefaultCompressed;
+  end;
+
+implementation

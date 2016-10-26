@@ -1,0 +1,81 @@
+
+uses
+  Windows,
+  SysUtils,
+  Classes,
+  graphics,
+  consts,
+  controls,
+  imglist,
+  {$IFNDEF LMDTOOLS_SPECIALEDITION}
+  LMDGraphicList,
+  {$ENDIF}
+  LMDCustomImageList,
+  LMDBitmapList,
+  LMDImageList,
+  LMDWaveList,
+  LMDStringList,
+  LMDCustomComponent,
+  LMDBaseController;
+
+type
+
+  {**************************** LMD Container *********************************}
+  {------------------------ Class TLMDContainer -------------------------------}
+  TLMDContainer=class(TLMDBaseController)
+  private
+    FBitmapList:TLMDBitmapList;
+    FImageList:TLMDImageList;
+    FWaveList:TLMDWavelist;
+    FStringList:TLMDStringList;
+    procedure SetBitmapList(aValue:TLMDBitmapList);
+    procedure SetImageList(aValue:TLMDImageList);
+    procedure SetStringList(aValue:TLMDStringList);
+    procedure SetWaveList(aValue:TLMDWaveList);
+  protected
+    procedure GetChange(Sender:TObject);override;
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+    {properties}
+    property BitmapList:TLMDBitmapList read FBitmapList write SetBitmapList;
+    property ImageList:TLMDImageList read FImageList write SetImageList;
+    property StringList:TLMDStringList read FStringList write SetStringList;
+    property WaveList:TLMDWaveList read FWaveList write SetWaveList;
+    {missing
+    -> RTF-List
+    }
+
+  end;
+
+  {------------------------ Class TLMDContainerCtrl  --------------------------}
+  TLMDContainerCtrl=class(TLMDCustomComponent)
+  private
+    FContainer:TLMDContainer; {at designtime - tmp.Object}
+    FInternal:Byte;
+    procedure ReadStream(Stream:TStream);
+    procedure WriteStream(Stream:TStream);
+  protected
+    procedure DefineProperties(Filer:TFiler);override;
+    procedure Notification(AComponent: TComponent;  Operation: TOperation);override;
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+    property Container:TLMDContainer read FContainer;
+  published
+    property About;
+  end;
+
+var
+  LMDContainer:TLMDContainer;
+
+  {****************************** Helper Routines *******************************}
+  function LMDIsSingleItemImageList(aList:TLMDCustomImageList):Boolean;
+  function LMDIsCollectionImageList(aList:TLMDCustomImageList):Boolean;
+
+  {for properties}
+  procedure LMDWriteGlobalIdent(Writer:TWriter; aList:TLMDCustomImageList);
+  function LMDReadGlobalIdent(Reader:TReader):TLMDCustomImageList;
+  function LMDIsGlobalIdent(aList:TLMDCustomImageList):Boolean;
+
+implementation

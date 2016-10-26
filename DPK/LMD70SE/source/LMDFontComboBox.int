@@ -1,0 +1,125 @@
+
+uses
+  Windows,
+  Graphics,
+  Messages,
+  Classes,
+  Controls,
+  StdCtrls,
+  LMDCustomComboBox;
+
+type
+  TLMDFontCBOption=(foPrinterFonts,
+                    foScreenFonts,
+                    foTrueTypeOnly,
+                    foDisplayFont,
+                    foDisplaySymbol,
+                    foDisplaySelectedFont);
+
+  TLMDFontCBOptions=set of TLMDFontCBOption;
+
+  TLMDFontComboExampleAlign = (eaComboBox, eaDropDownList{, eaMousePos});
+
+  TLMDFontComboBox = class(TLMDCustomComboBox)
+  private
+    FBuffer          : TBitmap;
+    FOptions         : TLMDFontCBOptions;
+    FSizeChange      : TNotifyEvent;
+    FShowExample,
+    FFastMode        : Boolean;
+    FHintWnd         : THintWindow;
+    FExampleFontSize : Integer;
+    FExampleText     : String;
+    FExampleAlign    : TLMDFontComboExampleAlign;
+
+//    procedure SetFastMode(aValue:Boolean);
+    procedure SetSelectedFont(const aValue:TFontName);
+    procedure SetOptions(aValue:TLMDFontCBOptions);
+//    procedure SetBoolean(aValue : Boolean);
+//    procedure SetInteger(aValue : Integer);
+    function GetSelectedFont: TFontName;
+    procedure CMFontChanged(var Message: TMessage); message CM_FONTCHANGED;
+    procedure CMFontChange(var Message: TMessage); message CM_FONTCHANGE;
+    procedure CNCommand(var Message: TWMCommand); message CN_COMMAND;
+  protected
+    procedure Change; override;
+    procedure CreateWnd; override;
+    procedure CreateFontList;
+    procedure DrawItem(Index: Integer; Rect: TRect; State: TOwnerDrawState); override;
+    procedure InitFontHeight;
+
+    {for TLMDFontSizeControls}
+    property OnFontChange:TNotifyEvent read FSizeChange write FSizeChange;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure Loaded; override;
+    property SelectedFont:TFontName read GetSelectedFont write SetSelectedFont;
+    property Text;
+
+    // 7.0 - Rebuilds full fontlist
+    procedure Init;
+  published
+    property About;
+    property Color;
+    property Ctl3D;
+    property DragMode;
+    property DragCursor;
+    property DropDownCount;
+    property DropDownWidth;
+    property Enabled;
+    property ExampleAlign : TLMDFontComboExampleAlign read FExampleAlign write FExampleAlign default eaComboBox;
+    property ExampleText : String read FExampleText write FExampleText;
+    property ExampleFontSize : Integer read FExampleFontSize write FExampleFontSize default 12;
+    property FastMode:Boolean read FFastMode write FFastMode default false;
+    property Flat;
+    property FocusControl;
+    property Font;
+    property MRUList;
+    property MRUMax;
+    property Options:TLMDFontCBOptions read FOptions write SetOptions
+                     default [foScreenFonts, foDisplaySymbol, foDisplaySelectedFont];
+    property ParentColor;
+    property ParentCtl3D;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    //property Search;
+    property ShowExample : Boolean read FShowExample write FShowExample default false;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    property UseGlobalTimer;
+    property Visible;
+
+   {Events}
+   property OnSelect;
+   property OnChange;
+   property OnClick;
+   property OnDblClick;
+   property OnDragDrop;
+   property OnDragOver;
+   property OnDropDown;
+   property OnEndDrag;
+   property OnEnter;
+   property OnExit;
+   property OnKeyDown;
+   property OnKeyPress;
+   property OnKeyUp;
+   property OnStartDrag;
+
+    // V4 enhancements
+    property Anchors;
+    property Constraints;
+    property DragKind;
+    property BiDiMode;
+    property ParentBiDiMode;
+    property OnEndDock;
+    property OnStartDock;
+
+  end;
+
+  function EnumFontsProc(var LogFont: TLogFont; var TextMetric: TTextMetric;
+                         FontType: Integer; Data: Pointer): Integer; stdcall;
+
+implementation

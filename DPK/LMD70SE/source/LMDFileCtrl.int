@@ -1,0 +1,111 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  ShellApi, lmdconst, LMDCustomComponent, lmdclass,imglist;
+
+type
+  TLMDFileOpFlag=(ffFilesOnly, ffNoActionConfirm, ffNoMKDIRConfirm, ffRenameFileOnCollision, ffShowNoErrors, ffShowNoProgress, ffSimpleProgress, ffUseRecycleBin);
+  TLMDFileOpFlags=set of TLMDFileOpFlag;
+
+  TLMDFileCtrlAttribute=(fcaArchive, fcaDirectory, fcaHidden, fcaNormal, fcaOffline, fcaReadonly, fcaSystem,fcaTemporary, fcaCompressed);
+  TLMDFileCtrlAttributes=set of TLMDFileCtrlAttribute;
+
+  TLMDFileOperation=(foCopy, foRename, foMove, foDelete);
+
+  TLMDFileCtrl = class(TLMDCustomComponent)
+  private
+    FFileName: String;
+    FOptions:TLMDFileOpFlags;
+    // File-Attributes
+    procedure SetAttributes (aValue : TLMDFileCtrlAttributes);
+    function GetAttributes: TLMDFileCtrlAttributes;
+    // Copy - Move - Delete - Rename
+    function FileOps(aSource:String; aDestination:String; Operation:TLMDFileOperation):Boolean;
+    // Filesize
+    function GetFileBytes:LongInt;
+    procedure SetFileBytes(aDummy: LongInt);
+    // Timestamps
+    function GetFileTimeb(index: Integer):String;
+    procedure SetFileTimeb(index: Integer; aValue:String);
+    // Filetype
+    function GetFileType:String;
+    procedure SetFileType(aDummy:String);
+    // Associated Program-File
+    function GetExecuteable:String;
+    // More File-Infos
+    function GetFileExtension:String;
+    function GetShortAttrib:String;
+    function GetFileExist:Boolean;
+    function GetFilePath:String;
+    function GetFileNameOnly:String;
+    procedure SetFileName(aValue:String);
+    // Icon-Operations
+    function GetFileIconPath:String;
+    function GetFileIconIndex:Integer;
+    function GetSmallIconListHandle:DWORD;
+    function GetLargeIconListHandle:DWORD;
+    function GetLargeIconHeight:Integer;
+    function GetSmallIconHeight:Integer;
+    function GetLargeIconWidth:Integer;
+    function GetSmallIconWidth:Integer;
+    function GetIconNum:Integer;
+  protected
+    { Protected-Deklarationen }
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+    // File-Ops
+    {$IFDEF CPPBUILDER}
+    function CopyFiles(aSource, aDestination:LPCSTR):Boolean;
+    function DeleteFiles(aSource:LPCSTR):Boolean;
+    function MoveFiles(aSource, aDestination:LPCSTR):Boolean;
+    function RenameFiles(aSource, aDestination:LPCSTR):Boolean;
+    {$ELSE}
+    function CopyFiles(aSource:String; aDestination:String):Boolean;
+    function DeleteFiles(aSource:String):Boolean;
+    function MoveFiles(aSource, aDestination:String):Boolean;
+    function RenameFiles(aSource, aDestination:String):Boolean;
+    {$ENDIF}
+    // Icon-Operations
+    procedure GetLargeFileIcon(var TempIcon:TIcon);
+    procedure GetSmallFileIcon(var TempIcon:TIcon);
+    procedure GetLargeIconFromFile(aIndex:DWord; var TempIcon:TIcon);
+    procedure GetSmallIconFromFile(aIndex:DWord; var TempIcon:TIcon);
+    procedure ExtractIconsFromFile(var TempList:TCustomImageList; Small:Boolean);
+    property FileIconPath:String read GetFileIconPath;
+    property FileIconSysIndex:Integer read GetFileIconIndex;
+    property SmallIconSysList:DWORD read GetSmallIconListHandle;
+    property LargeIconSysList:DWORD read GetLargeIconListHandle;
+    property LargeIconHeight: Integer read GetLargeIconHeight;
+    property SmallIconHeight: Integer read GetSmallIconHeight;
+    property LargeIconWidth: Integer read GetLargeIconWidth;
+    property SmallIconWidth: Integer read GetSmallIconWidth;
+    property ExtractIconsNumber: Integer read GetIconNum;
+    // More File-Infos
+    property Executeable:String read GetExecuteable;
+    property FileExtension:String read GetFileExtension;
+    property ShortAttributes:String read GetShortAttrib;
+    property FileExist:Boolean read GetFileExist;
+    property FilePath:String read GetFilePath;
+    property FileNameOnly:String read GetFileNameOnly;
+  published
+    property About;
+    // the filename
+    property FileName:String read FFileName write SetFilename;
+    // a set of file-attributes
+    property Attributes:TLMDFileCtrlAttributes read GetAttributes write SetAttributes stored false;
+    // a set of options according to file-ops
+    property Options:TLMDFileOpFlags read FOptions write FOptions default [ffUseRecycleBin, ffFilesOnly];
+    // the filesize
+    property FileSize:LongInt read GetFileBytes write SetFileBytes stored false;
+    // the file-create-time
+    property FileCreateStamp:String index 0 read GetFileTimeb write SetFileTimeb stored false;
+    // the time of last access to file
+    property FileAccessStamp:String index 1 read GetFileTimeb write SetFileTimeb stored false;
+    // the time file was last written
+    property FileWriteStamp:String index 2 read GetFileTimeb write SetFileTimeb stored false;
+    // the type of the file
+    property FileType:String read GetFileType write SetFileType stored false;
+  end;
+
+implementation

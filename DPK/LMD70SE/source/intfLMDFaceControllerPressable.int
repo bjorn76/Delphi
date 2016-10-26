@@ -1,0 +1,13 @@
+
+uses
+  Windows,
+  Graphics,
+  intfLMDBase;
+
+type
+  ILMDFaceControllerPressable = interface(IInterface)
+    ['{DAF1F323-1814-4CF5-97C9-5B82B945D7E6}']
+    function fcGetPressed: Boolean;
+  end;
+
+implementation

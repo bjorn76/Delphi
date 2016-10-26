@@ -1,0 +1,52 @@
+
+uses
+  Classes,
+  LMDBrowseDlg,
+  LMDCustomBrowseEdit;
+
+type
+  TLMDBrowseExecuteEvent = procedure (Sender : TObject; bDlg : TLMDBrowseDlg) of object;
+  { ----------------------- TLMDBrowseEdit ----------------------------------- }
+  TLMDBrowseEdit = class(TLMDCustomBrowseEdit)
+  private
+    FOptions     : TLMDBrowseDlgOptions;
+    FStartFolder : TLMDSystemFolders;
+    FEllipse,
+    FStartWithLast : Boolean;
+    FOnExecute   : TLMDBrowseExecuteEvent;
+    FFullText    : String;
+
+    procedure SetPath (const aValue : String);
+    function GetPath : String;
+    procedure SetEllipse(const Value: Boolean);
+  protected
+    procedure DoBrowse; override;
+    procedure DoEnter; override;
+    procedure DoExit; override;
+    procedure UpdateText;
+    procedure SetNewText; override;
+  public
+    constructor Create (aOwner : TComponent); override;
+    procedure Loaded; override;
+    property FullText: String read FFullText;
+  published
+    property Options : TLMDBrowseDlgOptions read FOptions write FOptions default [doReturnFileSysDirs, doShowPath];
+    property Path : String read GetPath write SetPath;
+    property StartFolder : TLMDSystemFolders read FStartFolder write FStartFolder default bfoDesktopExpanded;
+    property StartWithLast : Boolean read FStartWithLast write FStartWithLast default false;
+    property MinimizeName: Boolean read FEllipse write SetEllipse default false;
+    property ReadOnly;
+    property OnExecute : TLMDBrowseExecuteEvent read FOnExecute write FOnExecute;
+  end;
+
+  TLMDLabeledBrowseEdit = class(TLMDBrowseEdit)
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property LabelPosition;
+    property LabelSpacing;
+    property LabelSync;
+    property EditLabel;
+  end;
+
+implementation

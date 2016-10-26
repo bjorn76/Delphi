@@ -1,0 +1,83 @@
+
+uses
+  LMDCustomComboBox;
+
+type
+  TLMDComboBox = class(TLMDCustomComboBox)
+  published
+    property About;
+    property Color;
+    property Ctl3D;
+    property Cursor;
+    property DragCursor;
+    property DragMode;
+    property DropDownCount;
+    property DropDownWidth;
+    property Enabled;
+    property Flat;
+    property FocusControl;
+    property Font;
+    property Height;
+    property HelpContext;
+    property Hint;
+    property ImeMode;
+    property ImeName;
+    property ItemHeight;
+    property Items;
+    property Interval;
+    property Left;
+    property MaxLength;
+    property MRUList;
+    property MRUMax;
+    property Name;
+    property ParentColor;
+    property ParentCtl3D;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property Search;
+    property ShowHint;
+    property Sorted;
+    property Style;
+    property TabOrder;
+    property TabStop;
+    property Tag;
+    property Text;
+    property Top;
+    property UseGlobalTimer;
+    property Visible;
+    property Width;
+
+    property OnChange;
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnDrawItem;
+    property OnDropDown;
+    property OnEditClick;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnMeasureItem;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnSelect;
+    property OnStartDrag;
+
+    // V4 enhancements
+    property Anchors;
+    property Constraints;
+    property DragKind;
+    property BiDiMode;
+    property ParentBiDiMode;
+    property OnEndDock;
+    property OnStartDock;
+  end;
+
+
+implementation

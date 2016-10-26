@@ -1,0 +1,87 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  LMDCustomMaskEdit, LMDSpinButton;
+
+type
+  TLMDCustomExtSpinEdit = class(TLMDCustomMaskEdit)
+  private
+    FSpinBtn      : TLMDSpinButton;
+    FSpinBtnWidth : Integer;
+    FInfiniteMax,
+    FInfiniteMin,
+    FEditorEnabled: Boolean;
+    FType         : TLMDNumberType;
+    FValue,
+    FFractionStep,
+    FLargeStep,
+    FStep         : Double;
+    FOnUpClick: TNotifyEvent;
+    FOnDownClick: TNotifyEvent;
+    procedure SetInteger (index, aValue : Integer);
+    procedure SetType (aValue : TLMDNumberType);
+    procedure SetDouble (index : Integer; aValue : Double);
+    procedure SetColor(Index:Integer; const Value: TColor);
+    procedure SetDiag(const Value: Boolean);
+    procedure SetInterval(const Value: Word);
+    function GetColor(Index:Integer): TColor;
+    function GetInterval: Word;
+    function GetDiag: Boolean;
+    function IsNoDefault:Boolean;
+    function IsNoFractionDefault:Boolean;
+    function IsNoLargeDefault:Boolean;
+    procedure CMEnabledChanged (var Message : TMessage); message CM_ENABLEDCHANGED;
+    procedure WMKILLFOCUS (var Message : TMessage); message WM_KILLFOCUS;
+  protected
+    procedure DoInc(Sender : TObject);virtual;
+    procedure DoDec(Sender : TObject);virtual;
+    procedure  Increment (by : Double);
+    procedure  Decrement (by : Double);
+    procedure GetCommandKey (var KeyCode : Word; Shift : TShiftState); override;
+    //procedure ChangedText (At : Integer); override;
+    procedure GetChange (Sender : TObject); override;
+    function AllowedOperation(textToInsert : String) : Boolean; override;
+    function getOutString(aValue : Double) : String;
+    procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseExit; override;
+    procedure DoThemeChanged; override;
+    // 7.0
+    function DoMouseWheelDown(Shift: TShiftState; MousePos: TPoint): Boolean; override;
+    function DoMouseWheelUp(Shift: TShiftState; MousePos: TPoint): Boolean; override;
+    // ----
+
+    property EditType : TLMDNumberType read FType write SetType default ntInteger;
+    property Value : Double index 2 read FValue write SetDouble{ stored false};
+    property InfiniteMax: Boolean read FInfiniteMax write FInfiniteMax default false;
+    property InfiniteMin: Boolean read FInfiniteMin write FInfiniteMin default false;
+    property LargeStep : Double read FLargeStep write FLargeStep stored isNoLargeDefault;
+    property FractionStep : Double read FFractionStep write FFractionStep stored isNoFractionDefault;
+  public
+    constructor Create (aOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Loaded; override;
+    procedure ModifyPaintRect; override;
+  published
+    property AutoSize;
+    property Alignment;
+    property CustomButtons;
+    property CustomButtonsStyle;
+    property CustomButtonWidth;
+    property CustomButtonParentCtlXP;
+    property Interval:Word read GetInterval write SetInterval default 100;
+    property SpinBtnWidth : Integer index 0 read FSpinBtnWidth write SetInteger default -1;
+    property SpinBtnColor:  TColor index 0 read GetColor write SetColor default clBtnFace;
+    property SpinBtnDiag: Boolean read GetDiag write SetDiag default true;
+    property SpinBtnHotColor:TColor index 1 read GetColor write SetColor default def_SPINHOTCOLOR;
+
+    property Step : Double read FStep write FStep stored isNoDefault;
+    property EditorEnabled : Boolean read FEditorEnabled write FEditorEnabled default true;
+
+    property ReadOnly;
+    // 7.0
+    property OnSpinBtnUpClick:TNotifyEvent read FOnUpClick write FOnUpClick;
+    property OnSpinBtnDownClick:TNotifyEvent read FOnDownClick write FOnDownClick;
+    // -----
+  end;
+
+implementation

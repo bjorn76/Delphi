@@ -1,0 +1,83 @@
+
+uses
+  Windows,
+  Classes,
+  LMDClass,
+  LMDDateTime,
+  LMDCustomComponent;
+
+type
+  { --------------------------------- TLMD Starter --------------------------- }
+  TLMDStarterOperation = (smOpen, smPrint, smExplore, smEdit, smProperties);
+
+  TLMDStarterOptions = (soSW_HIDE, soSW_MAXIMIZE, soSW_MINIMIZE, soSW_RESTORE,
+                        soSW_SHOW, soSW_SHOWMAXIMIZED,
+                        soSW_SHOWMINIMIZED, soSW_SHOWMINNOACTIVE, soSW_SHOWNA,
+                        soSW_SHOWNORMAL);
+
+  TLMDStarter = class(TLMDCustomComponent)
+  private
+    FStartOperation : TLMDStarterOperation;
+    FStartOption    : TLMDStarterOptions;
+    FParameters,
+    FFilename,
+    FDirectory      : String;
+    FResult         : LongInt;
+
+    FAutoStart,
+    FWait           : Boolean;
+
+    FStart          : TLMDDateTime;
+    FFinishedId,
+    FTimerID        : TLMDTimer;
+
+    FProcess        : THandle;
+
+    FOnError,
+    FOnFinished,
+    FBeforeStart,
+    FAfterStart     : TNotifyEvent;
+    FUseGlobalTimer: Boolean;
+
+    procedure SetStartOperation (aValue : TLMDStarterOperation);
+    procedure SetStartOption (aValue : TLMDStarterOptions);
+    procedure SetString (index : Integer; aValue : String);
+    procedure SetWait (aValue : Boolean);
+    procedure SetAutoStart (aValue : Boolean);
+    procedure SetStart (aValue : TLMDDateTime);
+
+    procedure GetTimer(Sender:TObject);
+    function GetLastError : Integer;
+    procedure CheckForProcessEnd (Sender : TObject);
+    procedure SetUseGlobalTimer(const Value: Boolean);
+  protected
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure TerminateProcess;
+    property LastError:Integer read GetLastError;
+    procedure Execute;
+    property Process : THandle read FProcess;
+  published
+    property About;
+    property StartOperation : TLMDStarterOperation read FStartOperation write SetStartOperation default smOpen;
+    property StartOption : TLMDStarterOptions read FStartOption write SetStartOption default soSW_SHOW;
+    property Command : String index 0 read FFilename write SetString;
+    property Parameters : String index 1 read FParameters write SetString;
+    property DefaultDir : String index 2 read FDirectory write SetString;
+    property AutoStart : Boolean read FAutoStart write SetAutoStart default false;
+    property StartTime : TLMDDateTime read FStart write SetStart;
+    property Wait : Boolean read FWait write SetWait default false;
+
+    // 7.0
+    property UseGlobalTimer:Boolean read FUseGlobalTimer write SetUseGlobalTimer default false;
+    // ---
+
+    property OnBeforeStart : TNotifyEvent read FBeforeStart write FBeforeStart;
+    property OnAfterStart : TNotifyEvent read FAfterStart write FAfterStart;
+    property OnError : TNotifyEvent read FOnError write FOnError;
+    property OnFinished : TNotifyEvent read FOnFinished write FOnFinished;
+  end;
+
+
+implementation

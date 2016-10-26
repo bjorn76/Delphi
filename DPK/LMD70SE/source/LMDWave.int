@@ -1,0 +1,87 @@
+
+uses
+  Windows, SysUtils, Classes, messages, MMSystem,
+  LMDObject;
+
+type
+
+  {TLMDWave}
+  EInvalidWave = class(Exception);
+  EErrorCheckingWave = class(Exception);
+
+  TLMDWaveFormat=(wfUnknown, wfPCM);
+  TLMDChannelMode=(cmUnknown, cmMono, cmStereo);
+
+  TLMDWaveInfo=record
+    Size:LongInt;
+    SampleRate:LongInt;
+    Channels:TLMDChannelMode;
+    Format:TLMDWaveFormat;
+    BitsCount:Word;
+  end;
+
+  TLMDSndPlayMode=(sdSync, sdAsync, sdLoop);
+
+  {Objects}
+  {------------------------ Object TLMDWave -----------------------------------}
+  TLMDWave = class(TLMDObject)
+  private
+    FMemoryWave:TMemoryStream;
+    {function  CheckIfWave(Stream:TStream):Boolean;}
+    function  GetBits:Word;
+    function  GetEmpty:Boolean;
+    function  GetInfo:TLMDWaveInfo;
+    function  GetChannelMode:TLMDChannelMode;
+    function  GetFormat:TLMDWaveFormat;
+    function  GetSampleRate:LongInt;
+    function  GetSize:LongInt;
+    Procedure NewWave(Stream:TMemoryStream);
+    procedure ReadStream(size:Longint; Stream:TStream);
+    procedure WriteStream(Stream:TStream; WriteSize:Boolean);
+  protected
+    procedure DefineProperties(Filer:TFiler);override;
+    procedure ReadData(Stream:TStream);virtual;
+    procedure WriteData(Stream:TStream);virtual;
+  public
+    constructor Create;override;
+    constructor CreateFromFile(const FileName:String);virtual;
+    destructor Destroy;override;
+    procedure Assign(Source: TPersistent); override;
+    Procedure FreeWave;
+    procedure LoadCompressedFromStream(Stream: TStream);
+    procedure LoadFromFile(const Filename: string);virtual;
+    procedure LoadFromStream(Stream:TStream);virtual;
+    procedure LoadFromStreamEx(Stream:TStream);
+
+    function  Play:Boolean;
+    {$IFDEF CPPBUILDER}
+    function  PlaySoundExt(aValue:TLMDSndPlayMode):Boolean;
+    {$ELSE}
+    function  PlaySound(aValue:TLMDSndPlayMode):Boolean;
+    {$ENDIF}
+    procedure SaveToFile(const Filename: string);virtual;
+    procedure SaveCompressedToStream(Stream: TStream);
+    procedure SaveToStream(Stream:TStream);virtual;
+    procedure SaveToStreamEx(Stream:TStream);
+    Procedure Stop;
+
+    property Bits:Word read GetBits;
+    property ChannelMode:TLMDChannelMode read GetChannelMode;
+    property Empty:Boolean read GetEmpty;
+    property Format:TLMDWaveFormat read GetFormat;
+    property Info:TLMDWaveInfo read GetInfo;
+    Property MemoryWave:TMemoryStream read FMemoryWave;
+    property SampleRate:Longint read GetSampleRate;
+    property Size:LongInt read GetSize;
+  end;
+
+  {------------------ Helper Routines -----------------------------------------}
+  {WaveInfos}
+  Function LMDGetWaveFileInfo(const FileName:TFileName; var info:TLMDWaveInfo):Boolean;
+  Function LMDGetWaveStreamInfo(Stream:TStream; var info:TLMDWaveInfo):Boolean;
+
+  {Wave output}
+  {------------------------------------------------------------------------------}
+  function LMDMMWavePossible:Boolean;
+
+implementation

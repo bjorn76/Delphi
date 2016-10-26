@@ -1,0 +1,44 @@
+
+uses
+ Windows, SysUtils, Classes, Graphics, Controls, Menus, stdctrls, forms, messages, dialogs,
+ LMDSimplePanel,
+ LMDBase;
+
+type
+  TLMDDlgButtonAlign=(baTopLeft, baRightBottom, baCenter);
+  TLMDDlgButtonOption=(boAttachBtnHelp,  // integrate a simple Help (-> HelpContext ID) event
+                       boCheckBtnTag);   // allow individual gap settings using
+  TLMDDlgButtonOptions=set of TLMDDlgButtonOption;
+
+const
+  def_BtnOptions=[boAttachBtnHelp, boCheckBtnTag];
+
+type
+  TLMDDlgButtonPanel = class(TLMDSimplePanel)
+  private
+    FBtnGap,
+    FBtnMargin:Byte;
+    FBtnAlign:TLMDDlgButtonAlign;
+    FOptions:TLMDDlgButtonOptions;
+    procedure SetButtonAlign(aValue:TLMDDlgButtonAlign);
+    procedure SetButtonGap(aValue:Byte);
+    procedure SetButtonMargin(aValue:Byte);
+    procedure SetOptions(aValue:TLMDDlgButtonOptions);
+  protected
+    procedure AdjustClientRect(var Rect: TRect); override;
+    procedure AlignControls(AControl: TControl; var Rect: TRect); override;
+    procedure Loaded;override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure DoHelpClick(Sender:TObject);
+    procedure EndUpdate(aValue:Boolean);override;
+  published
+    property Align;
+    property BtnAlign:TLMDDlgButtonAlign read FBtnAlign write SetButtonAlign default baTopLeft;
+    property BtnGap:Byte read FBtnGap write SetButtonGap default 10;
+    property BtnMargin:Byte read FBtnMargin write SetButtonMargin default 10;
+    property BtnOptions:TLMDDlgButtonOptions read FOptions write SetOptions default def_BtnOptions;
+  end;
+
+implementation

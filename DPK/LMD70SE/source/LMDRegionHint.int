@@ -1,0 +1,77 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  LMDCustomComponent, lmdclass, lmdregion, lmdutils, lmdgraph,
+  LMDFillObject,
+  LMD3DCaption,
+  LMDCustomHint;
+
+type
+  TLMDRegionHintWindow = class;
+
+  TLMDHintRegion = class (TLMDRegion)
+  end;
+
+  TLMDCustomRegionHint = class(TLMDCustomHint)
+  private
+    FRegion : TLMDHintRegion;
+    FHintWnd: TLMDRegionHintWindow;
+    FFont3D : TLMD3DCaption;
+    FFont   : TFont;
+    FFillObject : TLMDFillObject;
+
+    procedure SetRegion (aValue : TLMDHintRegion);
+    procedure SetFont (aValue : TFont);
+    procedure SetFont3D (aValue : TLMD3DCaption);
+    procedure SetFillObject (aValue : TLMDFillObject);
+  protected
+    { Protected declarations }
+  public
+    constructor Create (aOwner : TComponent); override;
+    destructor Destroy; override;
+  published
+    property Region : TLMDHintRegion read FRegion write SetRegion;
+    property Font3D : TLMD3DCaption read FFont3D write SetFont3D;
+    property Font   : TFont read FFont write SetFont;
+    property FillObject : TLMDFillObject read FFillObject write SetFillObject;
+  end;
+
+  TLMDHintRegionShape = (hsRect, hsRoundRect, hsBitmap, hsElliptic, hsStar,
+                         hsRoundShield, hsSharpShield, hsDiamond, hsOctagon,
+                         hsComb, hsHalfRound, hsUserRegion, hsNoseRect, hsNoseRoundRect,
+                         hsNoseEllipse, hsThinkBubble);
+
+  TLMDRegionHint = class (TLMDCustomRegionHint)
+  public
+    FStyle : TLMDHintRegionShape;
+
+//    procedure SetStyle (aValue : TLMDHintRegionShape);
+  published
+//property Style : TLMDHintRegionShape read FStyle write SetStyle default hsRect;
+  end;
+
+  {-------------------- class TLMDRegionHintWindow -----------------------------}
+  TLMDRegionHintWindow = class(THintWindow)
+  private
+    FCaller:TLMDCustomRegionHint;
+    FCustom:Boolean;
+    procedure WMEraseBkgnd(var Message: TWMEraseBkgnd); message WM_ERASEBKGND;
+  protected
+    procedure CalculateDimensions(var aRect:TRect);virtual;
+    procedure CreateParams(var Params: TCreateParams); override;
+    procedure Paint; override;
+    procedure Draw(ABitmap: TBitmap; AHintPosition: TLMDHintPosition;
+              var TxRect:TRect);virtual;
+    procedure SetPosition(Origin:TPoint; var pos:TLMDHintPosition;
+                          var aRect:TRect);
+    procedure WndProc(var Message: TMessage);override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy;override;
+    procedure ActivateHint(aRect: TRect; const AHint: string); override;
+    procedure ActivateHintExt(aRect:TRect; const aHint:String; Caller:TLMDCustomRegionHint);
+  end;
+
+procedure Register;
+
+implementation

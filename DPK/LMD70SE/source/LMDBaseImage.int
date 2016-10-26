@@ -1,0 +1,27 @@
+
+uses
+  Classes,
+  LMDGraph,
+  LMDGraphicControl;
+
+type
+  {---------------------------- TLMDBaseImage ---------------------------------}
+  TLMDBaseImage=class(TLMDGraphicControl)
+  private
+    FQuickDraw:Boolean;
+    FStyle:TLMDBitmapStyle;
+    procedure SetQuickDraw(aValue:Boolean);
+    procedure SetStyle(aValue:TLMDBitmapStyle);
+  protected
+    function CorrectBounds:Boolean;virtual;
+    procedure AddStyleFlags(var Flags:Word);
+    property Style:TLMDBitmapStyle read FStyle write SetStyle default sbNone;
+    property QuickDraw:Boolean read FQuickDraw write SetQuickDraw default True;
+  public
+    constructor Create(AOwner:TComponent);override;
+  published
+    property About;
+  end;
+
+
+implementation

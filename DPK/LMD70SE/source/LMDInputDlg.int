@@ -1,0 +1,51 @@
+
+uses
+  Forms,
+  Classes,
+  LMDBaseDialog;
+
+type
+  TLMDInputDlg = class (TLMDBaseDialog)
+  private
+    FDefaultSelected: Boolean;
+    FWidth,
+    FMaxLength      : Integer;
+    FPasswordChar   : Char;
+    FReturnValue,
+    FDefault,
+    FPrompt         : String;
+  public
+    constructor Create (aOwner : TComponent); override;
+    function ShowDialog (const Caption, Prompt, DefaultValue : String;Main : TForm) : Boolean;
+    function Execute:Boolean;override;
+    function ExecuteEnh(aForm:TForm):Boolean;
+    function InputQuery (const ACaption, APrompt : String; var Value : String) : Boolean;
+    function InputBox (const ACaption, APrompt, ADefault: String): String;
+    property Value : String read FReturnValue;
+  published
+    property About;
+    property CaptionFill;
+    property CaptionTitle;
+    property Colors;
+    property CustomButton;
+    property CtlXP;
+    property DefaultValue : String read FDefault write FDefault;
+    property DefaultSelected: Boolean read FDefaultSelected write FDefaultSelected default false;
+    property Effect;
+    property Hints;
+    property ImageIndex;
+    property ImageList;
+    property ListIndex;
+    property MaxLength : Integer read FMaxLength write FMaxLength default 0;
+    property PasswordChar : Char read FPasswordChar write FPasswordChar default #0;
+    property Width: Integer read FWidth write FWidth default -1;
+    property Position;
+    property Prompt : String read FPrompt write FPrompt;
+    property RelatePos;
+    property ShowHints;
+
+    property OnCustomClick;
+    property OnCustomize;
+  end;
+
+implementation

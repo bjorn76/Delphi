@@ -1,0 +1,10 @@
+
+uses
+  Classes,
+  LMDListComboBox;
+
+type
+  TLMDHistoryEdit = class (TLMDListComboBox)
+  end;
+
+implementation

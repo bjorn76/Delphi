@@ -1,0 +1,84 @@
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  ExtCtrls,
+  LMDButtonBase,
+  LMDBaseEdit,
+  LMDCustomMaskEdit;
+
+type
+  TLMDCustomExtCombo = class(TLMDCustomMaskEdit)
+  private
+    FClickHandled,                 //JH March 2002
+    FDroppedDown       : Boolean;
+    FDropDownHeight,
+    FDropDownWidth     : Integer;
+    FOnDropDown        : TNotifyEvent;
+    FOldControlProc : TWndMethod;
+    FAllowDownKey      :Boolean;
+    procedure SetBoolean (aValue : Boolean);
+    procedure WMGetDlgCode(var Msg : TWMGetDlgCode); message WM_GETDLGCODE;
+    procedure WMKEYDown (var Msg : TMessage); message WM_KEYDOWN;
+    procedure WMSYSKEYDOWN (var Msg : TMessage); message WM_SYSKEYDOWN;
+    procedure WMKEYUP (var Msg : TMessage); message WM_KEYUP;
+    procedure WMCHAR (var Msg : TMessage); message WM_CHAR;
+    procedure WMKillFocus (var Msg : TMessage); message WM_KILLFOCUS;
+    procedure CMCancelMode(var Message: TCMCancelMode); message CM_CANCELMODE;
+    procedure WMCancelMode (var Msg: TMessage); message WM_CANCELMODE;
+  protected
+    FControl : TWinControl;
+
+    // 7.0
+    procedure NewControlProc(var Msg: TMEssage);
+    // ---
+    procedure CreateAndSetup;
+
+    procedure DoDropDownClick (Sender : TObject);
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseEnter; override;
+
+
+    procedure DoBtnMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure DoBtnMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+
+    procedure Close (acc : boolean);
+    procedure DropDown; dynamic;
+    procedure DoThemeChanged;override;
+    procedure CreateControl; virtual; abstract;
+    //called to modify the control if its created
+    procedure ModifyControl; virtual;
+    //called to modify control if it was already created
+    procedure ReModifyControl; virtual;
+    //this method can be used for (temporaly) prevent the control for being dropped down
+    function CanDropDown: Boolean; virtual;
+    procedure DisplayControl; virtual;
+    procedure BeforeDropDown; virtual;
+    procedure Cancel; virtual;
+    procedure Accept; virtual;
+    procedure Init;virtual;
+
+    function GetControl : TWinControl; virtual;
+    procedure DoDownKey; virtual;
+    procedure DoUpKey; virtual;
+    // if enabled, Downkey processing (opening dropdown is disabled)
+    property AllowDownKey:Boolean read FAllowDownKey write FAllowDownKey;
+  public
+    constructor Create (aOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Loaded; override;
+
+    // 6.1 - use Open to drop down combo at runtime
+    procedure Open;virtual;
+
+    property DroppedDown : Boolean read FDroppedDown write SetBoolean default false;
+    property Control : TWinControl read GetControl;
+    property DropDownWidth : Integer read FDropDownWidth write FDropDownWidth default 0;
+    property DropDownHeight : Integer read FDropDownHeight write FDropDownHeight default 0;
+  published
+    property CustomButtonsStyle default ubsCombo;
+    property CustomButtonWidth;
+    property OnDropDown : TNotifyEvent read FOnDropDown write FOnDropDown;
+  end;
+
+implementation

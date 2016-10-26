@@ -1,0 +1,126 @@
+
+uses
+  Windows,
+  Classes,
+  Graphics,
+  LMDShadow,
+  LMDShapeBase,
+  LMDBase,
+  LMDGraph,
+  LMDCaption,
+  LMDShapeFill,
+  LMDSimpleBevel,
+  LMDPointList,
+  LMDTeeth,
+  LMDShape,
+  LMDBaseGraphicControl;
+
+type
+  TLMDShapeControlMode=(scmShapeFast, scmShapeFill, scmTeethFast, scmTeethFill);
+
+  {------------------------ TLMDBaseShape -------------------------------------}
+  TLMDBaseShape = class(TLMDBaseGraphicControl)
+    private
+      FBevel         : TLMDSimpleBevel;
+      FBrush         : TBrush;
+      FBrushBackColor: TColor;
+      FCaption       : TLMDCaption;
+      FCaptionClip   : Boolean;
+      FList          : TLMDPointList;
+      FRoundPercent  : TLMDPercent;
+      FShadow        : TLMDShadow;
+      FShape         : TLMDShapeType;
+      FSquare        : Boolean;
+      FTeeth,
+      FTPointer      : TLMDTeeth;
+      FMode          : TLMDShapeControlMode;
+
+      procedure SetShapeFill(aValue:TLMDShapeFill);
+      procedure SetMode(aValue:TLMDShapeControlMode);
+      //--
+      procedure SetBevel(aValue: TLMDSimpleBevel);
+      procedure SetBrush(aValue: TBrush);
+      procedure SetBrushBackColor(aValue: TColor);
+      procedure SetCaption(aValue: TLMDCaption);
+      procedure SetCaptionClip(aValue: Boolean);
+      procedure SetRoundPercent(aValue: TLMDPercent);
+      procedure SetShadow(aValue: TLMDShadow);
+      procedure SetShape(aValue: TLMDShapeType);
+      procedure SetSquare(aValue: Boolean);
+      procedure SetTeeth(aValue: TLMDTeeth);
+    protected
+      FChange        : Boolean;
+      FShapeFill     : TLMDShapeFill;
+      FCacheBitmap   : TBitmap;
+
+      procedure GetShapeChange;
+      procedure OffscreenPaint;
+            
+      procedure BoundsChange(State:TLMDBoundsChangeStates);override;
+      Procedure DrawCaption(aCanvas: TCanvas; aRect: TRect); virtual;
+      procedure GetChange(Sender:TObject);override;
+      function GetGradientRect:TRect;virtual;
+      procedure GetIMLChange(Sender:TObject); override;
+      function GetLabelText:String; virtual;
+      function GetPalette:HPalette;override;
+      procedure PaintToCanvas (aCanvas : TCanvas);      
+      procedure Paint;override;
+    public
+      constructor Create(aOwner: TComponent);override;
+      destructor Destroy;override;
+      procedure SaveToFile (const Filename : String);
+      property Mode:TLMDShapeControlMode read FMode write SetMode default scmShapeFast;
+      property Teeth: TLMDTeeth read FTeeth write SetTeeth;
+    published
+      property About;
+      property Align;
+      property Bevel: TLMDSimpleBevel read FBevel write SetBevel;
+      property Brush: TBrush read FBrush write SetBrush;
+      property BrushBackColor:TColor read FBrushBackColor write SetBrushBackColor default clBtnFace;
+      property Caption:TLMDCaption read FCaption write SetCaption;
+      property CaptionClip:Boolean read FCaptionClip write SetCaptionClip default false;
+      property Color;
+      property DragCursor;
+      property DragMode;
+      property ParentColor;
+      property ParentFont;
+      property ParentShowHint;
+      property PopupMenu;
+      property RoundPercent: TLMDPercent read FRoundPercent write SetRoundPercent default 33;
+      property Shadow: TLMDShadow read FShadow write SetShadow;
+      property Shape: TLMDShapeType read FShape write SetShape default stRectangle;
+      property ShowHint;
+      property Square: Boolean read FSquare write SetSquare default False;
+      property Transparent;
+      property Visible;
+
+      property OnClick;
+      property OnDblClick;
+      property OnDragDrop;
+      property OnDragOver;
+      property OnEndDrag;
+      property OnMouseDown;
+      {3.0}
+      property OnMouseEnter;
+      property OnMouseExit;
+      {---}
+      property OnMouseMove;
+      property OnMouseUp;
+      property OnStartDrag;
+
+      {4.0}
+      //properties
+      property Anchors;
+      property BiDiMode;
+      property Constraints;
+      property ParentBiDiMode;
+      //events
+      property OnEndDock;
+      property OnStartDock;
+
+      //4.0
+      property ShapeFill: TLMDShapeFill read FShapeFill write SetShapeFill;
+  end;
+
+
+implementation

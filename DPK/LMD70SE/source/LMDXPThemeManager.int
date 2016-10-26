@@ -1,0 +1,12 @@
+
+uses
+  LMDWndProcComponent, Messages, lmdclass;
+
+type
+  { --------------------------- TLMDXPThemeManager --------------------------- }
+  TLMDXPThemeManager = class(TLMDWndProcComponent)
+  protected
+    procedure WndProc(var Message: TMessage); override;
+  end;
+
+implementation

@@ -1,0 +1,22 @@
+
+uses
+  Classes,
+  Controls,
+  LMDCustomShapeHint;
+
+type
+  {-------------------- class TLMDShapeHint -----------------------------------}
+  TLMDShapeHint=class(TLMDCustomShapeHint)
+  protected
+    procedure SetEnabled(aValue:Boolean);override;
+  public
+    Constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+    procedure ShowHint(const Msg:string; x, y: integer; ms:Word);
+    procedure ShowControlHint(const Msg:string; aControl:TControl; ms:Word);
+  published
+    property Enabled;
+  end;
+
+
+implementation

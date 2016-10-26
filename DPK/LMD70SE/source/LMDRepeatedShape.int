@@ -1,0 +1,37 @@
+
+uses
+  Windows,
+  Classes,
+  LMDBaseShape;
+
+type
+  TLMDRepeatedShape=class(TLMDBaseShape)
+  private
+    FShapeWidth,
+    FShapeHeight,
+    FHorOffset,
+    FVerOffset,
+    FHorCount,
+    FVerCount: Integer;
+    FSetPerCount: Boolean;
+    procedure SetInteger(Index:integer; aValue: Integer);
+    procedure SetSetPerCount(aValue: Boolean);
+  protected
+    function GetGradientRect:TRect;override;
+    function GetPalette:HPalette;override;
+  public
+    constructor Create(aOwner: TComponent);override;
+    destructor Destroy;override;
+    procedure Paint;override;
+  published
+    property CaptionClip;
+    Property HorCount: integer index 4 read FHorCount write SetInteger default 5;
+    Property HorOffset: integer index 2 read FHorOffset write SetInteger default 0;
+    Property ShapeWidth: integer index 0 read FShapeWidth write SetInteger default 0;
+    Property SetPerCount: boolean read FSetPerCount write SetSetPerCount default True;
+    Property ShapeHeight: integer index 1 read FShapeHeight write SetInteger default 0;
+    Property VerCount: integer index 5 read FVerCount write SetInteger default 5;
+    Property VerOffset: integer index 3 read FVerOffset write SetInteger default 0;
+  end;
+
+implementation

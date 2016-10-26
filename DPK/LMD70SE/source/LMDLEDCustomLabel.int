@@ -1,0 +1,79 @@
+
+uses
+  Windows,
+  Messages,
+  Classes,
+  Controls,
+  Graphics,
+  LMDGraphicControl,
+  LMDLED;
+
+type
+  {------------------------------- TLMDLEDLabel ----------------------------------}
+  TLMDLEDCustomLabel = class(TLMDGraphicControl)
+  private
+    FAutosize:Boolean;
+    FDigits:Byte;
+    FLED:TLMDLED;
+    FValue:LongInt;
+    FStyle:TLMDLEDStyle;
+    procedure SetAutosize(aValue:Boolean); reintroduce; 
+    procedure SetByte(aValue:Byte);
+    procedure SetLED(aValue:TLMDLED);
+    procedure SetStyle(aValue:TLMDLEDStyle);
+    procedure SetValue(aValue:LongInt);
+    procedure CalcBoundsRect;
+    procedure CMTextChanged(var Message: TMessage);message CM_TEXTCHANGED;
+    procedure CMColorChanged(var Message: TMessage);message CM_COLORCHANGED;
+  protected
+    procedure GetChange(Sender:TObject);override;
+    function GetLabelText:String;virtual;
+    procedure Loaded;override;
+    procedure Paint; override;
+    function ValueString(aValue:LongInt):String;
+    property Value:LongInt read FValue write SetValue default 0;
+  public
+    constructor Create(AOwner :TComponent); override;
+    destructor Destroy; override;
+    property Caption;
+  published
+    property About;
+    property Align;
+    property AutoSize:Boolean read FAutosize write SetAutosize default false;
+    property Bevel;
+    property Color default clBlack;
+    property DragCursor;
+    property DragMode;
+    property Digits:Byte read FDigits write SetByte default 2;
+    property Enabled;
+    property LED:TLMDLED read FLED write SetLED;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property Style:TLMDLEDStyle read FStyle write SetStyle default lsString;
+    property Transparent default false;
+    property Visible;
+    {Events}
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDrag;
+
+    // V4 enhancements
+    property Anchors;
+    property Constraints;
+    property DragKind;
+    //property BiDiMode;
+    //property ParentBiDiMode;
+    property OnEndDock;
+    property OnStartDock;
+
+  end;
+
+
+implementation

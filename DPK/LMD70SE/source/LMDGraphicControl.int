@@ -1,0 +1,27 @@
+
+uses
+  windows,                    //TRect
+  classes,                    //TComponent
+  LMDGraph,                   //TLMDBevel
+  LMDBase,
+  LMDBevel,
+  LMDBaseGraphicControl;
+
+type
+  {-------------------TLMDGraphicControl --------------------------------------}
+  TLMDGraphicControl=class(TLMDBaseGraphicControl)
+  private
+    FBevel:TLMDBevel;
+    procedure SetBevel(aValue:TLMDBevel);
+  protected
+    function BevelExt:Integer;
+    function DblBevelExt:Integer;
+    function BeveledRect:TRect;
+    procedure Paint;Override;
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+    property Bevel:TLMDBevel read FBevel write SetBevel;
+  end;
+
+implementation

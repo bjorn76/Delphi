@@ -1,0 +1,122 @@
+
+uses
+  LMDCFCSettingObject,
+  LMDCustomComponent,
+  LMDBase,
+  LMDClass,
+  Controls,
+  Classes;
+
+const
+  CFCSELFLINK    = -2;
+  CFCCONTROLLINK = -1;
+
+
+  StateIgnore = 0;
+  StateOn     = 1;
+  StateOff    = 2;
+type
+  TLMDStateKind = (skFocused, skMouseAbove, skDown, skModified, skReadOnly,
+                   skWrongData, skDisabled);
+  TLMDStateList = array[Low (TLMDStateKind)..High(TLMDStateKind)] of Byte;
+
+const
+  TLMDStateKindStr : array[Low (TLMDStateKind)..High(TLMDStateKind)] of String =
+           ('Focused', 'MouseAbove', 'Down',
+            'Modified', 'ReadOnly', 'WrongData', 'Disabled');
+
+
+  //Disabled > Error > Focused > ReadOnly > Hot > Down > Modified
+
+  stateDisabled: TLMDStateList = (0,0,0,0,0,0,1);
+  stateError   : TLMDStateList = (0,0,0,0,0,1,2);
+  stateFocused : TLMDStateList = (1,0,0,0,0,2,2);
+  stateReadOnly: TLMDStateList = (2,0,0,0,1,2,2);
+{
+  examplatory additional state:
+  stateHotPress: TLMDStateList = (2,1,1,0,2,2,2);
+  this state must be inserted before Hot (and so before pressed)
+  otherwise it would never be selected by the algorithm, because
+  stateHot already matches its internal search criteria
+}
+  stateHot     : TLMDStateList = (2,1,0,0,2,2,2);
+  statePressed : TLMDStateList = (2,2,1,0,2,2,2);
+  stateModified: TLMDStateList = (2,2,2,1,2,2,2);
+  stateNormal  : TLMDStateList = (2,2,2,2,2,2,2);
+
+  //state taking algorithm
+
+  //build up control specific state list
+  //-> e.g. (2,1,1,1,2,1,1)
+  // (imaging we have another state DE (0,0,0,0,0,1,1);
+  // 7x equals Disabled by 6 substitutions
+  // 7x equals DE by only 5 substitutions
+  //image we have a second state in addition (2, 1, 2, 2,2,2,2)
+  // => 7x equals this state by 2 substitutions ... dammned
+  //decicion by backtracking alg ...
+
+type
+  TLMDCFCStateObject = class (TCollectionItem)
+  private
+    FKind      : TLMDStateList;
+//    FFocused,
+//    FMouseAbove: Boolean;
+    FSettings  : TStringList;
+    FLinkIndex : Integer;
+    procedure SetStringList(const Value: TStringList); //-2 (self); -1 (control); 0 .. (other states)
+  protected
+    procedure DefineProperties(Filer: TFiler); override;
+    procedure ReadKind(Reader:TReader);
+    procedure WriteKind(Writer:TWriter);
+    procedure ReadSettings(Reader:TReader);
+    procedure WriteSettings(Writer:TWriter);
+  public
+    constructor Create(Collection: TCollection); override;
+    destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure Synchronize;
+    procedure SynchronizeName;
+    function Paint (aControl: TControl): Boolean;
+
+    function getKind : TLMDStateList;
+    procedure setKind (aStateList: TLMDStateList);
+
+    function Add(aSettingObject: TPersistent; replace: Boolean): Boolean;
+    //function Remove(aSettingObject: TLMDCFCSettingObject):Boolean;
+    function IndexOfSetting(const aValue:TLMDCFCSettingObjectKind):Integer;
+  published
+    property Settings: TStringList read FSettings write SetStringList;
+  end;
+
+  { -------------------------------------------------------------------------- }
+  TLMDCFCStateObjects = class (TLMDCollection)
+  private
+    FObjects:TLMDCFCSettingObjects;
+    function GetItem(Index: Integer): TLMDCFCStateObject;
+    procedure SetItem(Index: Integer; Value: TLMDCFCStateObject);
+    procedure SetObjects(aValue:TLMDCFCSettingObjects);
+  protected
+    procedure Update(Item: TCollectionItem); override;
+  public
+    constructor Create(Owner : TLMDCustomComponent);
+    destructor Destroy; override;
+    function Add: TLMDCFCStateObject;
+    function ItemByKind(Index:TLMDStateList):Integer;
+    property Items[Index: Integer]: TLMDCFCStateObject read GetItem write SetItem; default;
+    property SettingsObjects:TLMDCFCSettingObjects read FObjects write SetObjects;
+    procedure Synchronize;
+    procedure SynchronizeNames;
+  end;
+
+  function LMDCFCFindState (disabled: boolean; error: boolean; focused: boolean;
+                      readonly: boolean; hot: boolean; pressed: boolean;
+                      modified: boolean): TLMDStateList; overload;
+  function LMDCFCFindState (state: TLMDStateList): TLMDStateList; overload;
+  function LMDCFCCompareStates (s1, s2: TLMDStateList): boolean;
+  function LMDCFCGetAvailableStatesCount: Integer;
+  function LMDCFCGetAvailableState(index: Integer): TLMDStateList;
+  function LMDCFCGetStateByDescription (const des: String): TLMDStateList;
+  function LMDCFCGetStateDescription (state: TLMDStateList): String; overload;
+  function LMDCFCGetStateDescription (index: Integer): String; overload;
+
+implementation

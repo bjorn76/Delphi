@@ -1,0 +1,38 @@
+
+uses classes;
+
+  {****************************************************************************}
+  {----------------------TLMDDateListRecord------------------------------------}
+type
+  TLMDDateListRecord = record
+    Datefg     : TDateTime;
+    Date       : TDateTime;
+    DateString : String[40];
+    Active,
+    Calculated : Boolean;
+  End;
+  PLMDDateListRecord = ^TLMDDateListRecord;
+
+  TLMDDateList=class(TList)
+  private
+    function GetDate(Index: integer):TLMDDateListRecord;
+  protected
+    function Comp (Item1, Item2: Pointer): Integer;
+  public
+    destructor Destroy; override;
+    procedure DeleteDate (Index: Integer);
+    procedure PutDate(Index: integer; aValue: TLMDDateListRecord);
+    procedure AddDate(aValue: TLMDDateListRecord);
+    procedure EditDate(Index: Integer; aValue : TLMDDateListRecord);
+    procedure SortDates;
+
+    procedure SaveToFile (Filename : String);
+    procedure LoadFromFile (Filename : String);
+
+    procedure SaveToStream (Stream : TStream);
+    procedure LoadFromStream (Stream : TStream);
+
+    property Dates[Index: integer]:TLMDDateListRecord read GetDate write PutDate;
+  end;
+
+implementation

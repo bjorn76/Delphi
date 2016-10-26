@@ -1,0 +1,29 @@
+
+uses
+  LMDCustomLabelFill;
+
+type
+  TLMDLabelFill = class(TLMDCustomLabelFill)
+  published
+    property About;
+    property Align;
+    property Alignment;
+    property AutoSize;
+    property Bevel;
+    property BrushBackColor;
+    property Caption;
+    property FillObject;
+    property FocusControl;
+    property Font;
+    property FontFX;
+    property ImageIndex;
+    property ImageList;
+    property ListIndex;
+    property MultiLine;
+    property Options;
+    property ShowAccelChar;
+    property Transparent;
+  end;
+
+
+implementation

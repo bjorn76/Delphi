@@ -1,0 +1,67 @@
+
+uses
+  Windows,
+  Graphics,
+  Classes,
+  lmdbase,
+  lmdgraph,
+  LMDObject;
+
+type
+  TLMDGradientColorEntry = record
+    Color : TColor;
+    ColorCount : Integer;
+    Further : {$IFDEF CLR}IntPtr{$ELSE}Pointer{$ENDIF};
+  end;
+
+  TLMDGradientMode = (gmTwoColors, gmColorArray);
+
+  TLMDGradient = class(TLMDObject)
+  private
+    FColorCount : TLMDColorCount;
+    FColor      : TColor;
+    FColorList  : TList;
+    FEndColor   : TColor;
+    FPaletteRealize:Boolean;
+    FPalette    : HPalette;
+    FStyle      : TLMDGradientStyle;
+    FColors     : TList;
+    FTwoColors  : Boolean;
+
+    procedure SetColor(aValue:TColor);
+    procedure SetStyle(aValue:TLMDGradientStyle);
+    procedure SetEndColor(aValue:TColor);
+    procedure SetColorCount(aValue:TLMDColorCount);
+    procedure SetPaletteRealize(aValue:Boolean);
+    procedure SetTwoColors (aValue : Boolean);
+    procedure SetColors (aValue : TList);
+    procedure DestroyPalette;
+    procedure WriteColorArray (Writer : TWriter);
+    procedure ReadColorArray (Reader : TReader);
+    {$IFDEF LMDTOOLS10} procedure ReadIdent(Reader:TReader); {$ENDIF}
+  protected
+    procedure DefineProperties(Filer:TFiler);override;
+    function  GetPalette:HPalette;
+    procedure Change;override;
+  public
+    constructor Create;override;
+    destructor Destroy;override;
+    procedure InitPalette;
+    procedure Assign(Source: TPersistent);override;
+    function GetSetStr : String; override;
+    procedure PaintGradient(aCanvas:TCanvas; aRect:TRect);
+    procedure SetRealPalette(aCanvas:TCanvas);
+    property Palette:HPalette read GetPalette;
+    property ColorList:TList read FColorList;
+    property Colors : TList read FColors write SetColors;
+  published
+    property Color:TColor read FColor write SetColor default clBlue;
+    property ColorCount:TLMDColorCount read FColorCount write SetColorCount default 16;
+    property Style:TLMDGradientStyle read FStyle write SetStyle default gstVertical;
+    property EndColor:TColor read FEndColor write SetEndColor default clBlack;
+    property PaletteRealize:Boolean read FPaletteRealize write SetPaletteRealize default False;
+    property TwoColors : Boolean read FTwoColors write SetTwoColors default true;
+  end;
+
+
+implementation

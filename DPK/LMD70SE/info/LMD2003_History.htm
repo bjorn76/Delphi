@@ -1,0 +1,444 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<meta http-equiv="Content-Language" content="en-us">
+<TITLE>LMD 2003 History</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1252">
+</HEAD>
+<BODY>
+<STYLE>BODY {
+	FONT-SIZE: 70%; BACKGROUND: #ffffff; FONT-FAMILY: Verdana, Arial, Helvetica, MS Sans Serif
+}
+A:link {
+	COLOR: #0000ff; TEXT-DECORATION: none
+}
+A:visited {
+	COLOR: #0000ff; TEXT-DECORATION: none
+}
+A:hover {
+	COLOR: #ff0000; TEXT-DECORATION: underline
+}
+TABLE {
+	FONT-SIZE: 100%
+}
+HR {
+	WIDTH: 25%; COLOR: red; TEXT-ALIGN: left
+}
+div.Section1
+	{page:Section1;}
+</STYLE>
+<p>
+<FONT face=verdana size=+2><a name="Top"></a>LMD-Tools 2003 History<br>
+</FONT>
+<FONT size=-2>
+
+(© by LMD Innovative, (<A href="http://www.lmd.de/">http://www.lmd.de</A>
+ or <A href="http://www.lmdtools.com/">http://www.lmdtools.com</A>)</font></p>
+<HR>
+
+<p>
+<FONT color=#000080 size="1"><a href="_readme.htm">[Main]</a></FONT><br>
+<font size="2" face="Verdana"><br>
+<br>
+</font>
+            <b>
+<font size="3" face="Verdana">History Lists</font></b><font size="2" face="Verdana"><b><br>
+</b><a href="#LMDCore">LMD-Tools Core 7.X</a><br>
+<a href="#LMDBar">LMD BarPack 1.X</a><br>
+<a href="#LMDDesign">LMD DesignPack 2.X</a><br>
+<a href="#LMDRich">LMD RichPack 3.X</a><br>
+<a href="#LMDShell">LMD ShellPack 3.X</a><br>
+<a href="#LMDSearch">LMD SearchPack <span lang="de">2</span>.X</a> <br>
+<a href="#LMDSys">LMD SysPack 2.X</a><br>
+<a href="#LMDStorage">LMD StoragePack 1.X</a><br>
+<a href="#LMDWeb">LMD WebPack 3.X</a><br>
+</font>
+            <b>
+<font size="2" face="Verdana"><br>
+</font>
+<font size="3" face="Verdana">Legend<br>
+</font>
+            </b>
+<font size="2" face="Courier New">+ Feature added<br>
+* Feature changed<br>
+- Bug fixed<br>
+&nbsp;</font></p>
+<HR>
+
+<p>
+<font size="2" face="Verdana"><br>
+<br>
+</font>
+            <b>
+<font size="3" face="Verdana"><a name="LMDCore"></a>LMD-Tools Core 7.X</font></b></p>
+
+<p>
+<font size="2" face="Verdana"><i>Release <span lang="de">7</span>.<span lang="de">00</span>.<span lang="de">XX</span>
+<span lang="de">(XX</span>-<span lang="de">XX</span>-200<span lang="de">4</span>)</i><span lang="de"><br>
+TLMDButtonPanel<br>
+- AddButton/InsertButton AV fixed</span></font><font size="2"><span lang="de"><br>
+</span></font><span lang="de"><font size="2"><br>
+TLMDCaptionPanel <br>
++ AutoBringToFront property. Disable this property to switch off BringToFront 
+feature when mouse is moved into caption area.<br>
+<br>
+TLMDCustomBevelPanel and descendants<br>
++ NoHandleUpdate property. Enable this property if handle of panel should be 
+kept when Bevel settings are changed. This property might beuseful e.g. when an 
+edit control is placed within a panel and panel width should be changed when 
+enduser enters/exits edit field.<br>
+<br>
+</font></span>
+<font size="2" face="Verdana"><span lang="de">TLMDEdit<br>
+-&nbsp; Insert after AutoSelect and right key now at the correct, position, left 
+key (first char of text is selected, pos on that one) will remove the selection 
+now<br>
+</span></font><span lang="de"><font size="2">
+<br>
+</font></span><font size="2"><span lang="de">TLMDListBox</span><br>
+- Problem with header sizing in Delphi 7 in VirtualWith mode fixed<br>
+<br>
+<span lang="de">TLMDNoteBook<br>
+</span>- SaveResource<span lang="de">s</span> mode was always on, this was fixed</font></p>
+
+<p>
+<font size="2" face="Verdana"><i><br>
+Release <span lang="de">7</span>.<span lang="de">00</span>.<span lang="de">23</span>
+<span lang="de">SourcePack 1 (16</span>-<span lang="de">Feb</span>-200<span lang="de">4</span>)</i><span lang="de"><br>
+* TLMDBaseMeter and descendants: UserValues which are out of bounds are no 
+longer ingored but resetted to MinValue/MaxValue<br>
+<br>
+[Edit/Memos]<br>
++ Options property added. Current flags: eoNarrowHeight (one extra pixel for 
+border is left out) and eoSuppressDefaultMenu (default context menu is not 
+displayed).</span><i><br>
+</i><span lang="de">- Performance drop when using WinXP Themes solved<br>
+- Cursor problem when Memo was ActiveControl on a form fixed<br>
+<br>
+</span><i><br>
+Release <span lang="de">7</span>.00.<span lang="de">23</span>
+<span lang="de">(19</span>-<span lang="de">Jan</span>-200<span lang="de">4</span>)<br>
+<span lang="de">*</span></i></font><font face="Verdana" size="0"><font size="2"> DBSpeedButtons 
+provide<span lang="de">s</span> now ButtonStyle property <span lang="de"><br>
+* </span>OnContextPopup <span lang="de">is generated </span>in Base<span lang="de">E</span>dit 
+and descendants<br>
+<span lang="de">- </span>CaptionButtons problem with Arrow buttons fixed<span lang="de"><br>
+-</span> AV when setting Active property in TrayIcon component<span lang="de"> 
+fixed.</span><br>
+<span lang="de">- </span>Fix for TLMDScrollBar and TLMDMemo which caused heavy 
+CPU usage. <br>
+<span lang="de">- </span>TLMDCustomPanelFill </font> <span lang="de">
+<font size="2">update at 
+designtime fixed</font></span><br>
+</font>
+<font size="1" face="Verdana"><a href="#Top">[Top]</a></font></p>
+
+<HR>
+
+<p>
+<b>
+<font size="3" face="Verdana"><a name="LMDBar"></a>LMD BarPack 1.X</font></b></p>
+
+<p>
+<font size="2" face="Verdana"><i>Release 1.00.<span lang="de">50</span> (<span lang="de">21</span>-<span lang="de">Apr</span>-200<span lang="de">4</span>)<br>
+</i><span lang="de">- Resource leak on Win9X systems (caused by TransparentBlt 
+API call in MSImg32.DLL) fixed<br>
+- Small resource Leak in TLMDExplorerBar fixed</span><br>
+<span lang="de">* OnDragOver/OnDragDrop is now called in TLMDSectionBar for 
+external controls&nbsp; <i><br>
+</i></span><i><br>
+Release 1.00.01 (28-July-2003)<br>
+</i>- LMDBarCtlXPSupported function can be used to check whether Themes is 
+available and enabled for current application (defined in LMDBarBase). This 
+method was accidentally used in ExplorerBar demo in first release but now made 
+public.</font></p>
+
+<p>
+<font face="Arial"><a href="#Top"><font size="1" face="Verdana">[Top]</font></a></font></p>
+<HR>
+
+<p>
+<b>
+<font size="3" face="Verdana"><a name="LMDDesign"></a>LMD DesignPack 2.X</font></b></p>
+
+<p>
+<font size="2" face="Verdana"><i>Release 2.<span lang="de">1</span>0.<span lang="de">00</span> (<span lang="de">06</span>-<span lang="de">Jan</span>-200<span lang="de">4</span>)<br>
+</i><span lang="de">Feature Update! (e.g. new visual styles and support of 
+property categories) Check DesignPack ReadMe for more info.</span><i><br>
+<br>
+Release 2.00.20 (09-Aug-2003)<br>
+</i>+ TLMDDBDiagram: New event OnItemClick. Also LMDDBDiagram demo was extended.<i><br>
+&nbsp;</i></font></p>
+
+<p>
+<font face="Arial"><a href="#Top"><font size="1" face="Verdana">[Top]</font></a></font></p>
+<HR>
+
+<p>
+<b>
+<font size="3" face="Verdana"><a name="LMDRich"></a>LMD RichPack 3.X</font></b></p>
+
+<p>
+
+<font size="2" face="Verdana"><i>Release <span lang="de">3</span>.<span lang="de">04</span>.<span lang="de">10</span> (<span lang="de">30</span>-<span lang="de">Mar</span>-200<span lang="de">4</span>)<br>
+</i><span lang="de">* TLMDRichLabel link handling changed</span></font></p>
+
+<p>
+
+<font size="2" face="Verdana"><i>Release <span lang="de">3</span>.<span lang="de">04</span>.<span lang="de">00</span> (<span lang="de">29</span>-<span lang="de">Jan</span>-200<span lang="de">4</span>)<br>
+</i><span lang="de">[TLMDRichEdit]<br>
+* RTFText property reintroduced<br>
+*
+</span></font>
+<font SIZE="2">Left/First Indent logic<span lang="de"> of a paragraph was 
+changed. </span>N<span lang="de">e</span>w <span lang="de">meaning: </span>
+LeftIndent -- paragraph relative to the left<span lang="de"> </span>margin<span lang="de">,
+</span>FirstIndent -- first line of the paragraph</p>
+
+</font>
+
+<p>
+
+<font SIZE="2"><span lang="de">[TLMDCustomRichLabel and descendants]<br>
+- Several problems with bevel painting fixed<br>
+</span></font>
+
+<span lang="de"><font size="2"><br>
+[Storage Controls, Collection Editor]<br>
++ You can open editor for an item via double click instead via object inspector 
+now</font></span><font size="2" face="Verdana"><i><br>
+<br>
+Release <span lang="de">3</span>.<span lang="de">03</span>.<span lang="de">00</span> (<span lang="de">08</span>-<span lang="de">Jan</span>-200<span lang="de">4</span>)<br>
+</i><span lang="de">[TLMDRichEdit]<br>
+- several position and TLMDRuler issues fixed<br>
++ Method: procedure SetSelRange(SelStart, SelLength: integer); <br>
++ Event: OnLinkMouseMove -- e.g., for updating statusbar (like PropertyEditor 
+from pLMDRTFHyperTextEditor.pas) or as hint (like in pHyperLink.dpr project).<br>
+OnLinkMouseMove is generated when entering/exiting mouse cursor into/out link 
+area.<br>
+<br>
+</span> </font>
+<font SIZE="2"><span lang="de">[TLMDCustomRichLabel]<br>
+- Resizing problems fixed<br>
+<br>
+[HyperText]<br>
+Behaviour of links was&nbsp; improved (including usability of corresponding 
+forms). Check updated HyperLink demo for more info<br>
+</span></font>
+
+<font size="2" face="Verdana"><i><br>
+<br>
+Release <span lang="de">3</span>.<span lang="de">02</span>.<span lang="de">00</span> (<span lang="de">09</span>-<span lang="de">Dec</span>-2003)<br>
+</i><span lang="de">[TLMDRichEdit]<i><br>
+-
+</i></span> </font><font SIZE="2"><span lang="de">A</span>bility to past raw 
+text<span lang="de"> improved</span>. <br>
+<span lang="de">- F</span>ixed several bugs with non-English charset.<span lang="de"><br>
++ New method: </span><font face="Courier New">procedure PastePlainText;</font><span lang="de"> 
+(Paste raw text from ClipBoard).</span><br>
+<span lang="de">+ </span>procedure<font face="Courier New"> 
+InsertGraphic(aGraphic: TGraphic)</font>;</p>
+
+</font>
+
+<p>
+<font SIZE="2"><span lang="de">[TLMDCustomRichLabel]<br>
+- improved display in</span> transparent &amp; smoothing<span lang="de"> mode<br>
+- </span>fixed bug with change of DeltaX&nbsp;and DeltaY values</font></p>
+
+<p>
+<font SIZE="2"><span lang="de">[TLMDRichScrollBox]</span><br>
+<span lang="de">- Division by Zero error fixed which happened eventually when 
+loading different text snippets<br>
+- Scrollbar initialization when loading different files corrected<br>
+<br>
+[TLMDRichSyntaxEdit]<br>
+* </span>processing non-standard keywords, work scheme&nbsp;and work speed<span lang="de"> 
+improved<br>
+<br>
+[Hint]<br>
+Y</span>ou can <span lang="de">minimize flicker in </span>transparency<span lang="de"> 
+mode</span>: <span lang="de">Set </span>for Parent control<span lang="de">s of
+</span>TLMDCustomRichLabel <span lang="de">and </span>descendants DoubleBuffered 
+:= True;</p>
+</font>
+
+<p>
+<font size="2" face="Verdana"><i>Release <span lang="de">3</span>.<span lang="de">01</span>.<span lang="de">00</span> (<span lang="de">23</span>-<span lang="de">Nov</span>-2003)<br>
+</i><span lang="de">-</span> </font><font SIZE="2"><span lang="de">bug fixed:</span> 
+put link text to Clip<span lang="de">b</span>oard<br>
+<span lang="de">- bug fixed: </span>clear <span lang="de">selection </span>with 
+links<br>
+<span lang="de">- TLMDRichScrollBoxl: fl</span>ick<span lang="de">er</span>ing
+<span lang="de">when using scrollbars reduced<br>
+- </span>fixed <span lang="de">several </span>bugs with Indents.<br>
+<br>
+</font>
+
+<font face="Arial"><a href="#Top"><font size="1" face="Verdana">[Top]</font></a></font></p>
+<HR>
+
+<p>
+<b>
+<font size="3" face="Verdana"><a name="LMDShell"></a>LMD ShellPack 3.X</font></b></p>
+
+<p><i><font face="Verdana" size="2">Status: Coming soon...</font></i></p>
+
+<p>
+<font size="1" face="Verdana"><a href="#Top">[Top]</a></font></p>
+<HR>
+
+<p>
+<b>
+<font size="3" face="Verdana"><a name="LMDSearch"></a>LMD SearchPack
+<span lang="de">2</span>.X</font></b></p>
+
+<p>
+<font size="2" face="Verdana"><i>Release 2.0<span lang="de">3</span> (<span lang="de">20</span>-<span lang="de">Oct</span>-2003)<br>
+</i><span lang="de">+</span> TLMDSearchFileGrep<span lang="de">: OnErrorOpenFile 
+event. This event is generated when a file matches filemask, but<br>
+contents of file could not be checked.<br>
+</span><i><br>
+Release 2.02 (30-Aug-2003)<br>
+</i>- Fixed: Skip character after found wildcard<br>
+- Fixed: Result list fixed
+</font>
+            </p>
+
+<p>
+<font size="2" face="Verdana"><i>Release 2.01 (19-May-2003)<br>
+</i>- Problem with search expression starting at first position fixed<br>
+- MatchCase bug fixed<br>
++ New properties: AnySequenceCharacter and AnySingleCharacter - Use them to 
+specify custom wildcard characters.<br>
+</font>
+            <br>
+<font size="1" face="Verdana"><a href="#Top">[Top]</a></font></p>
+<HR>
+
+<p>
+<b>
+<font size="3" face="Verdana"><a name="LMDSys"></a>LMD SysPack 2.X</font></b></p>
+
+<p>
+<font size="2" face="Verdana"><i>Release 2.0<span lang="de">0.50</span> (<span lang="de">20</span>-<span lang="de">Apr</span>-200<span lang="de">4</span>)<br>
+</i><span lang="de">[</span>TLMDSysInfoListView <span lang="de">]<br>
++ ShowDescriptionColumn property<br>
++ Columns property made public</span></font></p>
+
+<p>
+<font size="2"><span lang="de">[</span>TLMDSysNetworkEnumerator<span lang="de">]</span><br>
++ OnEnumItem event<br>
++ CancelThread method</font><br>
+<font size="1" face="Verdana"><a href="#Top">[Top]</a></font></p>
+<HR>
+
+<p>
+<b>
+<font size="3" face="Verdana"><a name="LMDStorage"></a>LMD StoragePack 1.X<br>
+</font>
+<font size="2" face="Verdana"><br>
+</font>
+            </b>
+<font size="2" face="Verdana"><i>Release 1.0<span lang="de">6.50</span> (<span lang="de">30-Mar-2004</span>)<br>
+</i><span lang="de">- &quot;Data not found&quot; bug when no active section was set fixed
+</span></font></p>
+
+<p>
+<font size="2" face="Verdana"><i>Release 1.0<span lang="de">6.40</span> (<span lang="de">29-Jan-2004</span>)<br>
+</i><span lang="de">- XML-Parser: Problem with &lt;CR&gt; in properties fixed.<br>
+</span></font><font SIZE="2">*<span lang="de"> </span>Chars [#0..#31,'%','&quot;'] 
+stores <span lang="de">now </span>in vault <span lang="de">controls </span>as<span lang="de">
+</span>%00..%1F,%25...</p>
+
+</font>
+
+<p>
+<font size="2" face="Verdana"><i>Release 1.0<span lang="de">6.30</span> (<span lang="de">31-Dec-2003</span>)<br>
+</i><span lang="de">- Problem with doubled attributes in XML files solved</span></font></p>
+
+<p>
+<font size="2" face="Verdana"><i>Release 1.0<span lang="de">6.20</span> (<span lang="de">04-Nov-2003</span>)<br>
+</i><span lang="de">- Fixes in Visual designer, e.g.compatbility with TChart 
+control</span></font></p>
+
+<p>
+<font size="2" face="Verdana"><i>Release 1.0<span lang="de">6</span> (<span lang="de">20-Oct-2003</span>)<br>
+</i><span lang="de">+ New property in TLMDStorCustomPropertiesStorage: 
+SkipNotFoundComponents</span><i><br>
+</i></font>
+<b>
+<font size="2" face="Verdana"><span lang="de">- </span>
+</font>
+            </b>
+<font size="2" face="Verdana"><span lang="de">Stack overflow</span>
+<span lang="de">in certain conditions in </span>visual design editor
+<span lang="de">fixed.</span></font></p>
+
+<p>
+<font size="2" face="Verdana"><i>Release 1.05 (05-Sep-2003)<br>
+</i>[LMDStorBase.pas TLMDAbstractStorageVault]<br>
+* Fixed procedure SetFileName - now file name isn't stripped during loading<br>
++ Add new property &quot;AutoUpdate&quot; in base storage class&nbsp; 
+TLMDAbstractStorageVault. It is used by INI and XML vaults to toggle save mode 
+between update after each property change (slow) and cached writing (fast).<br>
+<br>
+[LMDStorINIVault.pas TLMDStorINIVault]<br>
++ New property &quot;AutoUpdate&quot; of base storage class <br>
+<br>
+[LMDStorXMLVault.pas TLMDStorINIVault]<br>
++ New property &quot;AutoUpdate&quot; of base storage class <i><br>
+<br>
+Release 1.04 (25-July-2003)<br>
+</i>- Writer objects were completely rewritten to store default properties and 
+empty dynamic objects.</font></p>
+
+<p>
+<font size="2" face="Verdana"><i>Release 1.03 (02-July-2003)<br>
+</i>- Minor Problems with dynamic objects were fixed</font></p>
+
+<p>
+<font size="2" face="Verdana"><i>Release 1.02 (01-July-2003)<br>
+</i>- Problems with XML format were fixed (quoted strings)<br>
+<i><br>
+Release 1.01 (19-May-2003)<br>
+</i>- Bug in visual design editor which caused an infinity loop was fixed</font></p>
+
+<p>
+<font face="Arial"><a href="#Top"><font size="1" face="Verdana">[Top]</font></a></font></p>
+<HR>
+
+<p>
+<b>
+<font size="3" face="Verdana"><a name="LMDWeb"></a>LMD WebPack 3.X</font></b></p>
+
+<p>
+<font size="2" face="Verdana"><span lang="de"><i>Release 3.02.20 (30-Mar-2004)<br>
+</i>+ New flag moNoAddressField for TLMDMAPIOption (TLMDMapiSendMail): Keeps 
+address field empty for better MS Exchange support</span><br>
+<i><br>
+Release 3.0<span lang="de">2.10</span> (<span lang="de">28</span>-<span lang="de">Jan</span>-200<span lang="de">4</span>)<br>
+</i><span lang="de">- URL decode function fixed (e.g. for Scan control)<br>
+- Minor problem with Charset in Download Form fixed<br>
+- Unnecessary calls in RAS support removed<br>
+</span><i><br>
+Release 3.0<span lang="de">2</span> (<span lang="de">20</span>-<span lang="de">Oct</span>-2003)<br>
+</i><span lang="de">- Several minor bugs fixed<br>
+</span><i><br>
+Release 3.01 (15-Sep-2003)<br>
+- </i>News demos for Delphi updated<i>. </i>In source version english resource 
+file is by default installed.<i><br>
+- </i></font><font SIZE="2"><font face="Courier New">LMDHTMLObjectUnit.pas</font>:&nbsp; 
+Memory leak during parsing fixed<br>
+- TLMDWebHTTPScan: Memory leak fixed.<br>
++ TLMDWebHTTPScan.Clear method added.</p>
+
+</font>
+
+<p>
+            <font face="Arial"><a href="#Top"><font size="1" face="Verdana">[Top]</font></a></font></p>
+<P> 
+<HR>
+
+<P><FONT color=#000080>©&nbsp;  </FONT><FONT color=#0000FF>by</FONT><FONT color=#000080> <A 
+href="http://www.lmd.de/">LMD Innovative</A> Germany<BR>All other trademarks are 
+acknowledged.</FONT> </P></BODY></HTML>

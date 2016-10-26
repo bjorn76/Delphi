@@ -1,0 +1,32 @@
+
+uses
+  Windows,
+  Graphics,
+  Classes,
+  LMDGraph,
+  LMDFillObject,
+  LMDCustomFormFill;
+
+type
+  TLMDFormFill = class(TLMDCustomFormFill)
+  private
+    FFillObject:TLMDFillObject;
+    procedure SetFillObject(aValue:TLMDFillObject);
+    procedure SetEraseMode;
+  protected
+    procedure GetChange(Sender:TObject);override;
+    procedure GetIMLChange(Sender:TObject);override;
+    procedure Loaded;override;
+    function PaintClientArea(DC:HDC):Boolean;override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+  published
+    property ImageList;
+    property ImageIndex;
+    property FillObject:TLMDFillObject read FFillObject write SetFillObject;
+    property ListIndex;
+  end;
+
+
+implementation

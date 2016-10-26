@@ -1,0 +1,38 @@
+
+uses
+  Windows, Classes, messages, Graphics, controls, Forms, Buttons, stdctrls, sysutils,
+  LMDClass,
+  LMDGraph,
+  LMDUtils,
+  LMDCustomComponent;
+
+type
+  {------------------------- TLMDNonHideVC ------------------------------------}
+  TLMDOnNewComponentEvent=procedure(Sender:TObject; aComponent:TComponent) of object;
+
+  TLMDHideNonVC=class(TLMDCustomComponent)
+  private
+    FNewComponent:TLMDOnNewComponentEvent;
+    FUseTag:Boolean;
+  protected
+    procedure Loaded;override;
+    procedure Notification(AComponent:TComponent;Operation:TOperation);override;
+  public
+    constructor Create(aOwner:TComponent);override;
+    property OnNewComponent:TLMDOnNewComponentEvent read FNewComponent write FNewComponent;
+  published
+    property About;
+    property UseTagInfo:Boolean read FUseTag write FUseTag default True;
+  end;
+
+const
+  defHideX:WORD=65000;
+  defComWidth:Byte=28;
+
+{required procedures for TLMDHideNonVC}
+function LMDCheckValidComponent(Comp, Parent:TComponent):Boolean;
+function LMDGetNonVCIndex(Target:TScrollingWinControl; Comp:TComponent):Integer;
+procedure LMDRemoveContainer(Target:TScrollingWinControl; Comp:TComponent);
+procedure LMDShowContainer(Target:TScrollingWinControl; Comp:TComponent);
+
+implementation

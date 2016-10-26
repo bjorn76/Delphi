@@ -1,0 +1,131 @@
+
+uses
+  Windows,
+  Classes,
+  Messages,
+  Controls,
+  Graphics,
+  StdCtrls,
+  LMD3DCaption,
+  LMDGlyphTextLayout,
+  LMDGraph,
+  LMDButtonControl;
+
+type
+  {----------------------- TLMDCustomCheckBox ---------------------------------}
+  TLMDCustomCheckBox = class(TLMDButtonControl)
+  private
+    FAllowGrayed : Boolean;
+    FState       : TCheckBoxState;
+    FIntNumGlyphs, //internal number of glyphs, JH March 2002
+    FNumGlyphs   : Byte;
+    procedure SetBool(index : integer;aValue : Boolean);
+    procedure SetNumGlyphs(aValue:Byte);
+    procedure SetState (aValue : TCheckBoxState);
+    procedure CMDialogChar(var Message: TCMDialogChar); message CM_DIALOGCHAR;
+    procedure WMKeyDown(var Message: TWMKeyDown); message WM_KEYDOWN;
+
+    function GetNumGlyphs: Byte; //JH March 2002
+  protected
+    procedure DoFlatChanged; override;
+    procedure CreateStandardGlyph;override;
+    function GetChecked:Boolean;override;
+    procedure SetChecked(aValue:Boolean);override;
+    procedure Click; override;
+    procedure DoEnter; override;
+    procedure CreateGlyph; override;
+    function GetGlyphNumber : Integer;
+    procedure DrawFace (aCanvas: TCanvas; const aString:String;
+                    Effects:TLMD3DCaption;
+                    aDest: TRect; srcCanvas: TCanvas; var srcRect:TRect;
+                    aMaskCanvas: TCanvas; TransColor:TColor;
+                    aLayout: TLMDGlyphTextLayout; MultiLine, Accel,
+                    Transparent:Boolean; ExtFlags:TLMDDrawTextStyles;
+                    flags:LongInt); override;
+    function DrawItem(target:TCanvas; toDraw:Boolean; flag:Byte):TRect;override;
+    procedure DrawGlyph(Target:TCanvas=nil); override;
+    procedure GetIMLChange(Sender:TObject);override;
+    function GetFieldState:TCheckBoxState; virtual;
+    procedure Toggle; virtual;
+    property State:TCheckBoxState read FState write SetState default cbUnchecked;
+  public
+    property Checked:Boolean read GetChecked write SetChecked default false;
+    constructor Create(aOwner : TComponent); override;
+    destructor Destroy; override;
+  published
+    property About;
+    property AllowGrayed:Boolean index 1 read FAllowGrayed write SetBool default false;
+    property Alignment;
+    property AutoSize;
+    property Caption;
+    property Color;
+    property Ctl3D;
+    property Cursor;
+    property DragCursor;
+    property DragMode;
+    property Enabled;
+    property Flat;
+    property FocusColor;
+    property FocusStyle;
+    property Font;
+    property Font3D;
+    property GlyphTransparent;
+    property GlyphTransparentColor;
+    property GlyphFlat;
+    property GlyphNumber:Byte read FNumGlyphs write SetNumGlyphs default 3;
+    property GlyphSize default 13;
+    property Height;
+    property HelpContext;
+    property Hint;
+    property ImageList;
+    property ImageIndex;
+    property Left;
+    property ListIndex;
+    property ParentColor;
+    property ParentCtl3D;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ReadOnly;
+    property ShowHint;
+    property TabOrder;
+    property TabStop default True;
+    property Tag;
+    property Top;
+    property Transparent;
+    property UseBitmap;
+    property UseFocusColor;
+    property Visible;
+    property Width;
+
+    property OnClick;
+    property OnChange;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDrag;
+    property OnMouseEnter;
+    property OnMouseExit;
+
+    {4.0}
+    //properties
+    property Action;
+    property Anchors;
+    property BiDiMode;
+    property DragKind;
+    property Constraints;
+    property ParentBiDiMode;
+    //events
+    property OnEndDock;
+    property OnStartDock;
+  end;
+
+implementation

@@ -1,0 +1,209 @@
+
+uses
+  Windows,
+  Messages,
+  Classes,
+  Graphics,
+  Controls,
+  StdCtrls,
+  LMDClass,
+  LMDGraph,
+  LMDFillObject,
+  LMDCustomPanel;
+
+type
+
+  {---------------------------- TLMDCustomTrackBar ----------------------------}
+  TLMDThumbStyle = (tsStandard, tsCustom);
+  TLMDTickStyle=(tsAuto, tsOwnerDraw, tsNone);
+  TLMDTickMarks=(tmBoth, tmBottomRight, tmTopLeft);
+  TLMDDrawTickEvent=procedure(Sender:TObject;aCanvas:TCanvas;aValue:Integer;
+                              pos:TPoint) of object;
+  TLMDTrackBarFocusStyle=(tbFocus, tbInvisibleFocus, tbNoFocus);
+
+  TLMDCustomTrackBar = class(TLMDCustomPanel)
+  private
+    FMax,
+    FMin,
+    FLineSize,
+    FPageSize,
+    FPosition,
+    FTickLength,
+    FMargin           : Integer;
+    FTimerId          : TLMDTimer;   {ident for global timer}
+    FOrientation      : TLMDOrientation;
+    FTickStyle        : TLMDTickStyle;
+    FTickMarks        : TLMDTickMarks;
+    FTickGap          : Integer;
+    FFocusColor,
+    FTickColor        : TColor;
+    FTrackTransparent,
+    FUseFocusColor    : Boolean;
+    FDirection        : Byte;
+    FFocusStyle       : TLMDTrackBarFocusStyle;
+
+    {track manipulation}
+    FTrackBorderStyle : TLMDBorderStyle;
+    FTrackBorder      : Integer;
+    FTrackColor,
+    FThumbColor       : TColor;
+    FTrackWidth       : Integer;
+    FTrackRect,
+    FBRect,
+    FCRect            : TRect;
+    FThumbStyle       : TLMDThumbStyle;
+    FThumb            : TBitmap;
+    FTrackFillObject  : TLMDFillObject;
+
+    {internal}
+    FSliding          : Boolean;
+    FThumbHeight,
+    FThumbWidth,
+    fh,
+    fmyw,
+    fmyh              : Integer;
+    FBack             : TBitmap;
+
+    FMousePos         : TPoint;
+
+    FOnChange         : TNotifyEvent;
+    FOnDrawTick       : TLMDDrawTickEvent;
+    FOnTrack          : TScrollEvent;
+    FUseGlobalTimer: Boolean;
+
+    procedure SetColor(Index:Integer; aValue:TColor);
+    procedure SetInteger(Index, aValue:Integer);
+    procedure SetOrientation(aValue:TLMDOrientation);
+    procedure SetPosition(aValue:Integer);
+    procedure SetThumb(aValue:TBitmap);
+    procedure SetThumbStyle(aValue:TLMDThumbStyle);
+    procedure SetTickMarks(aValue:TLMDTickMarks);
+    procedure SetTickStyle(aValue:TLMDTickStyle);
+    procedure SetTrackBorderStyle(aValue:TLMDBorderStyle);
+    procedure SetUseFocusColor(aValue:Boolean);
+    procedure SetFillObject (aValue : TLMDFillObject);
+    procedure SetBoolean (aValue : Boolean);
+    function GetThumb:TBitmap;
+    function IsCustom:Boolean;
+    procedure TimerExpired(Sender:TObject);
+    procedure WMGetDlgCode(var Msg:TWMGetDlgCode ); message WM_GetDlgCode;
+    procedure CMEnabledChanged(var Msg:TMessage); message CM_EnabledChanged;
+    procedure WMSetFocus (var Message: TMessage); message WM_SETFOCUS;
+    procedure WMKillFocus (var Message: TMessage); message WM_KILLFOCUS;
+    procedure SetUseGlobalTimer(const Value: Boolean);
+  protected
+    procedure CreateThumb;
+    procedure Change; dynamic;
+    procedure DoEnter; override;
+    procedure DoExit; override;
+    procedure DoThemeChanged; override;
+    function DoMouseWheelDown(Shift: TShiftState; MousePos: TPoint): Boolean; override;
+    function DoMouseWheelUp(Shift: TShiftState; MousePos: TPoint): Boolean; override;
+    procedure RestoreThumbBack;
+    procedure DrawFocus(aRect:TRect);
+    procedure DrawThumb(fpos:integer);
+    procedure DrawTicks;
+    procedure DoDrawTick(aCanvas:TCanvas;aValue:Integer;pos:TPoint); dynamic;
+    procedure GetChange(Sender:TObject);override;
+    procedure GetIMLChange(Sender:TObject);override;
+    function GetPosition:Integer;virtual;
+    function ControlSupportsXP: Boolean; override;
+    procedure KeyDown(var Key: Word; Shift: TShiftState); override;
+    procedure Loaded; override;
+    procedure MouseDown(Button:TMouseButton;Shift:TShiftState; x,y:Integer);override;
+    procedure MouseMove(Shift:TShiftState; x,y:Integer);override;
+    procedure MouseUp(Button:TMouseButton;Shift:TShiftState;X,Y:Integer);override;
+    procedure PaintPos(aValue:Integer);
+    procedure Paint; override;
+  public
+    constructor Create(AOwner:TComponent);override;
+    procedure Init;
+    destructor Destroy; override;
+    procedure Assign (Source : TPersistent); override;
+    function IsTransparentSet:Boolean; override;
+    property Position:Integer read FPosition write SetPosition;
+  published
+    property FocusColor:TColor index 3 read FFocusColor write SetColor default clGray;
+    property FocusStyle : TLMDTrackBarFocusStyle read FFocusStyle write FFocusStyle default tbFocus;
+    property UseFocusColor:Boolean read FUseFocusColor write SetUseFocusColor default false;
+    property MaxValue:Integer index 0 read FMax write SetInteger default 10;
+    property MinValue:Integer index 1 read FMin write SetInteger default 0;
+    property Margin:Integer index 7 read FMargin write SetInteger default 1;
+    property LineSize:Integer index 2 read FLineSize write SetInteger default 1;
+    property PageSize:Integer index 3 read FPageSize write SetInteger default 2;
+    property Orientation:TLMDOrientation read FOrientation write SetOrientation default toHorizontal;
+
+    property Thumb:TBitmap read GetThumb write SetThumb stored IsCustom;
+    property ThumbColor:TColor index 0 read FThumbColor write SetColor default clbtnface;
+    property ThumbStyle:TLMDThumbStyle read FThumbStyle write SetThumbStyle default tsStandard;
+    property TickColor:TColor index 2 read FTickColor write SetColor default clBlack;
+    property TickGap:Integer index 8 read FTickGap write SetInteger default -1;
+    property TickLength:Integer index 6 read FTickLength write SetInteger default 6;
+    property TickMarks:TLMDTickMarks read FTickMarks write SetTickMarks default tmBottomRight;
+    property TickStyle:TLMDTickStyle read FTickStyle write SetTickStyle default tsAuto;
+    property TrackBorderStyle:TLMDBorderStyle read FTrackBorderStyle write SetTrackBorderStyle default lsLoweredExt;
+    property TrackBorder:Integer index 4 read FTrackBorder write SetInteger default 0;
+    property TrackColor:TColor index 1 read FTrackColor write SetColor default clWhite;
+    property TrackWidth:Integer index 5 read FTrackWidth write SetInteger default 10;
+    property TrackFillObject : TLMDFillObject read FTrackFillObject write SetFillObject;
+    property TrackTransparent : Boolean read FTrackTransparent write SetBoolean default false;
+    property OnChange:TNotifyEvent read FOnChange write FOnChange;
+    property OnDrawTick:TLMDDrawTickEvent read FOnDrawTick write FOnDrawTick;
+    property OnTrack:TScrollEvent read FOnTrack write FOnTrack;
+
+    property About;
+    {inherited properties}
+    property Align;
+    {$IFNDEF LMDTOOLS_SPECIALEDITION}
+      property BackFX;
+    {$ENDIF}
+    property Color;
+    property CtlXP default false;
+    property DragCursor;
+    property DragMode;
+    property Enabled;
+    property Font;
+    property ImageList;
+    property ImageIndex;
+    property ListIndex;
+
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    property Transparent;
+
+    // 7.0
+    property UseGlobalTimer:Boolean read FUseGlobalTimer write SetUseGlobalTimer default false;
+    // ---
+
+    property Visible;
+
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnMouseWheel;
+    property OnStartDrag;
+
+    {4.0}
+    //properties
+    property Anchors;
+    property DragKind;
+    property Constraints;
+    //events
+    property OnEndDock;
+    property OnStartDock;
+    property OnMouseWheelDown;
+    Property OnMouseWheelUp;
+  end;
+
+
+implementation

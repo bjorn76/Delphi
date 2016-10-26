@@ -1,0 +1,99 @@
+
+uses
+  Classes,
+  Controls,
+  Messages,
+  LMDCustomButtonGroup;
+
+type
+  {------------------------- TLMDRadioGroup ----------------------------------}
+  TLMDCustomRadioGroup = class(TLMDCustomButtonGroup)
+  private
+    procedure SetItemIndex(aValue: LongInt);
+    procedure CMDialogChar(var Message: TCMDialogChar); message CM_DIALOGCHAR;
+    procedure WMSetFocus (var Message: TMessage); message WM_SETFOCUS;
+  protected
+    procedure SetButtonCount(aValue: Integer); override;
+    procedure UpdateButtons; override;
+    procedure UpdateItemIndex;
+  public
+    constructor Create(AOwner: TComponent); override;
+    property ItemIndex: LongInt read FResult write SetItemIndex default -1;
+  published
+    property About;
+    property Align;
+    property Alignment;
+    property Bevel;
+    property BtnAlignment;    
+    property Caption;
+    property CaptionFont;
+    property CaptionFont3D;
+    property CaptionOffset;
+    property CaptionParentFont;
+    property Color;
+    property Columns;
+    property DragCursor;
+    property DragMode;
+    property Enabled;
+    property FlatGlyphs;    
+    property FocusStyle;
+    property FocusColor;
+    property UseFocusColor;
+    property Font;
+    property Font3D;
+    property GlyphImageList;
+    property GlyphImageIndex;
+    property GlyphListIndex;
+    property GlyphFlat;
+    property GlyphSize default 13;
+    property GlyphTransparent default True;
+    property GlyphTransparentColor;
+    property HelpContextBtn;
+    property ImageList;
+    property ImageIndex;
+    property Items;
+    property ItemHeight;
+    property ItemOffset;
+    property ListIndex;
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ReadOnly;
+    property ShowAccelChar;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    property Transparent;
+    property UseBitmap;
+    property Visible;
+
+    property OnChange;
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnResize;
+    property OnStartDrag;
+
+    // V4 enhancements
+    property Anchors;
+    property AutoSize;
+    property Constraints;
+    property DragKind;
+    property BiDiMode;
+    property ParentBiDiMode;
+    property OnEndDock;
+    property OnStartDock;
+  end;
+
+implementation

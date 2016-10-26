@@ -1,0 +1,70 @@
+
+uses
+  Windows, Classes, Graphics,
+  LMDObject, lmdgraph, lmdcont, lmdutils,
+  LMDCustomControl,
+  LMDCustomImageList;
+
+type
+  TLMDCaretStyles = (csDefault, csBlock, csUnder, csOver, csBitmap, csUnderBlock);
+
+  TLMDCaretBitmap = (cbBmpSize, cbTile, cbStretch);
+
+  TLMDCaret = class(TLMDObject)
+  private
+    FPos           : TPoint;
+    FHBmp,
+    FBitmap        : Graphics.TBitmap;
+    FImageList     : TLMDCustomImageList;
+    FFontHeight,
+    FOldBlinkRate,
+    FWidth,
+    FHeight,
+    FImageIndex,
+    FListIndex,
+    FBlinkRate     : Word;
+    FStyle         : TLMDCaretStyles;
+    FOwner         : TLMDCustomControl;
+    FCanEnable,
+    FCreated,
+    FEnabled       : Boolean;
+    FCaretBmp      : TLMDCaretBitmap;
+    function GetPos(Index:Integer):Integer;
+    procedure SetPos (Index, aValue : Integer);
+    procedure SetStyle (aValue : TLMDCaretStyles);
+    procedure SetWord (Index : Integer; aValue : Word);
+    procedure SetImageList (aValue : TLMDCustomImageList);
+    procedure SetBitmap (aValue:Graphics.TBitmap);
+  public
+    //CreateExt instead of Create (to make the comiler happy ...)
+    constructor CreateExt (Owner : TLMDCustomControl);
+    procedure BuildCaret;
+    procedure DestroyCaret;
+    destructor Destroy; override;
+    procedure Assign (Source : TPersistent); override;
+    procedure GetIMLChange (Sender : TObject);
+    procedure Enable;
+    procedure Disable;
+
+    procedure SetCaretPos (X, Y: Integer);
+
+    property FontHeight : Word index 4 read FFontHeight write SetWord;
+    property Enabled : Boolean read FEnabled default false;
+    property CanEnable: Boolean read FCanEnable write FCanEnable default true;
+    //RM
+    property Row:Integer index 0 read GetPos write SetPos;
+    property Col:Integer index 1 read GetPos write SetPos;
+    //---
+  published
+    property BlinkRate : Word read FBlinkRate write FBlinkRate;
+    property Style : TLMDCaretStyles read FStyle write SetStyle default csDefault;
+    property Width : Word index 0 read FWidth write SetWord default 2;
+    property Height : Word index 1 read FHeight write SetWord default 10;
+    property ImageList : TLMDCustomImageList read FImageList write SetImageList;
+    property ImageIndex : Word index 2 read FImageIndex write SetWord default 0;
+    property ListIndex : Word index 3 read FListIndex write SetWord default 0;
+    property CaretBmpMode : TLMDCaretBitmap read FCaretBmp write FCaretBmp default cbBmpSize;
+    property Bitmap : Graphics.TBitmap read FBitmap write SetBitmap;
+  end;
+
+implementation

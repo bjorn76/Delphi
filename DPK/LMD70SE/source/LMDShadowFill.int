@@ -1,0 +1,40 @@
+
+uses
+  Classes,
+  Windows,
+  Graphics,
+  LMDGraphicControl;
+
+type
+  {------------------------- TLMDShadowFill -----------------------------------}
+  TLMDShadowFillStyle=(sfNone, sfShadow, sfFullShadow);
+
+  TLMDShadowFill=class(TLMDGraphicControl)
+  private
+    FShadowColor:TColor;
+    FBrushBitmap:TBitmap;
+    FFillMode:TLMDShadowFillStyle;
+    procedure SetColor(aColor:TColor);
+    procedure SetShadowMode(aValue:TLMDShadowFillStyle);
+  protected
+    function GetEmpty:Boolean;override;
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy; override;
+    procedure Paint;override;
+  published
+    property About;
+    property Align;
+    property Bevel;
+    property ParentShowHint;
+    property ShadowColor:TColor read FShadowColor write SetColor default clBlack;
+    property ShowHint;
+    property Style:TLMDShadowFillStyle read FFillMode write SetShadowMode default sfShadow;
+    property Visible;
+
+    property Anchors;
+    property Constraints;
+  end;
+
+
+implementation

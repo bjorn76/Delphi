@@ -1,0 +1,70 @@
+
+uses
+  Windows,
+  Classes,
+  Controls,
+  Graphics,
+  Messages,
+  StdCtrls,
+  LMDFontComboBox,
+  LMDCustomImageListBox;
+
+type
+  TLMDFontListExampleAlign = (eaListRightTop, eaMousePos, eaRow);
+
+  TLMDFontListBox = class (TLMDCustomDerivedImageListBox)
+  private
+    FOptions         : TLMDFontCBOptions;
+    FBuffer          : TBitmap;
+    FShowExample     : Boolean;
+    FHintWnd         : THintWindow;
+    FLastExample,
+    FExampleFontSize : Integer;
+    FExampleText     : String;
+    FExampleAlign    : TLMDFontListExampleAlign;
+    FMousePos        : TPoint;
+    FSizeChange      : TNotifyEvent;
+    procedure SetOptions(aValue:TLMDFontCBOptions);
+    procedure SetSelectedFont(const aValue:TFontName);
+    function GetSelectedFont: TFontName;
+
+    procedure WMMOUSEMOVE (var Msg : TWMMouse); message WM_MOUSEMOVE;
+    procedure WMCAPTURECHANGED (var Msg : TMessage); message WM_CAPTURECHANGED;
+    procedure CMMouseLeave (var Msg : TMessage); message CM_MOUSELEAVE;
+    procedure CMFontChange(var Message: TMessage); message CM_FONTCHANGE;    
+  protected
+    procedure DrawItem(Index: Integer; Rect: TRect; State: TOwnerDrawState); override;
+    procedure ShowExampleFor (i : Integer);
+    procedure DoSelect; override;
+
+    {for TLMDFontSizeControls}
+    property OnFontChange:TNotifyEvent read FSizeChange write FSizeChange;
+  public
+    procedure CreateFontList;
+    constructor Create (aOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Loaded; override;
+    // 7.0
+    procedure Init;
+    // ---
+    property SelectedFont:TFontName read GetSelectedFont write SetSelectedFont;
+  published
+    property Options:TLMDFontCBOptions read FOptions write SetOptions
+                     default [foScreenFonts, foDisplaySymbol];
+    property ExampleText : String read FExampleText write FExampleText;
+    property ExampleFontSize : Integer read FExampleFontSize write FExampleFontSize default 12;
+    property ExampleAlign    : TLMDFontListExampleAlign read FExampleAlign write FExampleAlign default eaListRightTop;
+    property ShowExample : Boolean read FShowExample write FShowExample default false;
+  end;
+
+  TLMDLabeledFontListBox = class(TLMDFontListBox)
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property LabelPosition;
+    property LabelSpacing;
+    property LabelSync;
+    property EditLabel;
+  end;
+
+implementation

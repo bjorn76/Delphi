@@ -1,0 +1,19 @@
+
+uses
+  Classes,
+  LMDCustomColorListBox;
+
+type
+  TLMDColorListBox = class (TLMDCustomColorListBox)
+  end;
+
+  TLMDLabeledColorListBox = class(TLMDColorListBox)
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property LabelPosition;
+    property LabelSpacing;
+    property LabelSync;
+    property EditLabel;
+  end;
+implementation

@@ -1,0 +1,113 @@
+
+uses
+  Graphics,
+  Classes,
+  Controls,
+  actnlist,
+  LMDGraph,
+  LMD3DCaption,
+  LMDBaseLabel;
+
+type
+  TLMDJumpModes = (jmInternet, jmApplication, jmNone, jmCustom);
+
+  {-------------------TLMDCustomSimpleLabel------------------------------------}
+  TLMDCustomSimpleLabel=class(TLMDBaseLabel)
+  private
+    FFont3D       : TLMD3DCaption;
+    FJump         : String;
+    FActiveColor,
+    FInActiveColor: TColor;
+    FUseAsJump,
+    FJumpUnderline: Boolean;
+    FJumpMode     : TLMDJumpModes;
+    FCounter      : LongInt;
+    procedure SetColor(Index:Integer; aValue:TColor);
+    procedure SetFont3D(aValue:TLMD3DCaption);
+    procedure SetJumpUnderLine(aValue:Boolean);
+    procedure ReadBoolean(Reader:TReader);
+    procedure SetJumpMode(aValue : TLMDJumpModes);
+    function GetCounter : Longint;
+  protected
+    procedure ActionChange(Sender: TObject; CheckDefaults: Boolean);override;
+    procedure Click; override;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    Procedure Paint;Override;
+
+    procedure Loaded; override;
+
+    property Caption;
+    property ActiveColor:TColor index 0 read FActiveColor write SetColor default clPurple;
+    property Jump:String read FJump write FJump;
+    property InActiveColor:TColor index 1 read FInActiveColor write SetColor default clBlue;
+    property JumpUnderline:Boolean read FJumpUnderLine write SetJumpUnderLine default True;
+    property JumpMode : TLMDJumpModes read FJumpMode write SetJumpMode default jmNone;
+
+    procedure DefineProperties(Filer:TFiler);override;
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+    procedure CorrectBounds;override;    
+    procedure ResetCounter;
+    // 5.0
+    procedure Execute;
+
+    property Counter:LongInt read GetCounter;
+
+  published
+    property Alignment;
+    property AutoSize;
+    property Color;
+    property DragCursor;
+    property DragMode;
+    property Enabled;
+    property FocusControl;
+    property Font;
+    property Font3D:TLMD3DCaption read FFont3D write SetFont3d;
+    property MultiLine;
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowAccelChar;
+    property ShowHint;
+    property Transparent;
+    property Twinkle;
+    property TwinkleColor;
+    property TwinkleVisible;
+    property TwinkleInVisible;
+
+    // 7.0
+    property UseGlobalTimer;
+    // ---
+    property Visible;
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnMouseDown;
+    {3.0}
+    property OnMouseEnter;
+    property OnMouseExit;
+    {---}
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDrag;
+
+    {4.0}
+    //properties
+    property Anchors;
+    property BiDiMode;
+    property DragKind;
+    property Constraints;
+    property ParentBiDiMode;
+    //events
+    property OnEndDock;
+    property OnStartDock;
+
+  end;
+
+
+implementation

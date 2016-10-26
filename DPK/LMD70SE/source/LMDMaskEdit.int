@@ -1,0 +1,55 @@
+
+uses
+  Classes,
+  LMDCustomMaskEdit;
+
+type
+  TLMDMaskEdit = class (TLMDCustomMaskEdit)
+  published
+    property About;
+    property Alignment;
+    property AutoSelect;
+    property Bevel;
+    property BlankChar;
+    property Caret;
+    property CharCase;
+    property CurrencySettings;
+    property CustomButtons;
+    property CustomButtonsStyle;
+    property CustomButtonWidth;
+    property CustomButtonParentCtlXP;
+    property DateSettings;
+    property Decimals;
+    property Flat;
+    property FocusOnMouseAbove;
+    property Font;
+    property Font3D;
+    property ImageIndex;
+    property ImageList;
+    property ListIndex;
+    property Mask;
+    property MaskType;
+    property MaxLength;
+    property NumberBase;
+    property OEMConvert;
+    property ReadOnly;
+    property Suffix;
+    property TabOnEnter;
+    property Text;
+    property Transparent;
+
+    property OnBtnClick;
+    property OnUserRule;
+  end;
+
+  TLMDLabeledMaskEdit = class(TLMDMaskEdit)
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property LabelPosition;
+    property LabelSpacing;
+    property LabelSync;
+    property EditLabel;
+  end;
+
+implementation

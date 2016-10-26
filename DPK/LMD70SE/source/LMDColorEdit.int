@@ -1,0 +1,53 @@
+
+uses
+  Classes,
+  Graphics,
+  Dialogs,
+  LMDCustomBrowseEdit;
+
+type
+  { ----------------------- TLMDColorEdit ------------------------------------ }
+  TLMDColorEditPaint = (ceText, ceColoredText, ceTextColor, ceColorText, ceColor);
+
+  TLMDColorEdit = class(TLMDCustomBrowseEdit)
+  private
+    FOptions      : TColorDialogOptions;
+    FCustomColors : TStrings;
+    FPaint        : TLMDColorEditPaint;
+    FColorBarHeight,
+    FColorBarWidth: Integer;
+
+    procedure SetCustomColors (aValue : TStrings);
+    procedure SetPaintStyle (aValue : TLMDColorEditPaint);
+    procedure SetInteger (index : Integer; aValue : Integer);
+    function GetSelColor : TColor;
+    procedure SetColor(aValue : TColor);
+  protected
+    procedure DoBrowse; override;
+    procedure GetXPBevelParams (var aClassName: WideString; var aPartId, aStateId : Integer); override;    
+    procedure DrawText(from : Integer); override;
+  public
+    constructor Create (aOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure ModifyTextRect; override;
+
+  published
+    property Options : TColorDialogOptions read FOptions write FOptions;
+    property CustomColors : TStrings read FCustomColors write SetCustomColors;
+    property ColorBarWidth : Integer index 0 read FColorBarWidth write SetInteger default 30;
+    property ColorBarHeight : Integer index 1 read FColorBarHeight write SetInteger default -1;
+    property PaintStyle : TLMDColorEditPaint read FPaint write SetPaintStyle default ceText;
+    property SelectedColor : TColor read GetSelColor write SetColor;
+  end;
+
+  TLMDLabeledColorEdit = class(TLMDColorEdit)
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property LabelPosition;
+    property LabelSpacing;
+    property LabelSync;
+    property EditLabel;
+  end;
+
+implementation

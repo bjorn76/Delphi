@@ -1,0 +1,55 @@
+
+uses
+  Windows,
+  Messages,
+  Classes,
+  Controls,
+  LMDBase,
+  LMDCustomPanel,
+  LMDBevel,
+  LMDGraph;
+
+type
+  {-------------------TLMDCustomBevelPanel-------------------------------------}
+  TLMDCustomBevelPanel=class(TLMDCustomPanel)
+  private
+    FNoHandleUpdate:Boolean;
+    procedure SetBevel(aValue:TLMDBevel);
+    procedure CMCtl3DChanged(var Message: TMessage); message CM_CTL3DCHANGED;
+    procedure CMLMDBevelChanged(var Message:TMessage);message CM_LMDBEVELCHANGED;
+  protected
+    FBevel : TLMDBevel;
+    function GetSizeRect:TRect;override;
+
+    procedure DoThemeChanged; override;
+    procedure MouseEnter; override;
+    procedure MouseExit; override;
+    procedure DoEnter; override;
+    procedure DoExit; override;
+
+    procedure RestoreBorderBack; override;
+    procedure RestoreBorderFront; override;
+    procedure AlignControls(AControl: TControl; var Rect: TRect);override;
+    procedure AdjustClientRect(var Rect: TRect);override;
+    function ControlSupportsXP: Boolean;override;
+    function BevelExt:Integer;
+
+    procedure CreateParams(var Params:TCreateParams);override;
+    function DblBevelExt:Integer;
+    function BeveledRect:TRect;
+    procedure GetChange(Sender:TObject);override;
+    function GetEmpty:Boolean;override;
+    procedure Paint;override;
+
+    property Bevel:TLMDBevel read FBevel write SetBevel;
+    //property CtlXP default false;
+    property NoHandleUpdate:Boolean read FNoHandleUpdate write FNoHandleUpdate default false;
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+
+    function GetBevel:TLMDBevel; override;
+  end;
+
+
+implementation

@@ -1,0 +1,37 @@
+
+uses
+  Classes,
+  LMDGraph,
+  LMDObject;
+
+type
+  {----------------------TLMDGlyphTextLayout---------------------------------}
+  TLMDGlyphTextLayout=class(TLMDObject)
+  private
+    FAlignText2Glyph: TLMDTextArrange;
+    FOffsetX,
+    FOffsetY: Integer;
+    FSpacing: Integer;
+  protected
+    FAlignment: TLMDAlignment;  
+    procedure SetAlignment(aValue: TLMDAlignment);
+    procedure SetAlignText2Glyph(aValue: TLMDTextArrange);
+    procedure SetOffset(index: Integer; aValue: Integer);
+    procedure SetSpacing(aValue:Integer);
+  public
+    constructor Create;override;
+    procedure Assign(Source: TPersistent); override;
+    function GetSetStr : String; override;
+  published
+    //default value removed, JH March 2001, otherwise this value will not be stored
+    //in controls needing another default value!!
+    property Alignment: TLMDAlignment read FAlignment write SetAlignment{ default agTopLeft};
+    property AlignText2Glyph: TLMDTextArrange read FAlignText2Glyph
+                                              write SetAlignText2Glyph default taRight;
+    property OffsetX: Integer index 0 read FOffsetX write SetOffset default 0;
+    property OffsetY: Integer index 1 read FOffsetY write SetOffset default 0;
+    property Spacing: Integer read FSpacing write SetSpacing default 2;
+  end;
+
+
+implementation

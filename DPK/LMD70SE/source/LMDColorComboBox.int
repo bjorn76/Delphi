@@ -1,0 +1,8 @@
+
+uses
+  LMDCustomColorComboBox;
+
+type
+  TLMDColorComboBox = class(TLMDCustomColorComboBox);
+
+implementation

@@ -1,0 +1,99 @@
+
+uses
+  stdctrls, classes, controls, messages, windows, graphics, extctrls, sysutils,
+  LMDClass, LMDBase, LMDXPStyles;
+
+const
+  defHeight=16;
+  defBufferHeight=10;
+
+type
+  {------------------------- TLMDCustomComboBox -------------------------------}
+  TLMDCustomComboBox = class(TCustomComboBox)
+  private
+    FAbout       : TLMDAboutVar;
+    FTimerId     : TLMDTimer;
+
+    FOnSelect    : TNotifyEvent;
+    //FXP,    
+    FFocused,
+    FKeyed,
+    FSearch,
+    FMouseAbove,
+    FRepaint,
+    FFlat        : Boolean;
+    FWidth,
+    FTimerInterval: Integer;
+    FFocusCtrl   : TWinControl;
+
+    //
+    FMRUCount,
+    FMRUMax      : Integer;
+    FMRUList     : Boolean;
+
+    FOnEditClick : TNotifyEvent;
+    FUseGlobalTimer: Boolean;
+
+    procedure SetBoolean (index : Integer; aValue : Boolean);
+    procedure SetSearch (aValue : Boolean);
+    procedure SetInteger (index, aValue : Integer);
+//    procedure SetCtlXP (aValue: Boolean);
+
+    procedure CNCommand(var Message: TWMCommand); message CN_COMMAND;
+    procedure CMMouseEnter(var Message : TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Message : TMessage); message CM_MOUSELEAVE;
+    procedure WMPaint (var Msg : TWMPaint); message WM_PAINT;
+    procedure WMLButtonDown (var Msg : TWMLButtonDown); message WM_LBUTTONDOWN;
+    procedure WMThemeChanged (var Msg : TMessage); message WM_THEMECHANGED;
+
+    procedure CMEnter (var Message : TMessage); message CM_ENTER;
+    procedure CMExit (var Message : TMessage); message CM_EXIT;
+    procedure RepaintBorder;
+    procedure DoTimerEvent (Sender : TObject);
+    procedure CreateTimer;
+    procedure FreeTimer;
+    procedure ExitCtrl;
+    function GetTopParentHandleFocusCtrl : HWnd;
+  protected
+    procedure PaintSeparatorLine (aRect : TRect; index : Integer);
+    procedure Notification (AComponent: TComponent; Operation: TOperation); override;
+    procedure DrawItem(Index:Integer; Rect:TRect; State:TOwnerDrawState);override;
+    procedure MeasureItem(Index: Integer; var Height: Integer); override;
+    procedure DoSelect; virtual;
+    procedure ComboWndProc(var Message: TMessage; ComboWnd: HWnd; ComboProc: Pointer); override;
+    procedure MouseDown (Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure KeyDown (var Key: Word; Shift: TShiftState); override;
+    procedure Change; override;
+
+    //added May 02
+    function UseXP: Boolean;
+//    property CtlXP:Boolean read FXP write SetCtlXP default true;
+  public
+    constructor Create (aOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Loaded; override;
+
+    function isMRUItem (index : Integer) : Boolean;
+
+    property About:TLMDAboutVar read FAbout write FAbout stored false;
+    property Flat : Boolean index 0 read FFlat write SetBoolean default false;
+    property Search : Boolean read FSearch write SetSearch default false;
+    property FocusControl:TWinControl read FFocusCtrl write FFocusCtrl;
+    //4.01
+    property Interval : Integer read FTimerInterval write FTimerInterval default 1500;
+    property DropDownWidth : Integer index 0 read FWidth write SetInteger default 0;
+    //----
+
+    property MRUList : Boolean index 1 read FMRUList write SetBoolean default false;
+    property MRUMax : Integer index 1read FMRUMax write SetInteger default 5;
+
+    property OnSelect : TNotifyEvent read FOnSelect write FOnSelect;
+    property OnEditClick : TNotifyEvent read FOnEditClick write FOnEditClick;
+
+    // 7.0
+    property UseGlobalTimer:Boolean read FUseGlobalTimer write FUseGlobalTimer default false;
+    // ---
+  end;
+
+
+implementation

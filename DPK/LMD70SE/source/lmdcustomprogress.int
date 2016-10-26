@@ -1,0 +1,101 @@
+
+uses
+  Graphics, //TCanvas
+  Classes, //TComponent
+  Windows, //TRect
+  LMDGraph, //TLMDBorderStyle
+  LMDSmallBar,
+  LMDBaseMeter;
+
+type
+  TLMDProgressStyle=(pgBar, pgSmallBar, pgSmallBarColor, pgOwnerDraw, pgXPBar);
+  TLMDProgressPaintEvent=procedure(Sender:TObject; aCanvas:TCanvas; dest, notDest, aRect:TRect) of object;
+  TLMDProgressColorEvent=procedure(Sender:TObject; nr:Byte; var aColor:TColor) of object;
+
+  {-------------------------- TLMDProgress ------------------------------------}
+  TLMDCustomProgress = class(TLMDBaseMeter)
+  private
+    FBarColor:TColor;
+    FBar3D:TLMDBorderStyle;
+    FSmBar:TLMDSmallBar;
+    FStyle:TLMDProgressStyle;
+    FOnPaint:TLMDProgressPaintEvent;
+    FOnColor:TLMDProgressColorEvent;
+    procedure SetBarColor(aColor:TColor);
+    procedure SetBar3D(aValue:TLMDBorderStyle);
+    procedure SetSmBarOptions(aValue:TLMDSmallBar);
+    procedure SetStyle(aValue:TLMDProgressStyle);
+  protected
+    function ControlSupportsXP: Boolean;override;
+    function CorrectBounds:Boolean;override;
+    procedure DrawBar(aCanvas:TCanvas; dest, notDest, aRect:TRect);override;
+    procedure GetChange(Sender:TObject);override;
+  public
+    constructor Create(AOwner:TComponent);override;
+    destructor Destroy;override;
+  published
+    property About;
+    property Align;
+    property Alignment;
+    property BarColor:TColor read FBarColor write SetBarColor default clNavy;
+    property Bar3D:TLMDBorderStyle read FBar3D write SetBar3D default lsNone;
+    property Bevel;
+    property CtlXP;
+    property Delta;
+    property Color;
+    property Caption;
+    property Direction;
+    property DragCursor;
+    property DragMode;
+    property Enabled;
+    property Font;
+    property Font3D;
+    property MaxValue;
+    property MinValue;
+    property OptionsText;
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property SmallBar:TLMDSmallBar read FSmBar write SetSmBarOptions;
+    property Style:TLMDProgressStyle read FStyle write SetStyle default pgSmallBar;
+    property UseFontColor;
+    property Visible;
+
+    {Events}
+    property OnGetColor:TLMDProgressColorEvent read FOnColor write FOnColor;
+    property OnPaint:TLMDProgressPaintEvent read FOnPaint write FOnPaint;
+
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    {3.0}
+    property OnMouseEnter;
+    property OnMouseExit;
+    {---}
+    property OnStartDrag;
+
+    {4.0}
+    //properties
+    property Anchors;
+
+    property BiDiMode;
+
+    property DragKind;
+    property Constraints;
+
+    property ParentBiDiMode;
+    //events
+    property OnEndDock;
+    property OnStartDock;
+
+  end;
+
+
+implementation

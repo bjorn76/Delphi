@@ -1,0 +1,64 @@
+
+uses
+  Classes,
+  Windows,
+  Graphics,
+  LMDGraph,
+  LMDSimpleBevel,
+  LMDShadow,
+  LMDObject,
+  LMDPointList,
+  LMDTeeth;
+
+  // Moved from LMDGrapA   {for shapes}
+
+type
+  PPoints = ^TPoints;
+  TPoints = array [0..110] of TPoint;
+
+  TLMDShapeType=(stEllipse,stRectangle,stRoundRect,stDirectUp,stDirectRight,
+                 stDirectDown,stDirectLeft,stDiamond,stComb,stOctagon,stStar);
+
+  TLMDShape = class(TLMDObject)
+    private
+      FBevel: TLMDSimpleBevel;
+      FBrush: TBrush;
+      FRoundPercent: TLMDPercent;
+      FShadow: TLMDShadow;
+      FShape: TLMDShapeType;
+      FSquare: Boolean;
+
+      procedure SetBevel(aValue: TLMDSimpleBevel);
+      procedure SetBrush(aValue: TBrush);
+      procedure SetRoundPercent(aValue: TLMDPercent);
+      procedure SetShadow(aValue: TLMDShadow);
+      procedure SetShape(aValue: TLMDShapeType);
+      procedure SetSquare(aValue: Boolean);
+    public
+      constructor Create;override;
+      destructor Destroy;override;
+    published
+      property Bevel: TLMDSimpleBevel read FBevel write SetBevel;
+      property Brush: TBrush read FBrush write SetBrush;
+      property RoundPercent: TLMDPercent read FRoundPercent write SetRoundPercent default 33;
+      property Shadow: TLMDShadow read FShadow write SetShadow;
+      property Shape: TLMDShapeType read FShape write SetShape default stRectangle;
+      property Square: Boolean read FSquare write SetSquare default False;
+  end;
+
+ procedure LMDShapeCalc(aRect: TRect;aShape: TLMDShapeType; aTeeth: TLMDTeeth;
+                       Square:Boolean; aBrush:TBrush; aRoundPercent: TLMDPercent;
+                       aBevel: TLMDSimpleBevel; aShadow: TLMDShadow;
+                       aList: TLMDPointList);
+
+  procedure LMDShapeDraw(aRect: TRect; aCanvas:TCanvas;
+                         aShape: TLMDShapeType; aTeeth: TLMDTeeth;
+                         aList: TLMDPointList; Square:Boolean;
+                         aBrush:TBrush; aRoundPercent: TLMDPercent;
+                         aBevel: TLMDSimpleBevel; aShadow: TLMDShadow;
+                         aBitmap: TBitmap; TransCol,BrushBackCol: TColor;
+                         flags: word);
+  procedure LMDOffsetPointArray(var anArray: array of TPoint; Count,Offsx,Offsy: integer);
+  procedure LMDOffsetPointList(aList: TLMDPointList; Offsx,Offsy: integer);
+
+implementation
